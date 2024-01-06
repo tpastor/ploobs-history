@@ -1,0 +1,1264 @@
+
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>Ploobs &#8211; Game Dev Blog</title>
+	<atom:link href="http://ploobs.com.br/feed/" rel="self" type="application/rss+xml" />
+	<link>http://ploobs.com.br</link>
+	<description>Game Development Blog</description>
+	<lastBuildDate>Mon, 10 Sep 2018 20:34:37 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>hourly</sy:updatePeriod>
+	<sy:updateFrequency>1</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=4.9.9</generator>
+	<item>
+		<title>Creating System Spawners to populate Level</title>
+		<link>http://ploobs.com.br/2018/09/10/creating-system-spawners-to-populate-level/</link>
+		<comments>http://ploobs.com.br/2018/09/10/creating-system-spawners-to-populate-level/#respond</comments>
+		<pubDate>Mon, 10 Sep 2018 02:45:01 +0000</pubDate>
+		<dc:creator><![CDATA[ploobs]]></dc:creator>
+				<category><![CDATA[Programming]]></category>
+		<category><![CDATA[PlantJumper]]></category>
+		<category><![CDATA[Procedural]]></category>
+
+		<guid isPermaLink="false">http://ploobs.com.br/?p=138</guid>
+		<description><![CDATA[While building the level of the game Plant Jumper i´ve been building, at first i decided to build an amount]]></description>
+				<content:encoded><![CDATA[<p>While building the level of the game Plant Jumper i´ve been building, at first i decided to build an amount of items and then add another row of blocks, removing the very old ones.<br/>This approach after a bunch of hours trying to understand how to create a simple and optimized solution led me to learn a little bit of the ECS way of think.<br/>The first thing i decided to do it is to create a system able to create and remove itens in a coherent way, doing it every time the same way</p>
+
+<p>I started deciding that the Level must be an entity because it will  deal with informations about the quality of the level and how many rows we already created.</p>
+
+<pre class="wp-block-code"><code>public struct LevelState : IComponentData
+{
+    public float currentRow;
+    public float higherRow;
+
+    public float isDirty;
+}</code></pre>
+
+<p>This component will be responsible to create the level from the scratch</p>
+
+<p>In the Bootstrap, creates a entity with that component and set the currentRow = 0, hightRow wich defines the size of items we will pre create and isDirty that will be explained further</p>
+
+<pre class="wp-block-code"><code>SetComponentData(level, new LevelState
+        {
+            currentRow = 0,
+            higherRow = constants.maxRows,
+            isDirty = 0
+        });</code></pre>
+
+<h4>Remove old items system</h4>
+
+<pre class="wp-block-code"><code>
+using UnityEngine;
+using Unity.Entities;
+using Unity.Transforms;
+using Unity.Collections;
+
+using Unity.Rendering;
+
+using System.Collections;
+using System.Collections.Generic;
+using Unity.Jobs;
+
+using Unity.Mathematics;
+
+public class UpdateLevelSystem : ComponentSystem
+{
+    public struct PlayerData
+    {
+        public readonly int Length;
+        [ReadOnly] public ComponentDataArray&lt;Player> Player;
+        [ReadOnly] public ComponentDataArray&lt;Position> Position;
+    }
+
+    [Inject] private PlayerData m_PlayerData;
+
+    public struct ItemData
+    {
+        public readonly int Length;
+        public EntityArray Entities;
+        public ComponentDataArray&lt;Item> Item;
+        public ComponentDataArray&lt;Position> Position;
+    }
+    [Inject] private ItemData m_ItemData;
+
+    public struct LevelData
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;LevelState> LevelState;
+    }
+
+    [Inject] private LevelData m_LevelData;
+
+    protected override void OnUpdate()
+    {
+        for (int index = 0; index &lt; m_ItemData.Length; ++index)
+        {
+            if (m_PlayerData.Position[0].Value.y - m_ItemData.Position[index].Value.y > 50)
+            {
+                PostUpdateCommands.DestroyEntity(m_ItemData.Entities[index]);
+
+                LevelState state = m_LevelData.LevelState[0];
+
+                if (state.isDirty == 0 &amp;&amp; state.currentRow > 0)
+                {
+                    m_LevelData.LevelState[0] = new LevelState
+                    {
+                        currentRow = state.currentRow - 1,
+                        isDirty = 1,
+                        higherRow = state.higherRow
+                    };
+                }
+            }
+        }
+    }
+}
+</code></pre>
+
+<p>This system do two things</p>
+
+<ul><li>Removes the items with a distance greater than an amount, here defined as 50</li><li>Set the level component once per row as dirty and set the new currentrow. The is dirty is here to avoid the changing every block removed once it is in the same row as the previous one.</li></ul>
+
+<h4>Add new items system</h4>
+
+<p>As we defined the maximun rows we want, it is easy to create a system that mantain this amount of rows existing and if anything removes a row, creates a new one</p>
+
+<pre class="wp-block-code"><code>
+using UnityEngine;
+using Unity.Entities;
+using Unity.Transforms;
+using Unity.Collections;
+
+using Unity.Rendering;
+
+using System.Collections;
+using System.Collections.Generic;
+using Unity.Jobs;
+
+using Unity.Mathematics;
+
+public class SpawnItemsSystem : ComponentSystem
+{
+    public struct LevelData
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;LevelState> LevelState;
+    }
+
+    [Inject] private LevelData m_LevelData;
+
+    private void SetItemBaseComponent(LevelGenerator.Item item)
+    {
+        PostUpdateCommands.SetComponent(new Position { Value = item.position });
+        PostUpdateCommands.SetComponent(default(Item));
+    }
+
+    private void createBlock()
+    {
+        string entityName = "block";
+
+        PostUpdateCommands.CreateEntity(ArchetypeFactory.Instance.getArchetypeByName(entityName));
+
+        MeshInstanceRenderer renderer = EntityLookFactory.Instance.getLook(entityName);
+        PostUpdateCommands.SetComponent(EntityFactory.getColliderInfo(renderer));
+        PostUpdateCommands.SetSharedComponent(renderer);
+    }
+    private void createBreakeable()
+    {
+        GameObject GameConstantsObject = GameObject.Find("GameConstants");
+        GameConstants _constants = GameConstantsObject.GetComponent&lt;GameConstants>();
+
+        string entityName = "breakeable";
+        PostUpdateCommands.CreateEntity(ArchetypeFactory.Instance.getArchetypeByName(entityName));
+
+        PostUpdateCommands.SetComponent(new BreakComponent
+        {
+            coolDown = _constants.breakTimeInSeconds,
+            started = 0
+        });
+
+        MeshInstanceRenderer renderer = EntityLookFactory.Instance.getLook(entityName);
+        PostUpdateCommands.SetComponent(EntityFactory.getColliderInfo(renderer));
+        PostUpdateCommands.SetSharedComponent(renderer);
+    }
+
+    private void createZigZag()
+    {
+        GameObject GameConstantsObject = GameObject.Find("GameConstants");
+        GameConstants _constants = GameConstantsObject.GetComponent&lt;GameConstants>();
+
+        string entityName = "zigzag";
+
+        PostUpdateCommands.CreateEntity(ArchetypeFactory.Instance.getArchetypeByName(entityName));
+
+        PostUpdateCommands.SetComponent(new ZigZagMoveable
+        {
+            Amplitude = _constants.MoveableBlockAmplitude * _constants.blockSize,
+            Speed = _constants.MoveableBlockSpeed,
+            CurrentPosition = 0,
+            Direction = 1
+        });
+
+        MeshInstanceRenderer renderer = EntityLookFactory.Instance.getLook(entityName);
+        PostUpdateCommands.SetComponent(EntityFactory.getColliderInfo(renderer));
+        PostUpdateCommands.SetSharedComponent(renderer);
+    }
+
+
+    private void createEntity(LevelGenerator.Item item)
+    {
+        switch (item.itemProperty.entityName)
+        {
+            case "block":
+                createBlock();
+                break;
+            case "breakeable":
+                createBreakeable();
+                break;
+            case "zigzag":
+                createZigZag();
+                break;
+            default:
+                createBlock();
+                break;
+        }
+
+        SetItemBaseComponent(item);
+    }
+
+
+    protected override void OnUpdate()
+    {
+        LevelState state = m_LevelData.LevelState[0];
+
+        if (state.currentRow &lt; state.higherRow)
+        {
+            List&lt;LevelGenerator.Item> items = LevelGenerator.Instance.buildValidRow();
+            foreach (var item in items)
+            {
+                createEntity(item);
+            }
+
+            m_LevelData.LevelState[0] = new LevelState
+            {
+                currentRow = state.currentRow + 1,
+                isDirty = 0,
+                higherRow = state.higherRow
+            };
+        }
+    }
+}
+</code></pre>
+
+<p>This code here contains creators to every type o items in the game. I don´t think this is the best solution because i´ve already created the EntityFactory and i am here creating again the methods. I did it this way because we have two different interfaces to createentities and add components.<br/>Once we are at the creation time, the ECS uses the entityManager, but as we started runing the systems we cannot access it anymore, and in the runtime moment we have to use the PostUpdateCommands which has not the same inheritance of the entityManager, and so i cannot declare in my factory the interface.<br/>I will think in a better solution for that further</p>
+
+<p></p>
+
+<p></p>
+]]></content:encoded>
+			<wfw:commentRss>http://ploobs.com.br/2018/09/10/creating-system-spawners-to-populate-level/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>Plant Jumper &#8211; Creating a breakeble and a moveable Block</title>
+		<link>http://ploobs.com.br/2018/09/05/plant-jumper-creating-a-breakeble-and-moveable-block/</link>
+		<comments>http://ploobs.com.br/2018/09/05/plant-jumper-creating-a-breakeble-and-moveable-block/#respond</comments>
+		<pubDate>Wed, 05 Sep 2018 17:41:46 +0000</pubDate>
+		<dc:creator><![CDATA[ploobs]]></dc:creator>
+				<category><![CDATA[Programming]]></category>
+		<category><![CDATA[ECS]]></category>
+		<category><![CDATA[PlantJumper]]></category>
+
+		<guid isPermaLink="false">http://ploobs.com.br/?p=104</guid>
+		<description><![CDATA[At the start i planned to implement two types of blocks. Breaekable: This block once hitted by a collision starts]]></description>
+				<content:encoded><![CDATA[<p>At the start i planned to implement two types of blocks.</p>
+
+<ul>
+<li>Breaekable: This block once hitted by a collision starts a timer and then fade away</li>
+<li>Moveable: This block moves in a zigzag around a starting point</li>
+</ul>
+
+<h2>Components Modeling</h2>
+
+<p>The first part when creating a new behavior in a ECS mindset it is to try to break it in components, wich will store the behavior data.</p>
+
+<h4>Breakeable Block</h4>
+
+<p>This block has 3 states, not touched, counting and dead. For that i created a component with two informations. The breaking cooldown and if the breaking started;</p>
+
+<pre class="wp-block-preformatted">public struct BreakComponent : IComponentData
+{
+    public float coolDown;
+    public float started;
+}</pre>
+
+<h4>ZigZag Block</h4>
+
+<p>This block will move to the right and then to the left along a initial point a until a determined amplitude.</p>
+
+<pre class="wp-block-preformatted">public struct ZigZagMoveable : IComponentData<br/>{<br/>    public float Amplitude;<br/>    public float CurrentPosition;<br/>    public float Speed;<br/>    public float Direction;<br/>}
+</pre>
+
+<p>The amplitude determines how far will the block moves from the initial Position<br/>The CurrentPosition stores the relative moviment of the block<br/>The Speed, how fast will the block moves<br/>The Direction, if the block moves right or left.</p>
+
+<h2>Entity Modeling</h2>
+
+<p>The Entities are pretty much blocks with an additional behavior, so the entity archetype will seams to be the block one</p>
+
+<pre class="wp-block-code"><code>var brackeableArchetype = this._entityManager.CreateArchetype(
+            typeof(Position),
+            typeof(Block),
+            typeof(BreakComponent),
+            typeof(AABBComponent),
+            typeof(Collider),
+            typeof(CollisionComponent),
+            typeof(MeshInstanceRenderer)
+        );</code></pre>
+
+<pre class="wp-block-code"><code>var zigzagArchetype = this._entityManager.CreateArchetype(
+            typeof(Position),
+            typeof(Block),
+            typeof(ZigZagMoveable),
+            typeof(AABBComponent),
+            typeof(Collider),
+            typeof(CollisionComponent),
+            typeof(MeshInstanceRenderer)
+        );</code></pre>
+
+<h2>Systems Modeling</h2>
+
+<h4>BreakItemSystem </h4>
+
+<p>For the first one, the breakeable i created a simple idea of a state machine, actually just the idea</p>
+
+<pre class="wp-block-code"><code>using UnityEngine;
+using Unity.Entities;
+using Unity.Transforms;
+
+using Unity.Mathematics;
+
+public class BreakeItemSystem : ComponentSystem
+{
+    public struct Data
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;CollisionComponent> Collision;
+        public EntityArray Entities;
+
+        public ComponentDataArray&lt;BreakComponent> BreakComponent;
+
+    }
+
+    [Inject] private Data m_Data;
+
+    protected override void OnUpdate()
+    {
+        float dt = Time.deltaTime;
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            BreakComponent breakComponent = m_Data.BreakComponent[index];
+            if (breakComponent.started == 0)
+            {
+                if (m_Data.Collision[index].direction.y > 0)
+                {
+
+                    m_Data.BreakComponent[index] = new BreakComponent
+                    {
+                        started = 1,
+                        coolDown = breakComponent.coolDown
+                    };
+                }
+            }
+            else
+            {
+                float coolDown = m_Data.BreakComponent[index].coolDown;
+                coolDown -= dt;
+                if (coolDown &lt;= 0.0f)
+                {
+                    PostUpdateCommands.DestroyEntity(m_Data.Entities[index]);
+                }
+                else
+                {
+                    m_Data.BreakComponent[index] = new BreakComponent
+                    {
+                        started = 1,
+                        coolDown = coolDown
+                    };
+                }
+            }
+        }
+    }
+}</code></pre>
+
+<p>In the update method i check if there is a valid collision in the object, if it is true i started the break timer and in the next cicle will be started and untill the time it is not equals to zero, we decrease its amount, otherwise kill the block.</p>
+
+<h4>ZigZag System</h4>
+
+<p>In this system i check if the relative position are bigger or smaller than the Amplitude, if so, the direction is changed </p>
+
+<pre class="wp-block-code"><code>
+using UnityEngine;
+using Unity.Entities;
+using Unity.Transforms;
+using Unity.Collections;
+using Unity.Jobs;
+
+using Unity.Mathematics;
+
+public class ZigZagSystem : ComponentSystem
+{
+    public struct Data
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;ZigZagMoveable> ZigZagMoveable;
+        public ComponentDataArray&lt;Position> Position;
+    }
+
+    [Inject] private Data m_Data;
+
+    protected override void OnUpdate()
+    {
+        float dt = Time.deltaTime;
+
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            ZigZagMoveable zigzag = m_Data.ZigZagMoveable[index];
+
+            float speed = 0;
+
+            if (zigzag.CurrentPosition >= zigzag.Amplitude)
+            {
+                zigzag.Direction = -1;
+            }
+            else if (zigzag.CurrentPosition &lt;= -zigzag.Amplitude)
+            {
+                zigzag.Direction = 1;
+            }
+            speed = zigzag.Direction * zigzag.Speed;
+
+            float3 currentPosition = m_Data.Position[index].Value;
+            float deltaPosition = dt * speed;
+            float newPosition = currentPosition.x + deltaPosition;
+
+            m_Data.ZigZagMoveable[index] = new ZigZagMoveable
+            {
+                Amplitude = zigzag.Amplitude,
+                CurrentPosition = zigzag.CurrentPosition + deltaPosition,
+                Speed = zigzag.Speed,
+                Direction = zigzag.Direction
+            };
+
+            m_Data.Position[index] = new Position
+            {
+                Value = new float3(newPosition, currentPosition.y, currentPosition.z)
+            };
+        }
+
+
+    }
+
+}</code></pre>
+
+<p>As you can noticed i didn´t need to think about its collision, because it is also a block and contains colliders, so the other systems will treat it well. This is the beauty of ECS, you just need to append behaviors and see the magic happening</p>
+]]></content:encoded>
+			<wfw:commentRss>http://ploobs.com.br/2018/09/05/plant-jumper-creating-a-breakeble-and-moveable-block/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>Plant Jumper &#8211; Procedural Level Generation</title>
+		<link>http://ploobs.com.br/2018/09/04/plant-jumper-procedural-level-generation/</link>
+		<comments>http://ploobs.com.br/2018/09/04/plant-jumper-procedural-level-generation/#respond</comments>
+		<pubDate>Tue, 04 Sep 2018 16:28:25 +0000</pubDate>
+		<dc:creator><![CDATA[ploobs]]></dc:creator>
+				<category><![CDATA[Programming]]></category>
+		<category><![CDATA[PlantJumper]]></category>
+		<category><![CDATA[Procedural]]></category>
+
+		<guid isPermaLink="false">http://ploobs.com.br/?p=100</guid>
+		<description><![CDATA[Building a game it is not just create some mechanics and a beauty graphic, it is overall and experience and]]></description>
+				<content:encoded><![CDATA[<p>Building a game it is not just create some mechanics and a beauty graphic, it is overall and experience and for that the player expects to be amazed with the universe you created and therefore there must have a good amount of content.</p>
+
+<p>In a lot of games, levels, and players and everything else are handcrafted but this approach it is not scalable if you want for example to create a endless level game, in this cases we use to create procedural levels.</p>
+
+<h3>Understanding the level</h3>
+
+<p>The first thing you need to know when creating procedural levels it is the pieces you will tie together, how will they behave and how will the player interact with it. For example, if you are creating platforms, as i am, you need to be sure the player can reach the platforms.</p>
+
+<p>The creation of a level i considered two ways.</p>
+
+<ul><li>Create a Maker and a Validator: This two steps approach it is a more robust but in the other hand harder to implement. In the Maker phase, you have to generate a level and in the Validator use the possible player actions to validate it</li><li>Create a Maker and Validate yourself. In this approach you have to create the level as in the previous approach, but there will be no valiration phase, which means that the level have to be well formed or you will have to look to it and validate. In this approach you have to have a way to make sure the moviment will be feasible.</li></ul>
+
+<p>In my case, i will use the second one at the beginning</p>
+
+<h3>PseudoCode of generator</h3>
+
+<p>In the plant jumper, the levels will formed of different kind of blocks and enemies, probabily i will add differente types while developing the game but there is a core behavior i want then to follow.</p>
+
+<p>At this moment i want to be able to control:</p>
+
+<ul><li>how many items will be in each height of the level;</li><li>The height space between a new group of items;</li><li>The amount of items each block will contain. For example a group of 2 normal blocks together or 3 normal blocks together;</li><li>The minX and maxX</li><li>The minY and maxY</li></ul>
+
+<pre class="wp-block-code"><code>public List&lt;float3> buildBlocks()
+    {
+        List&lt;float3> blocks = new List&lt;float3>();
+
+        int currentY = minY;
+
+        while (currentY &lt; maxY)
+        {
+            int distance = UnityEngine.Random.Range(2, this.maxDistanceBetweenRows);
+            currentY += (distance * size);
+
+            int currentX = minX;
+
+            int blocksPlaced = 0;
+
+            while (currentX &lt; maxX &amp;&amp; blocksPlaced &lt; this.maxItemsByColumn)
+            {
+                bool canInsertBlock = (UnityEngine.Random.Range(0, 10.0f) > 5) &amp;&amp; (currentX + blockSize * size &lt; maxX);
+                if (canInsertBlock)
+                {
+                    for (int i = 0; i &lt; blockSize; i++)
+                    {
+                        float3 blockPosition = new float3(currentX, currentY, 0);
+                        blocks.Add(blockPosition);
+                        blocksPlaced++;
+                        currentX += size;
+                    }
+                }
+                currentX += size;
+            }
+
+        }
+        return blocks;
+    }</code></pre>
+
+<h2>Next steps</h2>
+
+<p>In this level editor i want to be able to create a group of items and set the dificulty. For that in another post i will discuss about how i decided what it is a easy and a hard level</p>
+]]></content:encoded>
+			<wfw:commentRss>http://ploobs.com.br/2018/09/04/plant-jumper-procedural-level-generation/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>PlantJumper &#8211; Input System</title>
+		<link>http://ploobs.com.br/2018/08/30/plantjumper-input-system/</link>
+		<comments>http://ploobs.com.br/2018/08/30/plantjumper-input-system/#respond</comments>
+		<pubDate>Thu, 30 Aug 2018 22:54:53 +0000</pubDate>
+		<dc:creator><![CDATA[ploobs]]></dc:creator>
+				<category><![CDATA[Programming]]></category>
+
+		<guid isPermaLink="false">http://ploobs.com.br/?p=98</guid>
+		<description><![CDATA[Control the user input can be designed in several ways. I decided to use the accelerometer In a very simple]]></description>
+				<content:encoded><![CDATA[<p>Control the user input can be designed in several ways. I decided to use the accelerometer</p>
+
+<p>In a very simple approach and trying to keep classes decoupled. The PlayerInput only changes the Component PlayerInput</p>
+
+<pre class="wp-block-code"><code>using Unity.Entities;
+using UnityEngine;
+
+public class PlayerInputSystem : ComponentSystem
+{
+    struct PlayerData
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;PlayerInput> PlayerInput;
+    }
+
+    [Inject] private PlayerData m_Data;
+
+    protected override void OnUpdate()
+    {
+        float dt = Time.deltaTime;
+
+        for (int i = 0; i &lt; m_Data.Length; ++i)
+        {
+            UpdatePlayerInput(i, dt);
+        }
+    }
+
+    private void UpdatePlayerInput(int i, float dt)
+    {
+        float dirX = Input.acceleration.x;
+
+        float xDirection = dirX > 0 ? 1 : -1;
+
+        m_Data.PlayerInput[i] = new PlayerInput
+        {
+            Direction = xDirection
+        };
+    }
+}</code></pre>
+
+<pre class="wp-block-code"><code>public struct PlayerInput : IComponentData
+{
+    public float Direction;
+}</code></pre>
+
+<h4>Changing Player direction</h4>
+
+<p>Using the direction change information we can now rotate the player so it will face the direction we set using the accelerometer</p>
+
+<pre class="wp-block-code"><code>
+using UnityEngine;
+using Unity.Entities;
+using Unity.Transforms;
+using Unity.Mathematics;
+
+public class ChangeDirectionSystem : ComponentSystem
+{
+    public struct Data
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;Player> Player;
+        public ComponentDataArray&lt;Rotation> Rotation;
+        public ComponentDataArray&lt;Velocity> Velocity;
+        public ComponentDataArray&lt;PlayerInput> PlayerInput;
+    }
+
+    [Inject] private Data m_Data;
+
+    protected override void OnUpdate()
+    {
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            float directionX = m_Data.PlayerInput[index].Direction;
+
+            Velocity currentVelocity = m_Data.Velocity[index];
+
+            m_Data.Velocity[index] = new Velocity
+            {
+                Value = currentVelocity.Value + 0.5f * (new float3(directionX, 0, 0))
+            };
+
+            Vector3 rotationDirection = new Vector3(0, 0, -directionX);
+            m_Data.Rotation[index] = new Rotation
+            {
+                Value = Quaternion.LookRotation(rotationDirection, Vector3.up)
+            };
+        }
+    }
+}</code></pre>
+
+<p>A thing i noticed implementing this it is that the x velocity will be set in this system and not in the jump system.</p>
+
+<p>Well, this was a very short post but behind the decision of use the accelerometer are some tests i&#8217;ve made using touch, wich i didn´t use because the touch will be used to other player moviments, as shots for example</p>
+]]></content:encoded>
+			<wfw:commentRss>http://ploobs.com.br/2018/08/30/plantjumper-input-system/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>Plant Jumper &#8211; Player Moviment</title>
+		<link>http://ploobs.com.br/2018/08/28/plant-jumper-player-moviment/</link>
+		<comments>http://ploobs.com.br/2018/08/28/plant-jumper-player-moviment/#respond</comments>
+		<pubDate>Tue, 28 Aug 2018 12:00:38 +0000</pubDate>
+		<dc:creator><![CDATA[ploobs]]></dc:creator>
+				<category><![CDATA[Game Design]]></category>
+		<category><![CDATA[Programming]]></category>
+		<category><![CDATA[ECS]]></category>
+		<category><![CDATA[PlantJumper]]></category>
+
+		<guid isPermaLink="false">http://ploobs.com.br/?p=30</guid>
+		<description><![CDATA[The player moviment using ECS as another systems must be designed to be data driven. At the beginning our player]]></description>
+				<content:encoded><![CDATA[<p>The player moviment using ECS as another systems must be designed to be data driven.</p>
+
+<p>At the beginning our player will jump and change direction. So we need the following components</p>
+
+<p>Position &#8211; will describe its position<br/>Heading2D &#8211; will describe if it is pointing right ou left<br/>Velocity &#8211; will describe the jump and fall moviment</p>
+
+<h4>Auto Jump System</h4>
+
+<p>In the jumpter game, the player is always jumping, so i created an auto jump system</p>
+
+<pre class="wp-block-code"><code>
+using UnityEngine;
+using Unity.Entities;
+using Unity.Transforms;
+using Unity.Collections;
+
+using Unity.Mathematics;
+
+
+[UpdateAfter(typeof(ComputeColliderAABBSystem))]
+public class AutoJumpSystem : ComponentSystem
+{
+    public struct Data
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;Heading> Heading;
+        public ComponentDataArray&lt;Player> Player;
+
+        public ComponentDataArray&lt;Velocity> Velocity;
+
+        public ComponentDataArray&lt;CollisionComponent> CollisionComponent;
+
+    }
+
+    [Inject] private Data m_Data;
+
+    public AutoJumpSystem()
+    {
+    }
+
+    private float amountY = 20;
+    private float amountX = 5;
+    protected override void OnUpdate()
+    {
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            if (m_Data.CollisionComponent[index].Value > 0)
+            {
+                float3 velocity = new float3(0, amountY, 0);
+                velocity += (amountX * m_Data.Heading[index].Value);
+
+                m_Data.Velocity[index] = new Velocity { Value = velocity };
+            }
+        }
+    }
+}</code></pre>
+
+<p>As you can noticed we are not changing position, just the velocity data. This is due to the RigidBody system been already treating velocity changes, but for that i have to make a little change in the rigidbody system</p>
+
+<pre class="wp-block-code"><code>protected override void OnUpdate()
+    {
+        float dt = Time.deltaTime;
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            float3 gravity = new float3(0, -20, 0);
+
+            var position = m_Data.Position[index].Value;
+            if (m_Data.Collision[index].Value > 0)
+            {
+                gravity = float3.zero;
+            }
+
+            Velocity velocity = new Velocity
+            {
+                Value = m_Data.Velocity[index].Value + gravity * dt
+            };
+            m_Data.Velocity[index] = velocity;
+
+            position += (m_Data.Velocity[index].Value * dt + 0.5f * gravity * dt * dt);
+
+            m_Data.Position[index] = new Position { Value = position };
+        }
+    }</code></pre>
+
+<p>The method onUpdate now will apply the velocity every cicle and if there is a collision, not apply gravity. I know this is a very simple aproximation but for this game, it is enough.</p>
+]]></content:encoded>
+			<wfw:commentRss>http://ploobs.com.br/2018/08/28/plant-jumper-player-moviment/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>Physics on Unity Pure ECS</title>
+		<link>http://ploobs.com.br/2018/08/27/physics-on-unity-pure-ecs/</link>
+		<comments>http://ploobs.com.br/2018/08/27/physics-on-unity-pure-ecs/#respond</comments>
+		<pubDate>Mon, 27 Aug 2018 11:11:52 +0000</pubDate>
+		<dc:creator><![CDATA[ploobs]]></dc:creator>
+				<category><![CDATA[Programming]]></category>
+		<category><![CDATA[ECS]]></category>
+
+		<guid isPermaLink="false">http://ploobs.com.br/?p=86</guid>
+		<description><![CDATA[If you don´t know, there is no implementation of a physics collision treatment if you are implementing pure ECS at]]></description>
+				<content:encoded><![CDATA[<p>If you don´t know, there is no implementation of a physics collision treatment if you are implementing pure ECS at this moment.<br/>But what can we do is create our own collision detection and each kind of physics treatment we need.</p>
+
+<h2><strong>Gravity System</strong></h2>
+
+<p>For my platform game i need to create an implementation for gravity. A good point of that approach it is that we can create different ways of understand gravity as Mario Galaxy for example.</p>
+
+<p>Im my case i implemented a very simple one</p>
+
+<pre class="wp-block-code"><code>
+using UnityEngine;
+using Unity.Entities;
+using Unity.Transforms;
+
+using Unity.Mathematics;
+
+public class RidigBodySystem : ComponentSystem
+{
+    public struct Data
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;Position> Position;
+        public ComponentDataArray&lt;CollisionComponent> Collision;
+        public ComponentDataArray&lt;RigidBodyComponent> RigidBody;
+
+        public ComponentDataArray&lt;Velocity> Velocity;
+    }
+
+    [Inject] private Data m_Data;
+
+    protected override void OnUpdate()
+    {
+        float3 gravity = new float3(0, -20, 0);
+        float dt = Time.deltaTime;
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            var position = m_Data.Position[index].Value;
+
+            if (m_Data.Collision[index].Value == 0)
+            {
+                Velocity velocity = new Velocity
+                {
+                    Value = m_Data.Velocity[index].Value + gravity * dt
+                };
+                m_Data.Velocity[index] = velocity;
+
+                position += (m_Data.Velocity[index].Value * dt + 0.5f * gravity * dt * dt);
+            }
+
+            m_Data.Position[index] = new Position { Value = position };
+        }
+    }
+}
+</code></pre>
+
+<p>In this code there is a important concept, the injection</p>
+
+<pre class="wp-block-code"><code>public struct Data
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;Position> Position;
+        public ComponentDataArray&lt;RigidBodyComponent> RigidBody;
+    }
+
+    [Inject] private Data m_Data;</code></pre>
+
+<p>Unity, has its dependencies injection that based on the struct we create, give us the data of all entities that cointains this components. The beauty of ECS it is that we don´t know which entity we are changing, actualy, that is the main concept, we don´t need to know. The systems must be created thinking in the data. So we design systems that changes data and not managers that change objects as we as used to.</p>
+
+<p>In this example, only the entities that contains the components Position and RigidBody will have its data changed.</p>
+
+<p>The component created for that contains only the mass information and can be used to  identify that the entity falls and in the future create collisions and momentun</p>
+
+<pre class="wp-block-code"><code>public struct RigidBodyComponent : IComponentData
+{
+    public float Mass;
+}</code></pre>
+
+<h2>Collision detection</h2>
+
+<p>I will initially create just a broadphase physics detection, using a simple AABB</p>
+
+<h4><strong>Computing AABB</strong></h4>
+
+<p>First of all we calculate the AABB of every entities that contains the component AABB</p>
+
+<pre class="wp-block-code"><code>public struct AABBComponent : IComponentData
+{
+    public float3 center;
+    public float3 halfwidths;
+}</code></pre>
+
+<pre class="wp-block-code"><code>
+using UnityEngine;
+using Unity.Entities;
+using Unity.Transforms;
+
+using Unity.Mathematics;
+
+
+public class ComputeColliderAABBSystem : ComponentSystem
+{
+    public struct Data
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;Position> Position;
+        public ComponentDataArray&lt;AABBComponent> AABB;
+    }
+
+    [Inject] private Data m_Data;
+
+    protected override void OnUpdate()
+    {
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            var position = m_Data.Position[index].Value;
+            float size = 2.5f;
+
+            AABBComponent aabb = new AABBComponent
+            {
+                center = position,
+                halfwidths = new float3(size, size, size)
+            };
+            m_Data.AABB[index] = aabb;
+        }
+    }
+}
+</code></pre>
+
+<p>The size it is still hardcoded. This values will be tunned further</p>
+
+<h4>Calculating broad collision</h4>
+
+<p>For a while the collision component it is very simple</p>
+
+<pre class="wp-block-code"><code>public struct CollisionComponent : IComponentData
+{
+    public float Value;
+}</code></pre>
+
+<p>For every entity that contains collision and AABB component we must compare to check if a collision occurred</p>
+
+<pre class="wp-block-code"><code>private bool checkAABB(AABBComponent a, AABBComponent b)
+    {
+        bool x = Mathf.Abs(a.center[0] - b.center[0]) &lt;= (a.halfwidths[0] + b.halfwidths[0]);
+        bool y = Mathf.Abs(a.center[1] - b.center[1]) &lt;= (a.halfwidths[1] + b.halfwidths[1]);
+        bool z = Mathf.Abs(a.center[2] - b.center[2]) &lt;= (a.halfwidths[2] + b.halfwidths[2]);
+
+        return x &amp;&amp; y &amp;&amp; z;
+    }</code></pre>
+
+<p>The update method of the system it is a simple comparison</p>
+
+<pre class="wp-block-code"><code>protected override void OnUpdate()
+    {
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            m_Data.Collision[index] = new CollisionComponent
+            {
+                Value = 0
+            };
+            for (int id = 0; id &lt; m_Data.Length; ++id)
+            {
+                if (index == id)
+                    continue;
+
+                if (checkAABB(m_Data.AABB[index], m_Data.AABB[id]))
+                {
+                    m_Data.Collision[index] = new CollisionComponent
+                    {
+                        Value = 1
+                    };
+                }
+            }
+        }
+    }</code></pre>
+
+<h4>Applying collision</h4>
+
+<p>The only collision we will check for a while it is of players with blocks while the player falls, then the gravity check must have a little changes </p>
+
+<p>We added a anotation in the class</p>
+
+<pre class="wp-block-code"><code>[UpdateAfter(typeof(BroadphaseSystem))]</code></pre>
+
+<p>Telling the ECS system to run after the collisions were checked in the broadphasesystem.</p>
+
+<p>Another change is in the update method</p>
+
+<pre class="wp-block-code"><code>protected override void OnUpdate()
+    {
+        float3 gravity = new float3(0, -20, 0);
+        float dt = Time.deltaTime;
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            var position = m_Data.Position[index].Value;
+
+            if (m_Data.Collision[index].Value == 0)
+            {
+                Velocity velocity = new Velocity
+                {
+                    Value = m_Data.Velocity[index].Value + gravity * dt
+                };
+                m_Data.Velocity[index] = velocity;
+
+                position += (m_Data.Velocity[index].Value * dt + 0.5f * gravity * dt * dt);
+            }
+
+            m_Data.Position[index] = new Position { Value = position };
+        }
+    }</code></pre>
+
+<p>As you can notice there is a comparison</p>
+
+<pre class="wp-block-code"><code>if (m_Data.Collision[index].Value == 0)</code></pre>
+
+<p>To check if the entity was hitted by a collision.</p>
+
+<p>This is a very simple approach of a collision. In future tutorials i will treat it better</p>
+
+<h2>References</h2>
+
+<ul><li>https://forum.unity.com/threads/physics-in-pure-ecs.531716/</li><li>https://medium.com/@tomasz.piowczyk/https-medium-com-tomasz-piowczyk-part-1-unity-ecs-briefly-about-ecs-c077f90efc9a</li></ul>
+]]></content:encoded>
+			<wfw:commentRss>http://ploobs.com.br/2018/08/27/physics-on-unity-pure-ecs/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>First Configurations ECS Unity Project</title>
+		<link>http://ploobs.com.br/2018/08/26/first-steps-on-creating-a-pure-ecs-unity-project-part-2/</link>
+		<comments>http://ploobs.com.br/2018/08/26/first-steps-on-creating-a-pure-ecs-unity-project-part-2/#respond</comments>
+		<pubDate>Sun, 26 Aug 2018 15:45:20 +0000</pubDate>
+		<dc:creator><![CDATA[ploobs]]></dc:creator>
+				<category><![CDATA[Programming]]></category>
+		<category><![CDATA[ECS]]></category>
+
+		<guid isPermaLink="false">http://ploobs.com.br/?p=56</guid>
+		<description><![CDATA[In this part of the tutorial i will describe what i had to configure in the project and what a]]></description>
+				<content:encoded><![CDATA[<p>In this part of the tutorial i will describe what i had to configure in the project and what a created to have some components working in a simple system</p>
+
+<h2>First things first</h2>
+
+<p>The first thing you need to do it is, install the Entities Package in your project</p>
+
+<p>Go to the menu Window->Package Manager<br/>Search in the All tab and check if it has already been installed, othewise do that</p>
+
+<figure class="wp-block-image"><img src="http://ploobs.com.br/wp-content/uploads/2018/08/PACKAGE_MANAGER.png" alt="" class="wp-image-59" srcset="http://ploobs.com.br/wp-content/uploads/2018/08/PACKAGE_MANAGER.png 868w, http://ploobs.com.br/wp-content/uploads/2018/08/PACKAGE_MANAGER-300x153.png 300w, http://ploobs.com.br/wp-content/uploads/2018/08/PACKAGE_MANAGER-768x392.png 768w" sizes="(max-width: 868px) 100vw, 868px" /></figure>
+
+<p>Now make sure that the Scripting Runtime Version is .NET 4.x as described in the previous part of the tutorial</p>
+
+<figure class="wp-block-image"><img src="http://ploobs.com.br/wp-content/uploads/2018/08/configure.png" alt="" class="wp-image-54" srcset="http://ploobs.com.br/wp-content/uploads/2018/08/configure.png 353w, http://ploobs.com.br/wp-content/uploads/2018/08/configure-300x128.png 300w" sizes="(max-width: 353px) 100vw, 353px" /></figure>
+
+<h2>Creating Render Prototypes</h2>
+
+<p>As i cited in the previeous tutorial, i decided to create all the entities programaticaly, but thinking in a solution that i can easily try another models and materials, i chosed to use a gameobject to enable us to edit the Mesh Instance Renderer Component</p>
+
+<figure class="wp-block-image"><img src="http://ploobs.com.br/wp-content/uploads/2018/08/renderprototype.png" alt="" class="wp-image-61" srcset="http://ploobs.com.br/wp-content/uploads/2018/08/renderprototype.png 382w, http://ploobs.com.br/wp-content/uploads/2018/08/renderprototype-300x263.png 300w" sizes="(max-width: 382px) 100vw, 382px" /></figure>
+
+<p>As for the Mesh, you have to chose the inner object of your model, a mesh</p>
+
+<figure class="wp-block-image"><img src="http://ploobs.com.br/wp-content/uploads/2018/08/Sappling_model.png" alt="" class="wp-image-65"/></figure>
+
+<p>As for the material, you must create a Material and an important thing that have to be changed it is enable gpu instancing</p>
+
+<figure class="wp-block-image"><img src="http://ploobs.com.br/wp-content/uploads/2018/08/ECS_Material.png" alt="" class="wp-image-66" srcset="http://ploobs.com.br/wp-content/uploads/2018/08/ECS_Material.png 303w, http://ploobs.com.br/wp-content/uploads/2018/08/ECS_Material-300x131.png 300w" sizes="(max-width: 303px) 100vw, 303px" /></figure>
+
+<p> </p>
+
+<h2>Decoupling with Factories</h2>
+
+<p>I decided to create Factories of archetypes and entities to decouple of the bootstrap creation.<br/><br/></p>
+
+<p>The Archetype Factory is basicaly a simple Dictionary of archetypes by archetypeName</p>
+
+<p>The Entity Factory is a Delegate Dictionary by entityName</p>
+
+<p>Creation</p>
+
+<pre class="wp-block-code"><code>private delegate Entity Delegate1();
+
+private Dictionary&lt;string, Delegate1> entities = new Dictionary&lt;string, Delegate1>();</code></pre>
+
+<p>One of the methods</p>
+
+<pre class="wp-block-code"><code>    private Entity CreatePlayer()
+    {
+        this._entityManager = World.Active.GetExistingManager&lt;EntityManager>();
+
+        var playerEntity = this._entityManager.CreateEntity(ArchetypeFactory.Instance.getArchetypeByName("player"));
+        this._entityManager.SetSharedComponentData(playerEntity, GetLookFromPrototype("PlayerRenderPrototype"));
+
+        return playerEntity;
+    }</code></pre>
+
+<p>Method used to retrieve information from render prototypes</p>
+
+<pre class="wp-block-code"><code>private static MeshInstanceRenderer GetLookFromPrototype(string protoName)
+    {
+        var proto = GameObject.Find(protoName);
+        var result = proto.GetComponent&lt;MeshInstanceRendererComponent>().Value;
+        Object.Destroy(proto);
+        return result;
+    }</code></pre>
+
+<p>Interface method used by bootstrap</p>
+
+<pre class="wp-block-code"><code>    public Entity createEntityByName(string entityName)
+    {
+        return (Entity)entities[entityName].DynamicInvoke(null);
+    }</code></pre>
+
+<h2>Next Steps</h2>
+
+<p>In the next tutorial i will discuss about how will i solve the fact that pure ecs does not deal with physics automaticaly yet</p>
+]]></content:encoded>
+			<wfw:commentRss>http://ploobs.com.br/2018/08/26/first-steps-on-creating-a-pure-ecs-unity-project-part-2/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>First Steps on creating a pure ECS Unity Project</title>
+		<link>http://ploobs.com.br/2018/08/24/first-steps-on-creating-a-pure-ecs-unity-project-part-1/</link>
+		<comments>http://ploobs.com.br/2018/08/24/first-steps-on-creating-a-pure-ecs-unity-project-part-1/#respond</comments>
+		<pubDate>Fri, 24 Aug 2018 15:00:46 +0000</pubDate>
+		<dc:creator><![CDATA[ploobs]]></dc:creator>
+				<category><![CDATA[Programming]]></category>
+		<category><![CDATA[ECS]]></category>
+
+		<guid isPermaLink="false">http://ploobs.com.br/?p=33</guid>
+		<description><![CDATA[This the very first step of creating your game in unity using pure ECS. I will describe here how i]]></description>
+				<content:encoded><![CDATA[<p>This the very first step of creating your game in unity using pure ECS. I will describe here how i did it and some things i discovered during it</p>
+
+<p>This tutorial contains basic concepts and decisions i made.</p>
+
+<h2>Project Configuration</h2>
+
+<p>The first thing you must check it is the .NET version in the Scripting Runtime Version, that can be found at the menu Edit -> Project Settings -> Player</p>
+
+<figure class="wp-block-image"><img src="http://ploobs.com.br/wp-content/uploads/2018/08/configure.png" alt="" class="wp-image-54" srcset="http://ploobs.com.br/wp-content/uploads/2018/08/configure.png 353w, http://ploobs.com.br/wp-content/uploads/2018/08/configure-300x128.png 300w" sizes="(max-width: 353px) 100vw, 353px" /></figure>
+
+<p>A grand difference between classic projects and pure ecs projects as the moment i wrote this post it is that the editor it is not that ready yet. But what this means, it is not that clear how to configure the gameobjects and add ECS components as the ECS architecture needs.</p>
+
+<p><strong>Object Configuration</strong></p>
+
+<p>A project configuration nowaday since we will not configure the game objects directly in the editor needs to be done directly in the code</p>
+
+<p>For things like asset references, we need to create a prototype GameObjects in the Scene, where we can add wrapped <strong>IComponentData</strong> types. Once we&#8217;ve finished the configuration, we can discard these prototype objects.</p>
+
+<p>In the minigame plantjumper i will not use this approach since the level and player will be created procedurally.</p>
+
+<p><strong>Archetypes</strong></p>
+
+<p>As an ECS object, we must configure entities and components. In Unity we have a very interresting feature, archetypes, which is, as we are used in unity something like a prefab of a group of components.</p>
+
+<pre class="wp-block-code"><code>PlayerArchetype = entityManager.CreateArchetype(
+typeof(Position3D), 
+typeof(PlayerInput), 
+typeof(Health), 
+typeof(TransformMatrix));</code></pre>
+
+<p>The sample above creates an archetype with pre created components</p>
+
+<pre class="wp-block-code"><code>    public struct Health : IComponentData
+    {
+        public float Value;
+    }</code></pre>
+
+<p>Some of the components are unity defaults, and then we don´t need to create then. In the example i gave here, the Position3D and TransformMatrix.</p>
+
+<p>As you can notice the Health component i described it is a struct and not a class and this is not in vain. This is due to the fact that instances are passed as references and structs as value and then this is a good way to optimize memory because we will not handle unnecessary data.</p>
+
+<p>I decided to create a bunch of component files because i want to reuse then in another games and a Factory of archetypes to create a level of abstractions.</p>
+
+<h2>Bootstrap</h2>
+
+<p>As the object creation lifecycle, i will overload the unity initialization, that can tipicaly be configured as a script attached to a gameobject.</p>
+
+<p>The bootstrap script it is responsible to create the entities, associate its components and if necessary initialize some systems</p>
+
+<h2>References</h2>
+
+<figure class="wp-block-embed-youtube wp-block-embed is-type-video is-provider-youtube">
+<iframe width="910" height="512" src="https://www.youtube.com/embed/EYnTX66QPRg?feature=oembed" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</figure>
+
+<p><a href="https://github.com/Unity-Technologies/EntityComponentSystemSamples/blob/master/Documentation/content/two_stick_shooter.md">Two Stick Shooter ECS</a></p>
+]]></content:encoded>
+			<wfw:commentRss>http://ploobs.com.br/2018/08/24/first-steps-on-creating-a-pure-ecs-unity-project-part-1/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>Plant Jumper</title>
+		<link>http://ploobs.com.br/2018/08/22/plant-jumper/</link>
+		<comments>http://ploobs.com.br/2018/08/22/plant-jumper/#respond</comments>
+		<pubDate>Wed, 22 Aug 2018 19:00:22 +0000</pubDate>
+		<dc:creator><![CDATA[ploobs]]></dc:creator>
+				<category><![CDATA[Game Design]]></category>
+		<category><![CDATA[Programming]]></category>
+		<category><![CDATA[ECS]]></category>
+
+		<guid isPermaLink="false">http://ploobs.com.br/?p=39</guid>
+		<description><![CDATA[As the first minigame, i will build a simple jumper game. Features Simple BlocksWater going up to catch the playerPlayer]]></description>
+				<content:encoded><![CDATA[<figure class="wp-block-image"><img src="http://ploobs.com.br/wp-content/uploads/2018/08/Plant-Jumper.png" alt="" class="wp-image-38" srcset="http://ploobs.com.br/wp-content/uploads/2018/08/Plant-Jumper.png 220w, http://ploobs.com.br/wp-content/uploads/2018/08/Plant-Jumper-169x300.png 169w" sizes="(max-width: 220px) 100vw, 220px" /></figure>
+
+<p>As the first minigame, i will build a simple jumper game.</p>
+
+<h2>Features</h2>
+
+<ul><li>Simple Blocks</li><li>Water going up to catch the player</li><li>Player that jumps</li><li>Simple Controllers by clicking in the left or right of the screen</li><li>Simple procedural level generation</li><li>Using Pure ECS</li></ul>
+
+<p>Throughout the development I will post short posts describing how this will be done.</p>
+
+<h2>Entities, Components and Systems first idea</h2>
+
+<p>My first guess of Entities, Components and Systems are the list below, but probably while implementing i will notice another needs</p>
+
+<p><em><strong>Entities</strong></em></p>
+
+<ul><li>Player</li><li>Block</li><li>Water</li></ul>
+
+<p><em><strong>Components</strong></em></p>
+
+<ul><li>Position</li><li>Player (tags)</li><li>Block(tag)</li><li>Collision</li><li>PlayerInput</li><li>ParticleDispatcher</li><li>Jump</li><li>AutomaticAction</li></ul>
+
+<p><em><strong>Systems</strong></em></p>
+
+<ul><li>PlayerInputSystem</li><li>PlayerHitSystem</li><li>AutomaticJumpSystem</li></ul>
+
+<h2>Considerations</h2>
+
+<p>Decide the considerations on the granularity of components and systems will be a good challenge that we are going to face together</p>
+
+<p><em><strong></strong></em></p>
+]]></content:encoded>
+			<wfw:commentRss>http://ploobs.com.br/2018/08/22/plant-jumper/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>Why i decided to use ECS</title>
+		<link>http://ploobs.com.br/2018/08/22/why-i-decided-to-use-ecs/</link>
+		<comments>http://ploobs.com.br/2018/08/22/why-i-decided-to-use-ecs/#respond</comments>
+		<pubDate>Wed, 22 Aug 2018 16:12:29 +0000</pubDate>
+		<dc:creator><![CDATA[ploobs]]></dc:creator>
+				<category><![CDATA[Programming]]></category>
+		<category><![CDATA[ARCHITECTURE]]></category>
+		<category><![CDATA[ECS]]></category>
+
+		<guid isPermaLink="false">http://ploobs.com.br/?p=12</guid>
+		<description><![CDATA[Here i will not describe what it is a ECS because there is a lot of references for that. You]]></description>
+				<content:encoded><![CDATA[<p><strong>Here i will not describe what it is a ECS because there is a lot of references for that. You can learn about a little reading the references i gave here in the reference section. This is a short description on some characteristics i considered to choose to use it.</strong></p>
+
+<p>It is common cense among programmers that a code must be clean, concise an if possible modular. In my case reuse it is a very important issue.</p>
+
+<p>I decided to create a great game and therefore to create prototypes as a progression strategy, testing features. A strategy decision i made was to create minigames, using behaviors or features that will be part of the final one. </p>
+
+<p>A main characteristic for that it is that i want to use the same code used in the prototype, in the main game.</p>
+
+<p>Looking for the current effort that Unity it is adding to develop and change its engine core itself it is a good reason to decide using it</p>
+
+<p><strong>Performance</strong></p>
+
+<p>I confess that at the moment i am not so concerned about performance, because i still has no problems, and the main rule in the search of a performatic code it is <em><strong>do not nitpicking. </strong></em>But on the other hand i want my game to be executed in a mobile and create a great experience to the user, so the smooth it runs the better.</p>
+
+<p>While running the main loop of a game, the software fights a battle of time. Each piece of the main loop has it own frame time concurring in the CPU and GPU. You can reduce the complexity of a algorithm but a big CPU and GPU villain is the amount of memory in the data bus and therefore the size of buffers used to perform some computation.</p>
+
+<p>Another issue, in the convencional architectures it is the miss use of the computational power of the CPUs and GPUs, and this is due to the bad use of multi cores. Almost all the time, we are using only one core</p>
+
+<p>This two big issues, ECS can naturaly solved.</p>
+
+<p><strong>Another mindset</strong></p>
+
+<p>Creating a software nowaday starts by thinking about how to share functions and share data, so we don´t need to duplicate code and then can create bug sources or make the maintenance of the code harder.</p>
+
+<p>While thinking in ECS, we have to break the feature down in atomic characteristics, that will be the components, we should not create classes containing all the functions and data needed to describe an instance.</p>
+
+<p>I think that this mindset change will require a different kind of documentation, because we programmers are used to read OOP classes and think about code, this way.</p>
+
+<p><strong>Combine Behaviors easily</strong></p>
+
+<p>The main idea of my game lies upon characters with different behaviors, in an environment with different behaviors also. So to me seams to be that this concepts are very tigh together and once more, it is a very good hint that i moght try it</p>
+
+<p>Well, as i said at the beggining, this is a descriptions of my reasons, in the following posts i will describe my tragetory using UNITY PURE ECS.</p>
+
+<h1><strong>References</strong></h1>
+<p><strong><span style="color: #ff0000;">Definitions</span></strong></p>
+<p><em>ECS Concepts</em></p>
+<p><a href="https://katatunix.wordpress.com/2016/01/26/oop-vs-ecs/" target="_blank" rel="nofollow noopener">https://katatunix.wordpress.com/2016/01/26/oop-vs-ecs/</a></p>
+<p><a href="http://www.richardlord.net/blog/ecs/what-is-an-entity-framework.html" target="_blank" rel="nofollow noopener">http://www.richardlord.net/blog/ecs/what-is-an-entity-framework.html</a></p>
+<p><em>Unity ECS Concepts</em></p>
+<p><a href="https://github.com/Unity-Technologies/EntityComponentSystemSamples/blob/master/Documentation/index.md">https://github.com/Unity-Technologies/EntityComponentSystemSamples/blob/master/Documentation/index.md</a></p>
+<p><a href="https://github.com/Unity-Technologies/EntityComponentSystemSamples/blob/master/Documentation/content/ecs_concepts.md">https://github.com/Unity-Technologies/EntityComponentSystemSamples/blob/master/Documentation/content/ecs_concepts.md</a></p>
+<hr />
+<p><strong><span style="color: #ff0000;">Discussion about ECS over MVC</span></strong><br /><a href="http://www.richardlord.net/presentations/game-architecture-is-different.html" target="_blank" rel="nofollow noopener">http://www.richardlord.net/presentations/game-architecture-is-different.html</a></p>]]></content:encoded>
+			<wfw:commentRss>http://ploobs.com.br/2018/08/22/why-i-decided-to-use-ecs/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+	</channel>
+</rss>

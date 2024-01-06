@@ -1,0 +1,394 @@
+
+<!DOCTYPE html>
+<html lang="en-US"
+ xmlns:og="http://opengraphprotocol.org/schema/"
+ xmlns:fb="http://www.facebook.com/2008/fbml">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="profile" href="http://gmpg.org/xfn/11">
+
+<title>First Steps on creating a pure ECS Unity Project &#8211; Ploobs &#8211; Game Dev Blog</title>
+<link rel='dns-prefetch' href='//s.w.org' />
+<link rel="alternate" type="application/rss+xml" title="Ploobs - Game Dev Blog &raquo; Feed" href="http://ploobs.com.br/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Ploobs - Game Dev Blog &raquo; Comments Feed" href="http://ploobs.com.br/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Ploobs - Game Dev Blog &raquo; First Steps on creating a pure ECS Unity Project Comments Feed" href="http://ploobs.com.br/2018/08/24/first-steps-on-creating-a-pure-ecs-unity-project-part-1/feed/" />
+<!-- This site uses the Google Analytics by MonsterInsights plugin v7.3.2 - Using Analytics tracking - https://www.monsterinsights.com/ -->
+<!-- Note: MonsterInsights is not currently configured on this site. The site owner needs to authenticate with Google Analytics in the MonsterInsights settings panel. -->
+<!-- No UA code set -->
+<!-- / Google Analytics by MonsterInsights -->
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/11\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/11\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/ploobs.com.br\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.9.9"}};
+			!function(a,b,c){function d(a,b){var c=String.fromCharCode;l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,a),0,0);var d=k.toDataURL();l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,b),0,0);var e=k.toDataURL();return d===e}function e(a){var b;if(!l||!l.fillText)return!1;switch(l.textBaseline="top",l.font="600 32px Arial",a){case"flag":return!(b=d([55356,56826,55356,56819],[55356,56826,8203,55356,56819]))&&(b=d([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]),!b);case"emoji":return b=d([55358,56760,9792,65039],[55358,56760,8203,9792,65039]),!b}return!1}function f(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var g,h,i,j,k=b.createElement("canvas"),l=k.getContext&&k.getContext("2d");for(j=Array("flag","emoji"),c.supports={everything:!0,everythingExceptFlag:!0},i=0;i<j.length;i++)c.supports[j[i]]=e(j[i]),c.supports.everything=c.supports.everything&&c.supports[j[i]],"flag"!==j[i]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[j[i]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(h=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",h,!1),a.addEventListener("load",h,!1)):(a.attachEvent("onload",h),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),g=c.source||{},g.concatemoji?f(g.concatemoji):g.wpemoji&&g.twemoji&&(f(g.twemoji),f(g.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='gtranslate-style-css'  href='http://ploobs.com.br/wp-content/plugins/gtranslate/gtranslate-style16.css?ver=4.9.9' type='text/css' media='all' />
+<link rel='stylesheet' id='donovan-custom-fonts-css'  href='http://ploobs.com.br/wp-content/themes/donovan/assets/css/custom-fonts.css?ver=20180413' type='text/css' media='all' />
+<link rel='stylesheet' id='wp-block-library-css'  href='http://ploobs.com.br/wp-content/plugins/gutenberg/build/block-library/style.css?ver=1541844393' type='text/css' media='all' />
+<link rel='stylesheet' id='dashicons-css'  href='http://ploobs.com.br/wp-includes/css/dashicons.min.css?ver=4.9.9' type='text/css' media='all' />
+<link rel='stylesheet' id='post-views-counter-frontend-css'  href='http://ploobs.com.br/wp-content/plugins/post-views-counter/css/frontend.css?ver=1.2.14' type='text/css' media='all' />
+<link rel='stylesheet' id='wpt-twitter-feed-css'  href='http://ploobs.com.br/wp-content/plugins/wp-to-twitter/css/twitter-feed.css?ver=4.9.9' type='text/css' media='all' />
+<link rel='stylesheet' id='donovan-stylesheet-css'  href='http://ploobs.com.br/wp-content/themes/donovan/style.css?ver=1.2.1' type='text/css' media='all' />
+<link rel='stylesheet' id='enlighter-local-css'  href='http://ploobs.com.br/wp-content/plugins/enlighter/resources/EnlighterJS.min.css?ver=3.8.1' type='text/css' media='all' />
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery.js?ver=1.12.4'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var donovan_menu_title = "<svg class=\"icon icon-menu\" aria-hidden=\"true\" role=\"img\"> <use xlink:href=\"http:\/\/ploobs.com.br\/wp-content\/themes\/donovan\/assets\/icons\/genericons-neue.svg#menu\"><\/use> <\/svg>Menu";
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/themes/donovan/assets/js/navigation.js?ver=20171005'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/themes/donovan/assets/js/svgxuse.min.js?ver=1.2.4'></script>
+<link rel='https://api.w.org/' href='http://ploobs.com.br/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://ploobs.com.br/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://ploobs.com.br/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Plant Jumper' href='http://ploobs.com.br/2018/08/22/plant-jumper/' />
+<link rel='next' title='First Configurations ECS Unity Project' href='http://ploobs.com.br/2018/08/26/first-steps-on-creating-a-pure-ecs-unity-project-part-2/' />
+<meta name="generator" content="WordPress 4.9.9" />
+<link rel="canonical" href="http://ploobs.com.br/2018/08/24/first-steps-on-creating-a-pure-ecs-unity-project-part-1/" />
+<link rel='shortlink' href='http://ploobs.com.br/?p=33' />
+<link rel="alternate" type="application/json+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2F2018%2F08%2F24%2Ffirst-steps-on-creating-a-pure-ecs-unity-project-part-1%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2F2018%2F08%2F24%2Ffirst-steps-on-creating-a-pure-ecs-unity-project-part-1%2F&#038;format=xml" />
+	<link href="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Styles/SyntaxHighlighter.css" type="text/css" rel="stylesheet" />
+	<meta property="og:site_name" content="Ploobs - Game Dev Blog" />
+<meta property="og:title" content="First Steps on creating a pure ECS Unity Project" />
+<meta property="og:url" content="http://ploobs.com.br/2018/08/24/first-steps-on-creating-a-pure-ecs-unity-project-part-1/" />
+<meta property="og:type" content="article" />
+<script type="text/javascript">
+	window._se_plugin_version = '8.1.9';
+</script>
+
+<!-- Protected by WP-SpamFree :: JS BEGIN -->
+<script type="text/javascript" src="http://ploobs.com.br/wp-content/plugins/wp-spamfree/js/wpsfv2-js.php"></script> 
+<!-- Protected by WP-SpamFree :: JS END -->
+
+<link rel="pingback" href="http://ploobs.com.br/xmlrpc.php">
+		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		<style type="text/css" id="custom-background-css">
+body.custom-background { background-color: #048c96; }
+</style>
+
+<!-- BEGIN ExactMetrics v5.3.5 Universal Analytics - https://exactmetrics.com/ -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-124485945-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- END ExactMetrics Universal Analytics -->
+</head>
+
+<body class="post-template-default single single-post postid-33 single-format-standard custom-background boxed-theme-layout blog-grid-layout">
+
+	<div id="page" class="site">
+		<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+		
+		<header id="masthead" class="site-header clearfix" role="banner">
+
+			<div class="header-main container clearfix">
+
+				<div id="logo" class="site-branding clearfix">
+
+										
+			<p class="site-title"><a href="http://ploobs.com.br/" rel="home">Ploobs &#8211; Game Dev Blog</a></p>
+
+							
+			<p class="site-description">Game Development Blog</p>
+
+		
+				</div><!-- .site-branding -->
+
+				
+			</div><!-- .header-main -->
+
+			
+<div id="main-navigation-wrap" class="primary-navigation-wrap">
+
+	<div id="main-navigation-container" class="primary-navigation-container container">
+
+		
+		<nav id="main-navigation" class="primary-navigation navigation clearfix" role="navigation">
+					</nav><!-- #main-navigation -->
+
+	</div>
+
+</div>
+
+			
+			
+		</header><!-- #masthead -->
+
+		<div id="content" class="site-content container">
+
+	<div id="primary" class="content-area">
+		<main id="main" class="site-main">
+
+		
+<article id="post-33" class="post-33 post type-post status-publish format-standard hentry category-programming tag-ecs tag-programming">
+
+	
+			<div class="post-image">
+							</div>
+
+		
+	<div class="post-content">
+
+		<header class="entry-header">
+
+			<h1 class="entry-title">First Steps on creating a pure ECS Unity Project</h1>
+			<div class="entry-meta post-details"><span class="posted-on meta-date">Posted on <a href="http://ploobs.com.br/2018/08/24/first-steps-on-creating-a-pure-ecs-unity-project-part-1/" rel="bookmark"><time class="entry-date published" datetime="2018-08-24T15:00:46+00:00">24 de August de 2018</time><time class="updated" datetime="2018-08-26T21:56:38+00:00">26 de August de 2018</time></a></span><span class="posted-by meta-author"> by <span class="author vcard"><a class="url fn n" href="http://ploobs.com.br/author/ploobs/" title="View all posts by ploobs" rel="author">ploobs</a></span></span></div>
+		</header><!-- .entry-header -->
+
+		<div class="entry-content clearfix">
+
+			
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2F2018%2F08%2F24%2Ffirst-steps-on-creating-a-pure-ecs-unity-project-part-1%2F&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+<p>This the very first step of creating your game in unity using pure ECS. I will describe here how i did it and some things i discovered during it</p>
+
+<p>This tutorial contains basic concepts and decisions i made.</p>
+
+<h2>Project Configuration</h2>
+
+<p>The first thing you must check it is the .NET version in the Scripting Runtime Version, that can be found at the menu Edit -> Project Settings -> Player</p>
+
+<figure class="wp-block-image"><img src="http://ploobs.com.br/wp-content/uploads/2018/08/configure.png" alt="" class="wp-image-54" srcset="http://ploobs.com.br/wp-content/uploads/2018/08/configure.png 353w, http://ploobs.com.br/wp-content/uploads/2018/08/configure-300x128.png 300w" sizes="(max-width: 353px) 100vw, 353px" /></figure>
+
+<p>A grand difference between classic projects and pure ecs projects as the moment i wrote this post it is that the editor it is not that ready yet. But what this means, it is not that clear how to configure the gameobjects and add ECS components as the ECS architecture needs.</p>
+
+<p><strong>Object Configuration</strong></p>
+
+<p>A project configuration nowaday since we will not configure the game objects directly in the editor needs to be done directly in the code</p>
+
+<p>For things like asset references, we need to create a prototype GameObjects in the Scene, where we can add wrapped <strong>IComponentData</strong> types. Once we&#8217;ve finished the configuration, we can discard these prototype objects.</p>
+
+<p>In the minigame plantjumper i will not use this approach since the level and player will be created procedurally.</p>
+
+<p><strong>Archetypes</strong></p>
+
+<p>As an ECS object, we must configure entities and components. In Unity we have a very interresting feature, archetypes, which is, as we are used in unity something like a prefab of a group of components.</p>
+
+<pre class="wp-block-code"><code>PlayerArchetype = entityManager.CreateArchetype(
+typeof(Position3D), 
+typeof(PlayerInput), 
+typeof(Health), 
+typeof(TransformMatrix));</code></pre>
+
+<p>The sample above creates an archetype with pre created components</p>
+
+<pre class="wp-block-code"><code>    public struct Health : IComponentData
+    {
+        public float Value;
+    }</code></pre>
+
+<p>Some of the components are unity defaults, and then we don´t need to create then. In the example i gave here, the Position3D and TransformMatrix.</p>
+
+<p>As you can notice the Health component i described it is a struct and not a class and this is not in vain. This is due to the fact that instances are passed as references and structs as value and then this is a good way to optimize memory because we will not handle unnecessary data.</p>
+
+<p>I decided to create a bunch of component files because i want to reuse then in another games and a Factory of archetypes to create a level of abstractions.</p>
+
+<h2>Bootstrap</h2>
+
+<p>As the object creation lifecycle, i will overload the unity initialization, that can tipicaly be configured as a script attached to a gameobject.</p>
+
+<p>The bootstrap script it is responsible to create the entities, associate its components and if necessary initialize some systems</p>
+
+<h2>References</h2>
+
+<figure class="wp-block-embed-youtube wp-block-embed is-type-video is-provider-youtube">
+<iframe width="910" height="512" src="https://www.youtube.com/embed/EYnTX66QPRg?feature=oembed" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</figure>
+
+<p><a href="https://github.com/Unity-Technologies/EntityComponentSystemSamples/blob/master/Documentation/content/two_stick_shooter.md">Two Stick Shooter ECS</a></p>
+
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2F2018%2F08%2F24%2Ffirst-steps-on-creating-a-pure-ecs-unity-project-part-1%2F&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+<div class="post-views post-33 entry-meta">
+			<span class="post-views-icon dashicons dashicons-chart-bar"></span>
+			<span class="post-views-label">Post Views: </span>
+			<span class="post-views-count">4,048</span>
+			</div>
+			
+		</div><!-- .entry-content -->
+
+		
+	</div><!-- .post-content -->
+
+	<footer class="entry-footer post-details">
+		<div class="entry-categories"> <svg class="icon icon-category" aria-hidden="true" role="img"> <use xlink:href="http://ploobs.com.br/wp-content/themes/donovan/assets/icons/genericons-neue.svg#category"></use> </svg><a href="http://ploobs.com.br/category/programming/" rel="category tag">Programming</a></div>
+			<div class="entry-tags clearfix">
+				<svg class="icon icon-tag" aria-hidden="true" role="img"> <use xlink:href="http://ploobs.com.br/wp-content/themes/donovan/assets/icons/genericons-neue.svg#tag"></use> </svg>				<a href="http://ploobs.com.br/tag/ecs/" rel="tag">ECS</a>, <a href="http://ploobs.com.br/tag/programming/" rel="tag">Programming</a>			</div><!-- .entry-tags -->
+
+			</footer><!-- .entry-footer -->
+
+</article>
+
+	<nav class="navigation post-navigation" role="navigation">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="http://ploobs.com.br/2018/08/22/plant-jumper/" rel="prev"><span class="nav-link-text">Previous Post</span><h3 class="entry-title">Plant Jumper</h3></a></div><div class="nav-next"><a href="http://ploobs.com.br/2018/08/26/first-steps-on-creating-a-pure-ecs-unity-project-part-2/" rel="next"><span class="nav-link-text">Next Post</span><h3 class="entry-title">First Configurations ECS Unity Project</h3></a></div></div>
+	</nav>
+<div id="comments" class="comments-area">
+
+		<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2018/08/24/first-steps-on-creating-a-pure-ecs-unity-project-part-1/#respond" style="display:none;">Cancel reply</a></small></h3>			<form action="http://ploobs.com.br/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate>
+				<p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> Required fields are marked <span class="required">*</span></p><p class="comment-form-comment"><label for="comment">Comment</label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required="required"></textarea></p><p style="clear: both;" class="subscribe-to-comments">
+			<input type="checkbox" name="subscribe" id="subscribe" value="subscribe" style="width: auto;" />
+			<label for="subscribe">Notify me of followup comments via e-mail</label>
+			</p><p class="comment-form-author"><label for="author">Name <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" required='required' /></p>
+<p class="comment-form-email"><label for="email">Email <span class="required">*</span></label> <input id="email" name="email" type="email" value="" size="30" maxlength="100" aria-describedby="email-notes" required='required' /></p>
+<p class="comment-form-url"><label for="url">Website</label> <input id="url" name="url" type="url" value="" size="30" maxlength="200" /></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment" /> <input type='hidden' name='comment_post_ID' value='33' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+</p>	<script type='text/javascript'>
+	<!--
+	refJS = escape( document[ 'referrer' ] );
+	document.write("<input type='hidden' name='refJS' value='"+refJS+"'>");
+	// -->
+	</script>
+	<p style="font-size: 12px;clear:both;margin: 12px auto;text-align: center;">This blog is kept spam free by <a href="http://www.polepositionmarketing.com/library/wordpress-plugins/wpspam-free/" title="WP-SpamFree Anti-Spam WordPress Plugin" target="_blank">WP-SpamFree</a>.</p>			</form>
+			</div><!-- #respond -->
+	
+</div><!-- #comments -->
+
+		</main><!-- #main -->
+	</div><!-- #primary -->
+
+
+	<section id="secondary" class="sidebar widget-area clearfix" role="complementary">
+
+		<section id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="http://ploobs.com.br/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field"
+			placeholder="Search &hellip;"
+			value="" name="s"
+			title="Search for:" />
+	</label>
+	<button type="submit" class="search-submit">
+		<svg class="icon icon-search" aria-hidden="true" role="img"> <use xlink:href="http://ploobs.com.br/wp-content/themes/donovan/assets/icons/genericons-neue.svg#search"></use> </svg>		<span class="screen-reader-text">Search</span>
+	</button>
+</form>
+</section><section id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="http://ploobs.com.br/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field"
+			placeholder="Search &hellip;"
+			value="" name="s"
+			title="Search for:" />
+	</label>
+	<button type="submit" class="search-submit">
+		<svg class="icon icon-search" aria-hidden="true" role="img"> <use xlink:href="http://ploobs.com.br/wp-content/themes/donovan/assets/icons/genericons-neue.svg#search"></use> </svg>		<span class="screen-reader-text">Search</span>
+	</button>
+</form>
+</section><section id="categories-2" class="widget widget_categories"><h4 class="widget-title">Categories</h4>		<ul>
+	<li class="cat-item cat-item-4"><a href="http://ploobs.com.br/category/game-design/" >Game Design</a> (2)
+</li>
+	<li class="cat-item cat-item-3"><a href="http://ploobs.com.br/category/programming/" >Programming</a> (10)
+</li>
+		</ul>
+</section><section id="archives-2" class="widget widget_archive"><h4 class="widget-title">Archives</h4>		<ul>
+			<li><a href='http://ploobs.com.br/2018/09/'>September 2018</a></li>
+	<li><a href='http://ploobs.com.br/2018/08/'>August 2018</a></li>
+		</ul>
+		</section>		<section id="recent-posts-2" class="widget widget_recent_entries">		<h4 class="widget-title">Recent Posts</h4>		<ul>
+											<li>
+					<a href="http://ploobs.com.br/2018/09/10/creating-system-spawners-to-populate-level/">Creating System Spawners to populate Level</a>
+									</li>
+											<li>
+					<a href="http://ploobs.com.br/2018/09/05/plant-jumper-creating-a-breakeble-and-moveable-block/">Plant Jumper &#8211; Creating a breakeble and a moveable Block</a>
+									</li>
+											<li>
+					<a href="http://ploobs.com.br/2018/09/04/plant-jumper-procedural-level-generation/">Plant Jumper &#8211; Procedural Level Generation</a>
+									</li>
+											<li>
+					<a href="http://ploobs.com.br/2018/08/30/plantjumper-input-system/">PlantJumper &#8211; Input System</a>
+									</li>
+											<li>
+					<a href="http://ploobs.com.br/2018/08/28/plant-jumper-player-moviment/">Plant Jumper &#8211; Player Moviment</a>
+									</li>
+					</ul>
+		</section><section id="recent-comments-2" class="widget widget_recent_comments"><h4 class="widget-title">Recent Comments</h4><ul id="recentcomments"></ul></section><section id="archives-2" class="widget widget_archive"><h4 class="widget-title">Archives</h4>		<ul>
+			<li><a href='http://ploobs.com.br/2018/09/'>September 2018</a></li>
+	<li><a href='http://ploobs.com.br/2018/08/'>August 2018</a></li>
+		</ul>
+		</section><section id="categories-2" class="widget widget_categories"><h4 class="widget-title">Categories</h4>		<ul>
+	<li class="cat-item cat-item-4"><a href="http://ploobs.com.br/category/game-design/" >Game Design</a> (2)
+</li>
+	<li class="cat-item cat-item-3"><a href="http://ploobs.com.br/category/programming/" >Programming</a> (10)
+</li>
+		</ul>
+</section><section id="meta-2" class="widget widget_meta"><h4 class="widget-title">Meta</h4>			<ul>
+						<li><a href="http://ploobs.com.br/wp-login.php">Log in</a></li>
+			<li><a href="http://ploobs.com.br/feed/">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://ploobs.com.br/comments/feed/">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://wordpress.org/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.org</a></li>			</ul>
+			</section>
+	</section><!-- #secondary -->
+
+
+	</div><!-- #content -->
+
+	
+	<div id="footer" class="footer-wrap">
+
+		<footer id="colophon" class="site-footer container clearfix" role="contentinfo">
+
+			
+			<div id="footer-line" class="site-info">
+								
+	<span class="credit-link">
+		Powered by <a href="http://wordpress.org" title="WordPress">WordPress</a> and <a href="https://themezee.com/themes/donovan/" title="Donovan WordPress Theme">Donovan</a>.	</span>
+
+				</div><!-- .site-info -->
+
+		</footer><!-- #colophon -->
+
+	</div>
+
+</div><!-- #page -->
+
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shCore.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushCSharp.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushPhp.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushJScript.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushJava.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushVb.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushSql.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushXml.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushDelphi.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushPython.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushRuby.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushCss.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushCpp.js"></script>
+<script class="javascript">
+dp.SyntaxHighlighter.ClipboardSwf = 'http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/clipboard.swf';
+dp.SyntaxHighlighter.HighlightAll('code');
+</script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/comment-reply.min.js?ver=4.9.9'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/plugins/enlighter/resources/mootools-core-yc.js?ver=3.8.1'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/plugins/enlighter/resources/EnlighterJS.min.js?ver=3.8.1'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/wp-embed.min.js?ver=4.9.9'></script>
+<script type="text/javascript">/* <![CDATA[ */EnlighterJS_Config = {"selector":{"block":"pre.EnlighterJSRAW","inline":"code.EnlighterJSRAW"},"language":"csharp","theme":"enlighter","indent":4,"hover":"hoverEnabled","showLinenumbers":true,"rawButton":true,"infoButton":true,"windowButton":true,"rawcodeDoubleclick":false,"grouping":true,"cryptex":{"enabled":false,"email":"mail@example.tld"}};!function(){var a=function(a){var b="Enlighter Error: ";console.error?console.error(b+a):console.log&&console.log(b+a)};return window.addEvent?"undefined"==typeof EnlighterJS?void a("Javascript Resources not loaded yet!"):"undefined"==typeof EnlighterJS_Config?void a("Configuration not loaded yet!"):void window.addEvent("domready",function(){EnlighterJS.Util.Init(EnlighterJS_Config.selector.block,EnlighterJS_Config.selector.inline,EnlighterJS_Config)}):void a("MooTools Framework not loaded yet!")}();;/* ]]> */</script>
+</body>
+</html>

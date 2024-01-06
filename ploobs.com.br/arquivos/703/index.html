@@ -1,0 +1,817 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="keywords" content="Aceleradores Graficos, computacao grafica, GPU, Performance, pipeline, Shader, " />
+<meta name="description" content="Creators of Ploobs Engine, OpenSource XNA GameEngine and indie Game Development" />
+<meta name="google-site-verification" content="SHK4jeXj--ju-cPSerLDrbbhbEHEPgf_2Ckw8BClx8I" />
+
+<title>CPU VS GPU -  Encontrando o Gargalo -- Pt 2 | Ploobs</title>
+
+<link rel="alternate" type="application/rss+xml" title="Ploobs RSS Feed" href="http://ploobs.com.br/feed" />
+<link rel="alternate" type="application/atom+xml" title="Ploobs Atom Feed" href="http://ploobs.com.br/feed/atom" />
+<link rel="pingback" href="http://ploobs.com.br/xmlrpc.php" />
+
+
+<style type="text/css" media="all">
+@import "http://ploobs.com.br/wp-content/themes/fusion/style.css";
+#page-wrap2{ background: #0a0d2e; }
+#page-wrap1{ background: none; }
+</style>
+
+
+<!--[if lte IE 6]>
+<script type="text/javascript">
+/* <![CDATA[ */
+   blankimgpath = 'http://ploobs.com.br/wp-content/themes/fusion/images/blank.gif';
+ /* ]]> */
+</script>
+<style type="text/css" media="screen">
+  @import "http://ploobs.com.br/wp-content/themes/fusion/ie6.css";
+  body{ behavior:url("http://ploobs.com.br/wp-content/themes/fusion/js/ie6hoverfix.htc"); }
+  img{ behavior: url("http://ploobs.com.br/wp-content/themes/fusion/js/ie6pngfix.htc"); }
+</style>
+<![endif]-->
+
+
+  
+
+<!-- All in One SEO Pack 2.3.4 by Michael Torbert of Semper Fi Web Design[592,668] -->
+<meta name="description"  content="Neste post irei discutir um pouco sobre algumas maneiras que temos para perceber se um jogo esta limitado pela CPU ou pela GPU . Irei também falar brevemente" />
+
+<meta name="keywords"  content="aceleradores graficos,cpu,gpu,assíncrona,comunicacao,etapas,directx,xna,estagios,pipeline,shader,shader model,pipeline stall,gpu bounding,lento,performance,computacao grafica,all posts,artigos introdutorios" />
+
+<link rel="canonical" href="http://ploobs.com.br/arquivos/703" />
+<!-- /all in one seo pack -->
+<link rel="alternate" type="application/rss+xml" title="Ploobs &raquo; CPU VS GPU &#8211;  Encontrando o Gargalo &#8212; Pt 2  Feed de comentários" href="http://ploobs.com.br/arquivos/703/feed" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/ploobs.com.br\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.4.10"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;return g&&g.fillText?(g.textBaseline="top",g.font="600 32px Arial","flag"===a?(g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3):"diversity"===a?(g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e):("simple"===a?g.fillText(h(55357,56835),0,0):g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0])):!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g;c.supports={simple:d("simple"),flag:d("flag"),unicode8:d("unicode8"),diversity:d("diversity")},c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.simple&&c.supports.flag&&c.supports.unicode8&&c.supports.diversity||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery.js?ver=1.11.3'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/themes/fusion/js/fusion.js?ver=4.4.10'></script>
+<link rel='https://api.w.org/' href='http://ploobs.com.br/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://ploobs.com.br/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://ploobs.com.br/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='[PloobsEngine] Tutorial 4 &#8211; Lights and Cameras' href='http://ploobs.com.br/arquivos/1021' />
+<link rel='next' title='[PloobsEngine] Tutorial 5 – Initialization Parameters' href='http://ploobs.com.br/arquivos/1060' />
+<meta name="generator" content="WordPress 4.4.10" />
+<link rel='shortlink' href='http://ploobs.com.br/?p=703' />
+<link rel="alternate" type="application/json+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2Farquivos%2F703" />
+<link rel="alternate" type="text/xml+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2Farquivos%2F703&#038;format=xml" />
+<meta property="og:site_name" content="Ploobs" />
+<meta property="og:title" content="CPU VS GPU –  Encontrando o Gargalo — Pt 2" />
+<meta property="og:url" content="http://ploobs.com.br/arquivos/703" />
+<meta property="og:type" content="article" />
+
+<script type="text/javascript">
+/* <![CDATA[ */
+ jQuery(document).ready(function(){
+  // body .safari class
+  if (jQuery.browser.safari) jQuery('body').addClass('safari');
+
+  // layout controls
+     jQuery("#layoutcontrol a").click(function() {
+     switch (jQuery(this).attr("class")) {
+	   case 'setFont' : setFontSize();	break;
+	   case 'setLiquid'	: setPageWidth();	break;
+	 }
+	 return false;
+    });
+   // set the font size from cookie
+   var font_size = jQuery.cookie('fontSize');
+   if (font_size == '.70em') { jQuery('body').css("font-size",".70em"); }
+   if (font_size == '.95em') { jQuery('body').css("font-size",".95em"); }
+   if (font_size == '.75em') { jQuery('body').css("font-size",".75em"); }
+
+   // set the page width from cookie
+   var page_width = jQuery.cookie('pageWidth');
+   if (page_width) jQuery('#page').css('width', page_width);
+  
+  jQuery('#post-extra-content').minitabs(333, 'slide');
+
+  if (document.all && !window.opera && !window.XMLHttpRequest && jQuery.browser.msie) { var isIE6 = true; }
+  else { var isIE6 = false;} ;
+  jQuery.browser.msie6 = isIE6;
+  if (!isIE6) {
+    initTooltips({
+		timeout: 6000
+   });
+  }
+  tabmenudropdowns();
+
+  // some jquery effects...
+  jQuery('#sidebar ul.nav li ul li a').mouseover(function () {
+   	jQuery(this).animate({ marginLeft: "4px" }, 100 );
+  });
+  jQuery('#sidebar ul.nav li ul li a').mouseout(function () {
+    jQuery(this).animate({ marginLeft: "0px" }, 100 );
+  });
+  // scroll to top
+  jQuery("a#toplink").click(function(){
+    jQuery('html').animate({scrollTop:0}, 'slow');
+  });
+
+  // set roles on some elements (for accessibility)
+  jQuery("#tabs").attr("role","navigation");
+  jQuery("#mid-content").attr("role","main");
+  jQuery("#sidebar").attr("role","complementary");
+  jQuery("#searchform").attr("role","search");
+
+ });
+
+ /* ]]> */
+</script>
+
+</head>
+<body class="cpu-vs-gpu-descobrindo-gargalo">
+  <!-- page wrappers (100% width) -->
+  <div id="page-wrap1">
+    <div id="page-wrap2">
+      <!-- page (actual site content, custom width) -->
+      <div id="page" class="with-sidebar">
+
+       <!-- main wrapper (side & main) -->
+       <div id="main-wrap">
+        <!-- mid column wrap -->
+    	<div id="mid-wrap">
+          <!-- sidebar wrap -->
+          <div id="side-wrap">
+            <!-- mid column -->
+    	    <div id="mid">
+              <!-- header -->
+              <div id="header">
+                <div id="topnav" class="description"> Creators of Ploobs Engine, OpenSource XNA GameEngine and indie Game Development</div>
+
+                                <a id="logo" href="http://ploobs.com.br/"><img src="http://ploobs.com.br/wp-content/uploads/logo2.png" title="Ploobs" alt="Ploobs" /></a>
+                
+                <!-- top tab navigation -->
+                <div id="tabs">
+                 <ul>
+                                     <li id="nav-homelink"><a href="http://ploobs.com.br" title="Clique para Início"><span><span>Início</span></span></a></li>
+                                   <li class="page_item page-item-2"><a href="http://ploobs.com.br/about"><span><span>About</span></span></a></li>
+<li class="page_item page-item-1353"><a href="http://ploobs.com.br/contatos"><span><span>Contact Us</span></span></a></li>
+<li class="page_item page-item-494"><a href="http://ploobs.com.br/forum"><span><span>Forum</span></span></a></li>
+<li class="page_item page-item-233 page_item_has_children"><a href="http://ploobs.com.br/ploobsengine"><span><span>PloobsEngine</span></span></a>
+<ul class='children'>
+	<li class="page_item page-item-1381"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-presentation"><span><span>PloobsEngine Presentation</span></span></a></li>
+	<li class="page_item page-item-1392"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-features"><span><span>PloobsEngine Features</span></span></a></li>
+	<li class="page_item page-item-1395"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-download"><span><span>PloobsEngine Download</span></span></a></li>
+	<li class="page_item page-item-1379"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-tutorials"><span><span>PloobsEngine Tutorials</span></span></a></li>
+	<li class="page_item page-item-465"><a href="http://ploobs.com.br/ploobsengine/galeria"><span><span>PloobsEngine Galery</span></span></a></li>
+	<li class="page_item page-item-1371"><a href="http://ploobs.com.br/ploobsengine/ploobs-license"><span><span>PloobsEngine Dual-License</span></span></a></li>
+</ul>
+</li>
+<li class="page_item page-item-656"><a href="http://ploobs.com.br/iniciantes"><span><span>Comp Gráfica Tutoriais</span></span></a></li>
+                 </ul>
+                </div>
+                <!-- /top tabs -->
+
+              </div><!-- /header -->
+  <!-- mid content -->
+  <div id="mid-content">
+      <div class="navigation">
+      <div class="alignleft">&laquo; <a href="http://ploobs.com.br/arquivos/1021" rel="prev">[PloobsEngine] Tutorial 4 &#8211; Lights and Cameras</a></div>
+      <div class="alignright"><a href="http://ploobs.com.br/arquivos/1060" rel="next">[PloobsEngine] Tutorial 5 – Initialization Parameters</a> &raquo;</div>
+      <div class="clear"></div>
+    </div>
+
+    <div id="post-703" class="post-703 post type-post status-publish format-standard hentry category-geral category-artigos-introdutorios category-computacao-grafica tag-aceleradores-graficos tag-computacao-grafica-2 tag-gpu tag-performance tag-pipeline tag-shader">
+       <h2 class="title">CPU VS GPU &#8211;  Encontrando o Gargalo &#8212; Pt 2</h2>       <br />
+	    <div class="entry">
+          <div class="postbody entry clearfix">
+	       
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2Farquivos%2F703&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+<p><img class="alignleft" title="sfadfad" src="http://t3.gstatic.com/images?q=tbn:ANd9GcSoCJvfLLhRtsTTTp8F5W7IvKbaAQtccdu9rMV2wqpmqPV0X6-7" alt="" width="244" height="102" />Neste post irei discutir um pouco sobre algumas maneiras que temos para perceber se um jogo esta limitado pela CPU ou pela GPU . Irei também falar brevemente sobre como remover gargalos no caso da aplicacão esta limitada pela GPU. (<a href="http://ploobs.com.br/?p=694">Link para parte 1</a>)</p>
+<p><span id="more-703"></span></p>
+<p>Inicialmente recomendo que o pessoal tenha lido o <a href="http://ploobs.com.br/?p=694">primeiro tutorial da série</a>.</p>
+<p>Em jogos, normalmente encontramos os seguintes tipos de gargalos  :</p>
+<ol>
+<li>CPU bound (o processador é o fator limitante no seu jogo)</li>
+<li>GPU bound (a placa de vídeo é o fator limitante no seu jogo)</li>
+<li>Equilíbrio (CPU e GPU estão sob a mesma carga,praticamente impossível de alcançar em uma execução completa de um jogo)</li>
+</ol>
+<p>Nao existe uma maneira simples de detectar se estamos CPU e GPU bounded.</p>
+<p>O <a href="http://blogs.msdn.com/b/shawnhar/archive/2008/04/07/how-to-tell-if-you-are-cpu-or-gpu-bound.aspx">blog do Shawn Hargreaves</a> contem uma serie de passos que podemos seguir para tentar descobrir em qual caso acima estamos. Irei me basear um pouco no post dele neste artigo, porem sem focar exclusivamente no XNA.</p>
+<p>O primeiro e básico passo nesta procura é:</p>
+<ul>
+<li>Desabilitar qualquer espécie de sistema que controle o frame rate da aplicação. Alguns jogos/engines usam um sistema interno de clock que forcam o FPS a um determinado numero fixo.</li>
+<li>Desabilitar o V-Sync (vertical synchronization)</li>
+</ul>
+<p>Em seguida começamos os testes:</p>
+<p>O primeiro é feito para detectar se voce esta CPU Bounding usando um profiler de CPU.</p>
+<p>A idéia é ver se o tempo gasto em seu aplicativo percentualmente esta mais concentrado nos métodos que realizam tarefas exclusivamente de CPU (como a maioria dos sistemas de inteligência artificial por exemplo). Se voce encontrar numeros alarmantes nos métodos CPU, voce provavelmente estara CPU BOUNDED. Se voce perceber que uma grande parcela do tempo esta sendo gasta em metodos que realizam operacoes graficas, voce nao poderá concluir que sua aplicacão está GPU BOUNDED (lembre do ultimo post, a tarefa de desenhar uma primitiva é um conjunto de operacões executadas tanto pela CPU quanto pela GPU).</p>
+<p>Caso o seu aplicativo esteja gastando muito tempo na funcao chamada Present do DirectX (responsavel por traduzir as chamadas gráficas para o driver de vídeo executa-las (o opengl deve ter uma semelhante), conforme discutido no post anterior), isto pode significar que voce esta GPU Bound (o Present pode estar esperando a GPU terminar de desenhar o frame anterior e por isto estar demorando mais que o normal), porém em alguns casos pode significar que a CPU esta gastando muito tempo para converter as chamadas gráficas em instrucoes para a GPU. Para descobrir em qual caso voce está, a melhor maneira é (infelizmente) alterar o codigo que roda exclusivamente na CPU e verificar o que acontece com o frame rate. Tomar cuidado para não alterar algo que tenha a ver com desenho de primitivas (desenhar depende da GPU e CPU, se voce fizer isto,  nao podera concluir nada com a resposta obtida, deve-se alterar apenas trechos que dependam exclusivamente da CPU ou da GPU)</p>
+<p>Um exemplo de alteração possivel é desabilitar uma parte do calculo da IA, se o frame rate nao mudar, voce esta GPU BOUND, se ele mudar sensivelmente voce esta CPU BOUND.</p>
+<p>Uma vez que descobrimos que estamos GPU bound, precisamo saber em que estagio da pipeline da GPU esta o nosso gargalo. É interessante utilizar um profiler de GPU como o <a href="http://developer.nvidia.com/nvidia-perfhud">PerfHud</a> neste caso. Devemos olhar para os graficos que mostram a carga de operacão nas unidades Vertex e Pixel shader (DirectX 9c), além de verificar acesso a texturas e memória utilizada. Esta tarefa é bastante: &#8220;experiência, conhecimento da técnica usada e tentativa e erro&#8221;, não existe uma receita pronta.</p>
+<p>Situação comuns de GPU Bound (e solucões possíveis )são:</p>
+<ul>
+<li>Ter um Pixel Shader muito complexo. (Não há solucão simples, tente simplificar o algoritmo, usar texturas com valores pré-calculados, prefira se possível passar os cálculas para o Vertex Shader e utilizar os valores interpolados pelo rasterizador)</li>
+<li>Ter um Vertex Shader muito complexo. (Não há solucão simples, tente simplificar o algoritmo, usar texturas com valores pré-calculados)</li>
+<li>Efetuar muitas leituras de texturas no Pixel Shader (Não há solucão simples, tente simplificar o algoritmo, usar filtros mais simples como Point ou Linear)</li>
+<li>Desenhar muitas primitivas diferentes usando shaders diferentes (Efetue na CPU uma ordenação dos objetos a serem desenhados a fim de minimizar a troca de estados da GPU)</li>
+<li>Desenhar muitas primitivas (considere o uso de instancing para o caso de objetos iguais, tente usar estruturas cache friendly ao armazenar os vértices, considere o uso de estruturas de particão espacial (como uma Octree) para ajudar fazendo Culling na CPU)</li>
+</ul>
+<p>A seguir listei os parametros que mais afetam cada um dos estágios da pipeline da GPU, :</p>
+<h3>Input Assembler</h3>
+<ul>
+<li>Número de vértices enviados</li>
+<li>Tamanho de cada vértices (quantidade de dados enviado por vértices)</li>
+<li>O quão ordenado estão os vértices (coerência de cache).</li>
+</ul>
+<h3>Vertex shader</h3>
+<ul>
+<li>Número de vértices enviados</li>
+<li>Complexidade do código rodado nesta unidade</li>
+<li>Quanto ordenados estão os vértices do triângulos para coerência de cache.</li>
+</ul>
+<h3>Rasterizer</h3>
+<ul>
+<li>Número de pixel renderizado (Resolução da tela)</li>
+<li>Número de valores a serem interpolados passados do Vertex para o Pixel Shader</li>
+</ul>
+<h3>Pixel shader</h3>
+<ul>
+<li>Número de pixels renderizados</li>
+<li>Complexidade do Pixel Shader (funções utilizadas, tamanho, fluxo de dados, complexidade dos algoritmos utilizados)</li>
+</ul>
+<h3>Texture fetch (leitura de texels)</h3>
+<ul>
+<li>Número de Pixels renderizados</li>
+<li>Quantidade de leituras de textura por pixel</li>
+<li>Quantidade de dados de textura lidos da memória</li>
+</ul>
+<ul>
+<li>Texturas com Mipmap normalmente tem maior coerência de cache</li>
+<li>Compressão de textura utilizada</li>
+</ul>
+<ul>
+<li>Tipo de filtros aplicados</li>
+<li>Anisotrópico é o mais caro</li>
+<li>Trilinear é a segunda mais lenta</li>
+<li>Bilinear e Point são as que possuem os menores custos</li>
+</ul>
+<h3>Depth/stencil testes</h3>
+<ul>
+<li>Número de pixels renderizados</li>
+<li>Uso de MultiSampling (Antialiasing)</li>
+<li>Configuração do Depth/Stencil (modo read/write vs. read-only )</li>
+</ul>
+<h3>FrameBuffer</h3>
+<ul>
+<li>Número de pixel renderizado</li>
+<li>Uso de MultiSampling</li>
+<li>Tamanho de cada pixel em termo de bytes (including MRT)</li>
+<li>Modo read/write (alpha blending) vs. write-only (opaco)</li>
+</ul>
+<p>As informacoes acimas foram retiradas de blogs especializados, livros e da minha experiência no assunto.</p>
+<p>Uma última dica importante que ouvimos todos os dias, mas ninguém segue. Otimizacão  é feita depois que as coisas já estão funcionando. Otimizacão deve ser feita de maneira inteligente, não adianta absolutamente nada criar o método de busca mais rápido do universo se ele é usado uma única vez pelo seu jogo ( e ainda durante o loading =P). Encontre os gargalos antes !!!!</p>
+<p>Até a próxima pessoal =P</p>
+<p>&nbsp;</p>
+
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2Farquivos%2F703&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+          </div>
+                              <p class="tags"><a href="http://ploobs.com.br/arquivos/tag/aceleradores-graficos" rel="tag">Aceleradores Graficos</a>, <a href="http://ploobs.com.br/arquivos/tag/computacao-grafica-2" rel="tag">computacao grafica</a>, <a href="http://ploobs.com.br/arquivos/tag/gpu" rel="tag">GPU</a>, <a href="http://ploobs.com.br/arquivos/tag/performance" rel="tag">Performance</a>, <a href="http://ploobs.com.br/arquivos/tag/pipeline" rel="tag">pipeline</a>, <a href="http://ploobs.com.br/arquivos/tag/shader" rel="tag">Shader</a></p>
+          <div class="clear"></div>
+                    <p class="postmetadata alt">
+			<small>
+                This entry was posted on 8 de junho de 2011, 10:02 am and is filed under <a href="http://ploobs.com.br/arquivos/category/geral" rel="category tag">All Posts</a>, <a href="http://ploobs.com.br/arquivos/category/computacao-grafica/artigos-introdutorios" rel="category tag">Artigos Introdutorios</a>, <a href="http://ploobs.com.br/arquivos/category/computacao-grafica" rel="category tag">Computacao Grafica</a>. You can follow any responses to this entry through <a href="http://ploobs.com.br/arquivos/703/feed" title="RSS 2.0">RSS 2.0</a>.
+                Você pode <a href="#respond">deixar uma resposta</a>, ou <a href="http://ploobs.com.br/arquivos/703/trackback" rel="trackback">citar</a> de seu próprio site.                            </small>
+		  </p>
+	   </div>
+    </div>
+	
+
+<div id="post-extra-content">
+      <!-- comments and trackback tabs -->
+    <ul class="secondary-tabs">
+      <li><a href="#tab-1"><span><span>Comentários (11)</span></span></a></li>
+            <li><a href="#tab-3"><span><span>Related Posts</span></span></a></li>    </ul>
+    <!-- /comments and trackback tabs -->
+    <!-- comments -->
+  <div id="tab-1">
+   <ol id="comments">
+     <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-5066999">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/faa4b612ac70e482de450c0977757e57?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/faa4b612ac70e482de450c0977757e57?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-5066999">#1</a> by <a id="commentauthor-5066999" href="http://tzjb.info">Travel and Leisure</a> on 10 de junho de 2017 - 10:55 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-5066999">
+          <p>Pretty nice post. I just stumbled upon your blog and wanted to say that I&#8217;ve truly enjoyed browsing your blog posts. In any case I will be subscribing to your rss feed and I hope you write again very soon!</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-5066999', 'comment-5066999', 'commentbody-5066999', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-5067072">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/f924bf115323ae5115cf69bc2d436143?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/f924bf115323ae5115cf69bc2d436143?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-5067072">#2</a> by <a id="commentauthor-5067072" href="http://rjjn.info">Education and Training</a> on 10 de junho de 2017 - 11:03 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-5067072">
+          <p>I gotta bookmark  this website  it seems  very helpful   handy</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-5067072', 'comment-5067072', 'commentbody-5067072', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-5067102">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/1dac95af38fd3afa36081de066f91f35?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/1dac95af38fd3afa36081de066f91f35?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-5067102">#3</a> by <a id="commentauthor-5067102" href="http://kirkcrane86.blog5.net/4032287/trik-tenang-unduh-aplikasi-pada-google-play-store">home decorating ideas</a> on 10 de junho de 2017 - 11:06 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-5067102">
+          <p>Hiya, I am really glad I&#8217;ve found this information. Nowadays bloggers publish only about gossip and internet stuff and this is really annoying. A good blog with interesting content, this is what I need. Thanks for making this website, and I&#8217;ll be visiting again. Do you do newsletters by email?</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-5067102', 'comment-5067102', 'commentbody-5067102', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-5067160">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/e5131f766d4b718547bced1e66910a30?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/e5131f766d4b718547bced1e66910a30?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-5067160">#4</a> by <a id="commentauthor-5067160" href="http://www.gordenjogja.co.id/harga-gorden-minimalis-per-meter/">Gorden Minimalis</a> on 10 de junho de 2017 - 11:12 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-5067160">
+          <p>I am always looking online for tips that can help me. Thx!</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-5067160', 'comment-5067160', 'commentbody-5067160', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-5067168">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/73b9d74bc8d3e34ccfd87797b4dc2700?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/73b9d74bc8d3e34ccfd87797b4dc2700?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-5067168">#5</a> by <a id="commentauthor-5067168" href="https://www.touristtube.com/best-travel-images/Buildings-Next-to-the-Park-in-Strasbourg-Alsace-France/dyGP70xM">how to get started in travel photography</a> on 10 de junho de 2017 - 11:13 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-5067168">
+          <p>I was curious if you ever thought of changing the layout of your site? Its very well written; I love what youve got to say. But maybe you could a little more in the way of content so people could connect with it better. Youve got an awful lot of text for only having 1 or two pictures. Maybe you could space it out better?</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-5067168', 'comment-5067168', 'commentbody-5067168', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-5067177">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/ccc20e1db7aed750b976a42a06e35e66?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/ccc20e1db7aed750b976a42a06e35e66?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-5067177">#6</a> by <a id="commentauthor-5067177" href="http://www.heliko.no/temp/507.html">http://www.heliko.no/temp/507.html</a> on 10 de junho de 2017 - 11:14 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-5067177">
+          <p>Our son gave myself this one for parents evening.  He knows im never around price still what originates from that center.  I can&#8217;t feel it has our favorite color furthermore even fits the wrist.  I do not can get a hold of bracelets to fit headphonesmy limited wrist.  Most happy to get recieved our as a gifts.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-5067177', 'comment-5067177', 'commentbody-5067177', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-5067188">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/8121c73eddb9cd7154f1882a9dccef01?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/8121c73eddb9cd7154f1882a9dccef01?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-5067188">#7</a> by <a id="commentauthor-5067188" href="http://news.cartierreplica.top/cartierreplicatop/566.asp">http://news.cartierreplica.top/cartierreplicatop/566.asp</a> on 10 de junho de 2017 - 11:15 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-5067188">
+          <p>Our boy provided me this to parents time.  He realizes im not regarding price however things comes from the center.  I can&#8217;t know this has the favorite shade and really suits my wrist.  I never ever could uncover bracelets to suit headphonesmy personal slight wrist.  Very pleased to has recieved that as being a gift.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-5067188', 'comment-5067188', 'commentbody-5067188', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-5067214">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/cdfef4d34e6922881d1a499cf6c968cd?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/cdfef4d34e6922881d1a499cf6c968cd?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-5067214">#8</a> by <a id="commentauthor-5067214" href="http://www.fli-ghts.com">Hotel &amp; Resort</a> on 10 de junho de 2017 - 11:18 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-5067214">
+          <p>I am not positive where you&#8217;re getting your info, however great topic. I must spend some time finding out much more or working out more. Thank you for wonderful information I was looking for this info for my mission.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-5067214', 'comment-5067214', 'commentbody-5067214', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-5067271">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/07b9487a324b459d65bf11591dbdf1b0?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/07b9487a324b459d65bf11591dbdf1b0?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-5067271">#9</a> by <a id="commentauthor-5067271" href="http://issuu.com/buzzgayahidupdeal/docs/teknik_membentuk_pribadi_sebagai_ma">Kata Kata Pdkt</a> on 10 de junho de 2017 - 11:24 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-5067271">
+          <p>Awesome write-up. I’m a normal visitor of your web site and appreciate you taking the time to maintain the excellent site. I&#8217;ll be a regular visitor for a long time.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-5067271', 'comment-5067271', 'commentbody-5067271', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-5067439">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/bf940b01d0735d7d0797e19919d7a3ee?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/bf940b01d0735d7d0797e19919d7a3ee?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-5067439">#10</a> by <a id="commentauthor-5067439" href="http://www.anteprimadistampa.it/index.php?option=com_k2&#038;view=itemlist&#038;task=user&#038;id=331524">jual kanopi minimalis</a> on 10 de junho de 2017 - 11:40 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-5067439">
+          <p>Awesome post. I am a normal visitor of your website and appreciate you taking the time to maintain the excellent site. I will be a regular visitor for a really long time.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-5067439', 'comment-5067439', 'commentbody-5067439', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-5067486">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/349ae1b331beed604d3ec41eecda6ced?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/349ae1b331beed604d3ec41eecda6ced?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-5067486">#11</a> by <a id="commentauthor-5067486" href="http://www.gordenjogja.co.id/harga-gorden-minimalis-per-meter/">Gorden Minimalis</a> on 10 de junho de 2017 - 11:44 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-5067486">
+          <p>Pretty nice post. I simply stumbled upon your weblog and wanted to say that I&#8217;ve truly loved surfing around your weblog posts. After all I will be subscribing on your feed and I&#8217;m hoping you write again very soon!</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-5067486', 'comment-5067486', 'commentbody-5067486', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+    </ol>
+           <div class="commentnavi">
+  	    <div class="commentpager">
+  	    	<a class="prev page-numbers" href="http://ploobs.com.br/arquivos/703/comment-page-631#comments">&laquo; Anterior</a>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/703/comment-page-1#comments'>1</a>
+<span class="page-numbers dots">&hellip;</span>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/703/comment-page-630#comments'>630</a>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/703/comment-page-631#comments'>631</a>
+<span class='page-numbers current'>632</span>  	    </div>
+       </div>
+          
+      <div id="respond">
+      <form action="http://ploobs.com.br/wp-comments-post.php" method="post" id="commentform">
+        <div class="cancel-comment-reply"><a rel="nofollow" id="cancel-comment-reply-link" href="/arquivos/703#respond" style="display:none;">Cancelar resposta</a></div>          	                <div id="author_info">
+            <div class="row">
+              <input type="text" name="author" id="author" class="textfield" value="" size="24" tabindex="1" />
+              <label for="author" class="small">Nome (necessário)</label>
+            </div>
+            <div class="row">
+              <input type="text" name="email" id="email" class="textfield" value="" size="24" tabindex="2" />
+              <label for="email" class="small">E-Mail (necessário)</label> <em>(não será publicado)</em>
+            </div>
+            <div class="row">
+              <input type="text" name="url" id="url" class="textfield" value="" size="24" tabindex="3" />
+              <label for="url" class="small">Website</label>
+            </div>
+  		  </div>
+                  
+        <!-- comment input -->
+        <div class="row">
+        	<textarea name="comment" id="comment" tabindex="4" rows="8" cols="50"></textarea>
+        	        	<input type='hidden' name='comment_post_ID' value='703' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+
+                 <br />
+        </div>
+        <!-- /comment input -->
+
+        <!-- comment submit and rss -->
+        <div id="submitbox" class="left">
+         <span class="button submit"><a title="Mandar Comentário" href="javascript:jQuery('#commentform').submit();"><span><span>Mandar Comentário</span></span></a></span>
+         <input type="hidden" name="formInput" />
+        </div>
+        <div class="clear"></div>
+      </form>
+    </div>
+          </div>
+  <!-- /comments -->
+
+  <!-- trackbacks -->
+    <!-- /trackbacks -->
+
+  <!-- related posts -->
+         <div id="tab-3">
+        <ol id="relatedposts">
+           		 <li><a href="http://ploobs.com.br/arquivos/2378" rel="bookmark" title="Permanent Link to Implementing a Render Queue for Games">Implementing a Render Queue for Games</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/2364" rel="bookmark" title="Permanent Link to BitField in Shaders (SM 3 and before)">BitField in Shaders (SM 3 and before)</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1868" rel="bookmark" title="Permanent Link to Code Snippet : Fog Shader">Code Snippet : Fog Shader</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1732" rel="bookmark" title="Permanent Link to Code Snipped: Night Vision Shader">Code Snipped: Night Vision Shader</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1673" rel="bookmark" title="Permanent Link to Code Snipped: Contrast Shader">Code Snipped: Contrast Shader</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1499" rel="bookmark" title="Permanent Link to Code Snippet: HSV to RGB and Vice versa in Shader">Code Snippet: HSV to RGB and Vice versa in Shader</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1470" rel="bookmark" title="Permanent Link to Code Snippet: Classic Effects (Bump, Specular and Paralax) in Shader [HLSL]">Code Snippet: Classic Effects (Bump, Specular and Paralax) in Shader [HLSL]</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1223" rel="bookmark" title="Permanent Link to Code Snippet: Clipping Planes in Shader [HLSL]">Code Snippet: Clipping Planes in Shader [HLSL]</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1025" rel="bookmark" title="Permanent Link to Billboards e Transparência (XNA 4.0)">Billboards e Transparência (XNA 4.0)</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1207" rel="bookmark" title="Permanent Link to XNA 4.0 Gamma Corrected Pipeline">XNA 4.0 Gamma Corrected Pipeline</a></li>
+                 </ol>
+       </div>
+        <!-- /related posts -->
+
+</div>
+
+
+
+   </div>
+    <!-- mid content -->
+   </div>
+   <!-- /mid -->
+
+   
+<!-- sidebar -->
+<div id="sidebar">
+ <!-- sidebar 1st container -->
+ <div id="sidebar-wrap1">
+  <!-- sidebar 2nd container -->
+  <div id="sidebar-wrap2">
+     <ul id="sidelist">
+     	
+        <li><div id="fusion-search" class="widget fusion_SearchWidget">         <!-- wp search form -->
+          <div id="searchtab">
+            <div class="inside">
+              <form method="get" id="searchform" action="http://ploobs.com.br/">
+              <fieldset>
+                <input type="text" name="s" id="searchbox" class="searchfield" value="Procurar" onfocus="if(this.value == 'Procurar') {this.value = '';}" onblur="if (this.value == '') {this.value = 'Procurar';}" />
+                 <input type="submit" value="Go" class="searchbutton" />
+              </fieldset>
+              </form>
+            </div>
+          </div>
+         <!-- /wp search form -->
+  </div></li><li><div id="fusion-categories" class="widget fusion_CategoryWidget"> <!-- sidebar menu (categories) -->
+ <ul class="nav">
+   	<li  class="cat-item cat-item-1"><a href="http://ploobs.com.br/arquivos/category/geral" title="Todos os Posts do site"><span>All Posts <em>(107)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/geral/feed"></a>
+</li>
+	<li  class="cat-item cat-item-71"><a href="http://ploobs.com.br/arquivos/category/android" ><span>Android <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/android/feed"></a>
+</li>
+	<li  class="cat-item cat-item-168"><a href="http://ploobs.com.br/arquivos/category/artemis-2" ><span>Artemis <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/artemis-2/feed"></a>
+</li>
+	<li  class="cat-item cat-item-35"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica" ><span>Computacao Grafica <em>(43)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/feed"></a>
+<ul class='children'>
+	<li  class="cat-item cat-item-104"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/artigos-introdutorios" title="Artigos introdutorios a computacao grafica"><span>Artigos Introdutorios <em>(8)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/artigos-introdutorios/feed"></a>
+</li>
+	<li  class="cat-item cat-item-105"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/exemplos-source-code" title="Full Source Code and Explanation Samples"><span>Full Samples <em>(7)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/exemplos-source-code/feed"></a>
+</li>
+	<li  class="cat-item cat-item-89"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/shader-code-snippet" ><span>Shader Code Snippet <em>(12)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/shader-code-snippet/feed"></a>
+</li>
+</ul>
+</li>
+	<li  class="cat-item cat-item-133"><a href="http://ploobs.com.br/arquivos/category/developers-diary" ><span>Developers Diary <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/developers-diary/feed"></a>
+</li>
+	<li  class="cat-item cat-item-170"><a href="http://ploobs.com.br/arquivos/category/directx-11" ><span>DirectX 11 <em>(3)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/directx-11/feed"></a>
+</li>
+	<li  class="cat-item cat-item-115"><a href="http://ploobs.com.br/arquivos/category/divulgacao" ><span>Divulgação <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/divulgacao/feed"></a>
+</li>
+	<li  class="cat-item cat-item-26"><a href="http://ploobs.com.br/arquivos/category/ia" ><span>IA <em>(4)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ia/feed"></a>
+</li>
+	<li  class="cat-item cat-item-97"><a href="http://ploobs.com.br/arquivos/category/maxscript" ><span>MaxScript <em>(1)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/maxscript/feed"></a>
+</li>
+	<li  class="cat-item cat-item-21"><a href="http://ploobs.com.br/arquivos/category/ploobsengine" ><span>PloobsEngine <em>(27)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/feed"></a>
+<ul class='children'>
+	<li  class="cat-item cat-item-103"><a href="http://ploobs.com.br/arquivos/category/ploobsengine/releases" title="PloobsEngine Releases"><span>Releases <em>(4)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/releases/feed"></a>
+</li>
+	<li  class="cat-item cat-item-102"><a href="http://ploobs.com.br/arquivos/category/ploobsengine/tutoriais" title="Tutorais da PloobsEngine"><span>Tutorials <em>(15)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/tutoriais/feed"></a>
+</li>
+</ul>
+</li>
+	<li  class="cat-item cat-item-16"><a href="http://ploobs.com.br/arquivos/category/portfolio" ><span>Portfolio <em>(19)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/portfolio/feed"></a>
+</li>
+	<li  class="cat-item cat-item-9"><a href="http://ploobs.com.br/arquivos/category/xna" ><span>XNA <em>(36)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/xna/feed"></a>
+</li>
+     </ul>
+  <!-- /sidebar menu -->
+ </div></li><li><div id="text-4" class="widget widget_text">			<div class="textwidget"><div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div class="fb-like-box" data-href="http://www.facebook.com/pages/Ploobs-Games/101527043290136" data-width="250" data-show-faces="true" data-stream="false" data-header="true"></div></div>
+		</div></li>		<li><div id="recent-posts-3" class="widget widget_recent_entries">		<h2 class="title">Topicos Recentes</h2>		<ul>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2419">Free CI with GitHub, C# and Travis</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2396">C# Artemis Entity System Tutorial</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2378">Implementing a Render Queue for Games</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2364">BitField in Shaders (SM 3 and before)</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2351">Artemis Entity System for Games now on Nuget</a>
+						</li>
+				</ul>
+		</div></li>		     </ul>
+  </div>
+  <!-- /sidebar 2nd container -->
+ </div>
+ <!-- /sidebar 1st container -->
+</div>
+<!-- /sidebar -->
+
+
+
+  </div>
+  <!-- /side wrap -->
+ </div>
+ <!-- /mid column wrap -->
+</div>
+<!-- /main wrapper -->
+
+<!-- clear main & sidebar sections -->
+<div class="clearcontent"></div>
+<!-- /clear main & sidebar sections -->
+
+ 
+<!-- footer -->
+ <div id="footer">
+
+   
+   <!-- please do not remove this. respect the authors :) -->
+   <p>
+    Fusion theme by <a href="http://digitalnature.ro/projects/fusion">digitalnature</a> | powered by <a href="http://wordpress.org/">WordPress</a>    <br />
+   <a class="rss" href="http://ploobs.com.br/feed">Posts (RSS)</a> e <a href="http://ploobs.com.br/comments/feed">Comentários (RSS)</a> <a href="javascript:void(0);" id="toplink">^</a>
+   <!-- 43 queries. 0,886 seconds. -->
+   </p>
+ </div>
+ <!-- /footer -->
+   <div id="layoutcontrol">
+   <a href="javascript:void(0);" class="setFont" title="Aumentar/Diminuir tamanho do texto"><span>SetTextSize</span></a>
+   <a href="javascript:void(0);" class="setLiquid" title="Muda entre largura total e largura fixa"><span>SetPageWidth</span></a>
+ </div>
+ </div>
+<!-- /page -->
+
+</div>
+</div>
+<!-- /page wrappers -->
+
+
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/comment-reply.min.js?ver=4.4.10'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/wp-embed.min.js?ver=4.4.10'></script>
+</body>
+</html>

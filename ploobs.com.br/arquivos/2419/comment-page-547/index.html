@@ -1,0 +1,1746 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="keywords" content="artemis, CI, " />
+<meta name="description" content="Creators of Ploobs Engine, OpenSource XNA GameEngine and indie Game Development" />
+<meta name="google-site-verification" content="SHK4jeXj--ju-cPSerLDrbbhbEHEPgf_2Ckw8BClx8I" />
+
+<title>Free CI with GitHub, C# and Travis | Ploobs</title>
+
+<link rel="alternate" type="application/rss+xml" title="Ploobs RSS Feed" href="http://ploobs.com.br/feed" />
+<link rel="alternate" type="application/atom+xml" title="Ploobs Atom Feed" href="http://ploobs.com.br/feed/atom" />
+<link rel="pingback" href="http://ploobs.com.br/xmlrpc.php" />
+
+
+<style type="text/css" media="all">
+@import "http://ploobs.com.br/wp-content/themes/fusion/style.css";
+#page-wrap2{ background: #0a0d2e; }
+#page-wrap1{ background: none; }
+</style>
+
+
+<!--[if lte IE 6]>
+<script type="text/javascript">
+/* <![CDATA[ */
+   blankimgpath = 'http://ploobs.com.br/wp-content/themes/fusion/images/blank.gif';
+ /* ]]> */
+</script>
+<style type="text/css" media="screen">
+  @import "http://ploobs.com.br/wp-content/themes/fusion/ie6.css";
+  body{ behavior:url("http://ploobs.com.br/wp-content/themes/fusion/js/ie6hoverfix.htc"); }
+  img{ behavior: url("http://ploobs.com.br/wp-content/themes/fusion/js/ie6pngfix.htc"); }
+</style>
+<![endif]-->
+
+
+  
+
+<!-- All in One SEO Pack 2.3.4 by Michael Torbert of Semper Fi Web Design[526,582] -->
+<meta name="description"  content="Tutorial about using Travis CI with C# and github" />
+
+<meta name="keywords"  content="free,continuous integration,c#,travis,.net,artemis,github,merge,pull,conflicts,bugs,ci,all posts" />
+
+<link rel="canonical" href="http://ploobs.com.br/arquivos/2419" />
+<!-- /all in one seo pack -->
+<link rel="alternate" type="application/rss+xml" title="Ploobs &raquo; Free CI with GitHub, C# and Travis  Feed de comentários" href="http://ploobs.com.br/arquivos/2419/feed" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/ploobs.com.br\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.4.6"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;return g&&g.fillText?(g.textBaseline="top",g.font="600 32px Arial","flag"===a?(g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3):"diversity"===a?(g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e):("simple"===a?g.fillText(h(55357,56835),0,0):g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0])):!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g;c.supports={simple:d("simple"),flag:d("flag"),unicode8:d("unicode8"),diversity:d("diversity")},c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.simple&&c.supports.flag&&c.supports.unicode8&&c.supports.diversity||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery.js?ver=1.11.3'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/themes/fusion/js/fusion.js?ver=4.4.6'></script>
+<link rel='https://api.w.org/' href='http://ploobs.com.br/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://ploobs.com.br/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://ploobs.com.br/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='C# Artemis Entity System Tutorial' href='http://ploobs.com.br/arquivos/2396' />
+<meta name="generator" content="WordPress 4.4.6" />
+<link rel='shortlink' href='http://ploobs.com.br/?p=2419' />
+<link rel="alternate" type="application/json+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2Farquivos%2F2419" />
+<link rel="alternate" type="text/xml+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2Farquivos%2F2419&#038;format=xml" />
+<meta property="og:site_name" content="Ploobs" />
+<meta property="og:title" content="Free CI with GitHub, C# and Travis" />
+<meta property="og:url" content="http://ploobs.com.br/arquivos/2419" />
+<meta property="og:type" content="article" />
+
+<script type="text/javascript">
+/* <![CDATA[ */
+ jQuery(document).ready(function(){
+  // body .safari class
+  if (jQuery.browser.safari) jQuery('body').addClass('safari');
+
+  // layout controls
+     jQuery("#layoutcontrol a").click(function() {
+     switch (jQuery(this).attr("class")) {
+	   case 'setFont' : setFontSize();	break;
+	   case 'setLiquid'	: setPageWidth();	break;
+	 }
+	 return false;
+    });
+   // set the font size from cookie
+   var font_size = jQuery.cookie('fontSize');
+   if (font_size == '.70em') { jQuery('body').css("font-size",".70em"); }
+   if (font_size == '.95em') { jQuery('body').css("font-size",".95em"); }
+   if (font_size == '.75em') { jQuery('body').css("font-size",".75em"); }
+
+   // set the page width from cookie
+   var page_width = jQuery.cookie('pageWidth');
+   if (page_width) jQuery('#page').css('width', page_width);
+  
+  jQuery('#post-extra-content').minitabs(333, 'slide');
+
+  if (document.all && !window.opera && !window.XMLHttpRequest && jQuery.browser.msie) { var isIE6 = true; }
+  else { var isIE6 = false;} ;
+  jQuery.browser.msie6 = isIE6;
+  if (!isIE6) {
+    initTooltips({
+		timeout: 6000
+   });
+  }
+  tabmenudropdowns();
+
+  // some jquery effects...
+  jQuery('#sidebar ul.nav li ul li a').mouseover(function () {
+   	jQuery(this).animate({ marginLeft: "4px" }, 100 );
+  });
+  jQuery('#sidebar ul.nav li ul li a').mouseout(function () {
+    jQuery(this).animate({ marginLeft: "0px" }, 100 );
+  });
+  // scroll to top
+  jQuery("a#toplink").click(function(){
+    jQuery('html').animate({scrollTop:0}, 'slow');
+  });
+
+  // set roles on some elements (for accessibility)
+  jQuery("#tabs").attr("role","navigation");
+  jQuery("#mid-content").attr("role","main");
+  jQuery("#sidebar").attr("role","complementary");
+  jQuery("#searchform").attr("role","search");
+
+ });
+
+ /* ]]> */
+</script>
+
+</head>
+<body class="free-ci-with-github-c-and-travis">
+  <!-- page wrappers (100% width) -->
+  <div id="page-wrap1">
+    <div id="page-wrap2">
+      <!-- page (actual site content, custom width) -->
+      <div id="page" class="with-sidebar">
+
+       <!-- main wrapper (side & main) -->
+       <div id="main-wrap">
+        <!-- mid column wrap -->
+    	<div id="mid-wrap">
+          <!-- sidebar wrap -->
+          <div id="side-wrap">
+            <!-- mid column -->
+    	    <div id="mid">
+              <!-- header -->
+              <div id="header">
+                <div id="topnav" class="description"> Creators of Ploobs Engine, OpenSource XNA GameEngine and indie Game Development</div>
+
+                                <a id="logo" href="http://ploobs.com.br/"><img src="http://ploobs.com.br/wp-content/uploads/logo2.png" title="Ploobs" alt="Ploobs" /></a>
+                
+                <!-- top tab navigation -->
+                <div id="tabs">
+                 <ul>
+                                     <li id="nav-homelink"><a href="http://ploobs.com.br" title="Clique para Início"><span><span>Início</span></span></a></li>
+                                   <li class="page_item page-item-2"><a href="http://ploobs.com.br/about"><span><span>About</span></span></a></li>
+<li class="page_item page-item-1353"><a href="http://ploobs.com.br/contatos"><span><span>Contact Us</span></span></a></li>
+<li class="page_item page-item-494"><a href="http://ploobs.com.br/forum"><span><span>Forum</span></span></a></li>
+<li class="page_item page-item-233 page_item_has_children"><a href="http://ploobs.com.br/ploobsengine"><span><span>PloobsEngine</span></span></a>
+<ul class='children'>
+	<li class="page_item page-item-1381"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-presentation"><span><span>PloobsEngine Presentation</span></span></a></li>
+	<li class="page_item page-item-1392"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-features"><span><span>PloobsEngine Features</span></span></a></li>
+	<li class="page_item page-item-1395"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-download"><span><span>PloobsEngine Download</span></span></a></li>
+	<li class="page_item page-item-1379"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-tutorials"><span><span>PloobsEngine Tutorials</span></span></a></li>
+	<li class="page_item page-item-465"><a href="http://ploobs.com.br/ploobsengine/galeria"><span><span>PloobsEngine Galery</span></span></a></li>
+	<li class="page_item page-item-1371"><a href="http://ploobs.com.br/ploobsengine/ploobs-license"><span><span>PloobsEngine Dual-License</span></span></a></li>
+</ul>
+</li>
+<li class="page_item page-item-656"><a href="http://ploobs.com.br/iniciantes"><span><span>Comp Gráfica Tutoriais</span></span></a></li>
+                 </ul>
+                </div>
+                <!-- /top tabs -->
+
+              </div><!-- /header -->
+  <!-- mid content -->
+  <div id="mid-content">
+      <div class="navigation">
+      <div class="alignleft">&laquo; <a href="http://ploobs.com.br/arquivos/2396" rel="prev">C# Artemis Entity System Tutorial</a></div>
+      <div class="alignright"></div>
+      <div class="clear"></div>
+    </div>
+
+    <div id="post-2419" class="post-2419 post type-post status-publish format-standard hentry category-geral tag-artemis tag-ci">
+       <h2 class="title">Free CI with GitHub, C# and Travis</h2>       <br />
+	    <div class="entry">
+          <div class="postbody entry clearfix">
+	       
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2Farquivos%2F2419&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+<p><a href="http://ploobs.com.br/wp-content/uploads/2013/07/travis-logo.png"><img class="alignleft size-medium wp-image-2420" alt="travis-logo" src="http://ploobs.com.br/wp-content/uploads/2013/07/travis-logo-300x148.png" width="77" height="36" /></a>Recently, we recieved a lot of pull requests in out Artemis <a href="https://github.com/thelinuxlich/artemis_CSharp">Entity System repo</a>. Most of them solved lots of  our bugs but some also introduced new ones &#8230; every merge (or the week after one) was a big pain !!!</p>
+<p><span id="more-2419"></span></p>
+<p>To solve this problem we started to search for a CI (continuous integration) system that:</p>
+<ul>
+<li>Was Natively Integrated with GitHub (not only git)</li>
+<li>Worked with .Net C#</li>
+<li>FREE !!!</li>
+</ul>
+<p><a href="https://travis-ci.org/">Travis </a>was (almost) the perfect solution !</p>
+<p>The problem was the fact that travis does not support C# .Net out of the box, so we had to make some &#8220;magics&#8221;.</p>
+<p>The ste-by-step is:</p>
+<ol>
+<li>Go to <a href="https://travis-ci.org/">https://travis-ci.org/</a>, sign with your github account</li>
+<li>Link one of your repos with Travis (click in account and go to the repo config &#8212; it is very intuitive and well documented)</li>
+<li>Now the magic &#8230;  go to your project in git hub and create a file called <a id="354f30a63fb0907d4ad57269548329e3-db83bfd27428e3587d462f1fe6d5aa58ad0f1c4a" title=".travis.yml" href="https://github.com/thelinuxlich/artemis_CSharp/blob/master/.travis.yml">.travis.yml</a> in the root of the repo (like <a href="https://github.com/thelinuxlich/artemis_CSharp">this</a>)</li>
+</ol>
+<p>The .travis file contents should be: (adapt to your needs)</p>
+<pre class="c-Sharp">## Travis CI Integration
+
+language: c
+
+install:
+  - sudo apt-get install mono-devel mono-gmcs nunit-console
+script:
+  - xbuild Artemis_Mono/Artemis_Mono.sln
+  - nunit-console Artemis_Mono/bin/Debug/ArtemisMonoUnitTests.dll</pre>
+<p>Magics Explained:</p>
+<ul>
+<li>First we tell we will use the C language (remember, C# is not supported)</li>
+<li>We use apt-get (debian based host =P) to download MONO and NUNIT (to run our unit tests)</li>
+<li>Then we compiler our project using xbuild (clone of msbuild for mono &#8212; just point to the .sln file of your project)</li>
+<li>Finaly we run NUNIT in one of the generated DLLs</li>
+</ul>
+<p>Thats all !!!</p>
+<p>The gain:</p>
+<ul>
+<li>Every time someone send a pull or a commit to our repo, all the unit tests run (and a report is generated &#8212; you will recieve an email if something goes wrong &#8230; )</li>
+<li>The code in our repo is (almost never) broken</li>
+<li>We only accept pulls that dont break our code</li>
+<li>In few weeks we sow a HUGE difference !!!</li>
+</ul>
+<p>The cool part is that you will be able to use the following image that shows if your build process ran without errors.</p>
+<p><a href="https://api.travis-ci.org/thelinuxlich/artemis_CSharp.png"><img class="aligncenter" alt="" src="https://api.travis-ci.org/thelinuxlich/artemis_CSharp.png" width="77" height="19" /></a></p>
+<p>You can also access the travis website to see the build in process (like a real time remote ssh terminal =P).</p>
+
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2Farquivos%2F2419&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+          </div>
+                              <p class="tags"><a href="http://ploobs.com.br/arquivos/tag/artemis" rel="tag">artemis</a>, <a href="http://ploobs.com.br/arquivos/tag/ci" rel="tag">CI</a></p>
+          <div class="clear"></div>
+                    <p class="postmetadata alt">
+			<small>
+                This entry was posted on 18 de julho de 2013, 3:12 pm and is filed under <a href="http://ploobs.com.br/arquivos/category/geral" rel="category tag">All Posts</a>. You can follow any responses to this entry through <a href="http://ploobs.com.br/arquivos/2419/feed" title="RSS 2.0">RSS 2.0</a>.
+                Você pode <a href="#respond">deixar uma resposta</a>, ou <a href="http://ploobs.com.br/arquivos/2419/trackback" rel="trackback">citar</a> de seu próprio site.                            </small>
+		  </p>
+	   </div>
+    </div>
+	
+
+<div id="post-extra-content">
+      <!-- comments and trackback tabs -->
+    <ul class="secondary-tabs">
+      <li><a href="#tab-1"><span><span>Comentários (48)</span></span></a></li>
+      <li><a href="#tab-2"><span><span>Citações (2)</span></span></a></li>      <li><a href="#tab-3"><span><span>Related Posts</span></span></a></li>    </ul>
+    <!-- /comments and trackback tabs -->
+    <!-- comments -->
+  <div id="tab-1">
+   <ol id="comments">
+     <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3356387">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/bcc3ef71fa6c3439ddc0a780e29bf265?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/bcc3ef71fa6c3439ddc0a780e29bf265?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3356387">#1</a> by <a id="commentauthor-3356387" href="http://reife-frauen.erotikkontaktekoeln.xyz/tag/voyeurgeschichten-tumblr">nuetzliche seite</a> on 15 de janeiro de 2017 - 5:34 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3356387">
+          <p>Ich stelle mir eher was vor wie es Kid P.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3356387', 'comment-3356387', 'commentbody-3356387', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3356389">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/04cbf83874ea2b5236600ae1ad0f225d?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/04cbf83874ea2b5236600ae1ad0f225d?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3356389">#2</a> by <a id="commentauthor-3356389" href="http://cultureofaccountabilities.com/NJ/Cherry-Hill/low-income-auto-insurance-dmv/">low income auto insurance dmv Cherry Hill NJ</a> on 15 de janeiro de 2017 - 5:35 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3356389">
+          <p>I&#8217;m not a modesty freak and I&#8217;m definitely not the kind of person who is going to judge another girl for the way she dresses. While I totally agree that it is not the girl&#8217;s fault if a guy is lusting over her, it seems to me that if what you&#8217;re wearing makes ME uncomfortable, then it&#8217;s not modest. I mean, if you&#8217;re talking to me and I can&#8217;t keep my eyes on your face because the amount of cleavage you have showing is overwhelming&#8230; Maybe you should show yourself some respect and cover up.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3356389', 'comment-3356389', 'commentbody-3356389', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3356557">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/38ee6b813bf57edb1516974f4982ec29?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/38ee6b813bf57edb1516974f4982ec29?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3356557">#3</a> by <a id="commentauthor-3356557" href="http://hotellcdbrand.com/FL/Jacksonville/US-agency-car-insurance/">us agency car insurance Jacksonville FL</a> on 15 de janeiro de 2017 - 6:13 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3356557">
+          <p>Never would have thunk I would find this so indispensable.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3356557', 'comment-3356557', 'commentbody-3356557', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3356632">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/084bc62cd248e435a611a67a07be8f53?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/084bc62cd248e435a611a67a07be8f53?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3356632">#4</a> by <a id="commentauthor-3356632" href="http://actionbartendingschool.net/CA/Campbell/car-insurance-in/">car insurance in Campbell CA</a> on 15 de janeiro de 2017 - 6:24 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3356632">
+          <p>Such a treat to see photographed.  I just shot Gen in some of my clothes and couldn&#039;t resist a peek into her closet.  It is just as fabulous if not more so in real life!</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3356632', 'comment-3356632', 'commentbody-3356632', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3356741">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/58abd20460941901becf733cb44978e3?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/58abd20460941901becf733cb44978e3?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3356741">#5</a> by <a id="commentauthor-3356741" href="http://www.michael-kors-handbags.in.net">michael kors handbags</a> on 15 de janeiro de 2017 - 6:36 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3356741">
+          <p>After research a few of the blog posts in your website now, and I really like your manner of blogging. I bookmarked it to my bookmark web site list and will likely be checking back soon. Pls check out my web page as properly and let me know what you think.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3356741', 'comment-3356741', 'commentbody-3356741', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3356790">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/3a4f849d665dd5b31177d31add0ef8e5?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/3a4f849d665dd5b31177d31add0ef8e5?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3356790">#6</a> by <a id="commentauthor-3356790" href="http://www.straforevi.com/urunler/maket-pasta/">maket pasta</a> on 15 de janeiro de 2017 - 6:41 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3356790">
+          <p>Thanks for posttt. <a href="http://straforevi.com/" rel="nofollow">http://straforevi.com/</a></p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3356790', 'comment-3356790', 'commentbody-3356790', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3356806">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/503fd3e5d9b66e99b7355459081630f7?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/503fd3e5d9b66e99b7355459081630f7?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3356806">#7</a> by <a id="commentauthor-3356806" href="http://cheapcarinsurancefc.top/CA/Lemoore/car-insurance-with-no-license-in/">car insurance with no license in Lemoore CA</a> on 15 de janeiro de 2017 - 6:42 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3356806">
+          <p>You&#8217;ve really helped me understand the issues. Thanks.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3356806', 'comment-3356806', 'commentbody-3356806', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3356813">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/3a4f849d665dd5b31177d31add0ef8e5?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/3a4f849d665dd5b31177d31add0ef8e5?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3356813">#8</a> by <a id="commentauthor-3356813" href="http://www.straforevi.com/">strafor kesim</a> on 15 de janeiro de 2017 - 6:43 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3356813">
+          <p>For newest information you have to visit web and on internet I found this web page as a most excellent web site for latest updates.<a href="http://straforevi.com/urunler/maket-pasta/maket-pasta-macaron-strafor-kule/" rel="nofollow">http://straforevi.com/urunler/maket-pasta/maket-pasta-macaron-strafor-kule/</a></p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3356813', 'comment-3356813', 'commentbody-3356813', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3356856">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/f4b285fb7fc6318b5fa192dbafcbb070?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/f4b285fb7fc6318b5fa192dbafcbb070?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3356856">#9</a> by <a id="commentauthor-3356856" href="http://quotesautoinsurance.org/compare-auto-insurance-rates-by-zip-code/compare-auto-insurance-quotes.html">home insurance by zip code eugene</a> on 15 de janeiro de 2017 - 6:47 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3356856">
+          <p>When I initially commented I clicked the &#8220;Notify me when new comments are added&#8221; checkbox and now each time a comment is added I get four emails with the same comment. Is there any way you can remove me from that service? Thank you!</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3356856', 'comment-3356856', 'commentbody-3356856', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3357027">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/46a7d793ef01cb73e6c0ea35c7bfdd02?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/46a7d793ef01cb73e6c0ea35c7bfdd02?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3357027">#10</a> by <a id="commentauthor-3357027" href="http://quotesautoinsurance.org/compare-auto-insurance-rates-by-zip-code.html">average home insurance rates by zip code</a> on 15 de janeiro de 2017 - 7:05 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3357027">
+          <p>Valuable info. Lucky me I found your site by accident, and I am shocked why this accident did not happened earlier! I bookmarked it.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3357027', 'comment-3357027', 'commentbody-3357027', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3357036">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/848d718733bafdd67fd850907a5c402e?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/848d718733bafdd67fd850907a5c402e?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3357036">#11</a> by <a id="commentauthor-3357036" href="http://autoinsurancersr.top/AZ/Mesa/cheap-SR22-insurance/">cheap sr22 insurance Mesa AZ</a> on 15 de janeiro de 2017 - 7:06 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3357036">
+          <p>and today I am once again facing the same BS from them along with arrogant replies that try and tell me how to do my job but still refuse me access to all the site files.&#8220;Oh where has Tina Peters gone&#8221; I though all was lost but this afternoon I found her again. She has another hosting company &#8220;axishost.com&#8221;I am moving all my clients from affordablehost to her asap and saying goodbye to the BS.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3357036', 'comment-3357036', 'commentbody-3357036', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3357452">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/60c21da726cf2e0093d10713d2066d52?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/60c21da726cf2e0093d10713d2066d52?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3357452">#12</a> by <a id="commentauthor-3357452" href="http://carinsurancelit.top/IN/Gary/car-insurance-with-no-license-in/">http://carinsurancelit.top/IN/Gary/car-insurance-with-no-license-in/</a> on 15 de janeiro de 2017 - 7:50 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3357452">
+          <p>Regulus &gt; Vous rÃ©pondez parfaitement Ã  la problÃ©matique quand vous proposez &laquo;&nbsp;une notation qui ne compte que la progression&nbsp;&raquo;. C&rsquo;est toute la diffÃ©rence entre la note sanction qui est dÃ©noncÃ©e dans cet appel et une Ã©valuation formatrice nÃ©cessaire.On voit bien avec cet exemple qu&rsquo;il n&rsquo;est pas question ici de nivellement par le bas !</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3357452', 'comment-3357452', 'commentbody-3357452', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3357478">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/a2680b40ac7c62c5e0bd5cce038e9357?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/a2680b40ac7c62c5e0bd5cce038e9357?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3357478">#13</a> by <a id="commentauthor-3357478" href="http://cheapcarinsurancefc.top/MI/Houghton-Lake/full-coverage-auto-insurance/">http://cheapcarinsurancefc.top/MI/Houghton-Lake/full-coverage-auto-insurance/</a> on 15 de janeiro de 2017 - 7:53 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3357478">
+          <p>I searched a bunch of sites and this was the best.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3357478', 'comment-3357478', 'commentbody-3357478', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3357592">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/934ea2429441a02ebdd2bb51e86f0f7a?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/934ea2429441a02ebdd2bb51e86f0f7a?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3357592">#14</a> by <a id="commentauthor-3357592" href="http://autoinsurancersr.top/MS/Ridgeland/best-auto-insurance-in/">best auto insurance in Ridgeland MS</a> on 15 de janeiro de 2017 - 8:06 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3357592">
+          <p>I love these articles. How many words can a wordsmith smith?</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3357592', 'comment-3357592', 'commentbody-3357592', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3357643">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/56a53ab5e0732adc33bec4e2b34af02e?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/56a53ab5e0732adc33bec4e2b34af02e?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3357643">#15</a> by <a id="commentauthor-3357643" href="http://carinsuranceratescto.info/WI/Brookfield/cheap-auto-insurance-quotes/">http://carinsuranceratescto.info/WI/Brookfield/cheap-auto-insurance-quotes/</a> on 15 de janeiro de 2017 - 8:12 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3357643">
+          <p>Your answer lifts the intelligence of the debate.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3357643', 'comment-3357643', 'commentbody-3357643', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3357749">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/8c51530667cd494c076ad64709055bc9?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/8c51530667cd494c076ad64709055bc9?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3357749">#16</a> by <a id="commentauthor-3357749" href="http://www.tmearegion26.com/chanel/">chanel shoes outlet</a> on 15 de janeiro de 2017 - 8:26 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3357749">
+          <p>When making buys for their urgent food resources, numerous a variety of men and women opt for the already organized food supply plans. These bundles come in unique sizes, based on the amount of members in your family, or the number of people that you have got to feed.<br />
+chanel shoes outlet <a href="http://www.tmearegion26.com/chanel/" rel="nofollow">http://www.tmearegion26.com/chanel/</a></p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3357749', 'comment-3357749', 'commentbody-3357749', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3358007">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/ee97127220afea2ed6d078b76b2b3dbc?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/ee97127220afea2ed6d078b76b2b3dbc?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3358007">#17</a> by <a id="commentauthor-3358007" href="http://autoquotesbyzip.com/motorcycle-insurance-quotes-online.html">bike insurance quote online</a> on 15 de janeiro de 2017 - 9:18 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3358007">
+          <p>I&#8217;ve been browsing online greater than 3 hours as of late, but I by no means discovered any attention-grabbing article like yours. It is lovely price sufficient for me. Personally, if all site owners and bloggers made just right content material as you probably did, the internet might be much more helpful than ever before.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3358007', 'comment-3358007', 'commentbody-3358007', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3358182">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/a4b2e8aa7c044b44b4fe17328b244e9c?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/a4b2e8aa7c044b44b4fe17328b244e9c?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3358182">#18</a> by <a id="commentauthor-3358182" href="http://community.zest3d.com/members/rolleffect8/activity/2615/">serplify.net</a> on 15 de janeiro de 2017 - 9:36 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3358182">
+          <p>&#8220;Thanks for excellent info I used to be searching for this info for my mission.&#8221;</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3358182', 'comment-3358182', 'commentbody-3358182', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3358185">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/7d08366687069ea4771ba3e89c873671?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/7d08366687069ea4771ba3e89c873671?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3358185">#19</a> by <a id="commentauthor-3358185" href="http://autoquotesbyzip.com/motorcycle-insurance-quotes-online.html">new bike insurance</a> on 15 de janeiro de 2017 - 9:36 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3358185">
+          <p>Hello, Neat post. There is a problem along with your site in internet explorer, would test this?K IE nonetheless is the market leader and a huge component of other folks will omit your great writing because of this problem.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3358185', 'comment-3358185', 'commentbody-3358185', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3358313">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/10b35c031eb2280f418f11e356666742?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/10b35c031eb2280f418f11e356666742?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3358313">#20</a> by <a id="commentauthor-3358313" href="http://cheapcarinsurancefc.top/MI/Petoskey/low-income-auto-insurance-dmv/">low income auto insurance dmv Petoskey MI</a> on 15 de janeiro de 2017 - 9:47 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3358313">
+          <p>Hey, subtle must be your middle name. Great post!</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3358313', 'comment-3358313', 'commentbody-3358313', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3358346">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/b67188c9efe7dd966641ff414ead2ef0?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/b67188c9efe7dd966641ff414ead2ef0?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3358346">#21</a> by <a id="commentauthor-3358346" href="http://ixly.gotoip1.com/comment/html/?796600.html">breach of contract</a> on 15 de janeiro de 2017 - 9:50 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3358346">
+          <p>&#8220;It is really a great and useful piece of info. I&#8217;m glad that you shared this useful information with us. Please keep us up to date like this. Thanks for sharing.&#8221;</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3358346', 'comment-3358346', 'commentbody-3358346', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3358433">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/64f7713571e2545d832d1b0e5269a0e4?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/64f7713571e2545d832d1b0e5269a0e4?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3358433">#22</a> by <a id="commentauthor-3358433" href="http://www.ocbeekeepers.org/members/mintfine4/activity/99862/">abduljaami</a> on 15 de janeiro de 2017 - 10:00 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3358433">
+          <p>&#8220;Wow! This could be one particular of the most helpful blogs We&#8217;ve ever arrive across on this subject. Actually Magnificent. I am also an expert in this topic so I can understand your effort.&#8221;</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3358433', 'comment-3358433', 'commentbody-3358433', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3358505">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/1e259f581453d93dafe3a750dcae5e52?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/1e259f581453d93dafe3a750dcae5e52?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3358505">#23</a> by <a id="commentauthor-3358505" href="http://www.health-style.ru/vanilla/discussion/415436/business-contract-fear-losing-it...read-it#Item_1">abduljaami</a> on 15 de janeiro de 2017 - 10:07 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3358505">
+          <p>&#8220;I found myself nodding my noggin all the way through.&#8221;</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3358505', 'comment-3358505', 'commentbody-3358505', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3358642">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/2933dd0ae46dc392c858d2303f212dda?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/2933dd0ae46dc392c858d2303f212dda?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3358642">#24</a> by <a id="commentauthor-3358642" href="http://www2.tku.edu.tw/~tacx/html/userinfo.php?uid=2024821">discrimination</a> on 15 de janeiro de 2017 - 10:21 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3358642">
+          <p>&#8220;I have a mission that I&#8217;m just now working on, and I have been on the glance out for such info.&#8221;</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3358642', 'comment-3358642', 'commentbody-3358642', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3358735">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/cf7f1db0c535839b66295272dd76f33a?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/cf7f1db0c535839b66295272dd76f33a?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3358735">#25</a> by <a id="commentauthor-3358735" href="http://wsap.edu.pl/osrodkikariery/forumdyskusyjne/profile.php?mode=viewprofile&#038;u=54323">junk cars</a> on 15 de janeiro de 2017 - 10:31 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3358735">
+          <p>&#8220;Excellent article. I&#8217;m facing a few of these issues as well..&#8221;</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3358735', 'comment-3358735', 'commentbody-3358735', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3358828">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/a70840f51968dbb78d3242426ef91c40?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/a70840f51968dbb78d3242426ef91c40?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3358828">#26</a> by <a id="commentauthor-3358828" href="http://autoinsurancersr.top/TX/Bedford/Direct-auto-insurance/">http://autoinsurancersr.top/TX/Bedford/Direct-auto-insurance/</a> on 15 de janeiro de 2017 - 10:40 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3358828">
+          <p>Woah nelly, how about them apples!</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3358828', 'comment-3358828', 'commentbody-3358828', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3359011">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/f3abfbe9fb32117027438ad3936c7a0b?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/f3abfbe9fb32117027438ad3936c7a0b?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3359011">#27</a> by <a id="commentauthor-3359011" href="http://autoinsurancend.info/PA/Altoona/best-auto-insurance-in/">best auto insurance in Altoona PA</a> on 15 de janeiro de 2017 - 11:03 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3359011">
+          <p>I was added into over 52 groups. A bunch of them were groups I have never even heard of and some were explicit. The really fun part is when you go to remove yourself from all the groups it gives you an error and won&#039;t allow you to leave the group. Very frustrating. Big fail Facebook!</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3359011', 'comment-3359011', 'commentbody-3359011', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3359103">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/f50353826769e62ffa4588859acdf700?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/f50353826769e62ffa4588859acdf700?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3359103">#28</a> by <a id="commentauthor-3359103" href="http://www.wozhuan.la/">我赚啦广告任务网</a> on 15 de janeiro de 2017 - 11:14 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3359103">
+          <p>除了膜拜，别无它言！</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3359103', 'comment-3359103', 'commentbody-3359103', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3359267">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/1fc1cf081899bb8ee15da8f6d3c9d99f?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/1fc1cf081899bb8ee15da8f6d3c9d99f?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3359267">#29</a> by <a id="commentauthor-3359267" href="http://autoinsurancend.info/NJ/East-Orange/cheapest-car-insurance/">http://autoinsurancend.info/NJ/East-Orange/cheapest-car-insurance/</a> on 15 de janeiro de 2017 - 11:30 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3359267">
+          <p>Hallo David, hallo AndrÃ©,wie kann ich mich bewerben bei Euch!Ich hatte Anfang des Jahres leider keine zweite Geschichte dabei und konnte so nicht weiter machen,  wÃ¼rde es aber gerne noch einmal &#8220;richtig&#8221; bei Euch versuchen.Ich kÃ¶nnte am 14.06., 02.08., 06.09, 04.10&#8230;. habt Ihr noch was frei?Viele GrÃ¼ÃŸeBiggi HÃ¼bner (Wuppertal)</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3359267', 'comment-3359267', 'commentbody-3359267', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3359457">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/c8811af1afd6cd9ed78a7a218b5f80ad?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/c8811af1afd6cd9ed78a7a218b5f80ad?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3359457">#30</a> by <a id="commentauthor-3359457" href="http://autoinsurancersr.top/NY/Patchogue/low-income-car-insurance/">low income car insurance Patchogue NY</a> on 15 de janeiro de 2017 - 11:52 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3359457">
+          <p>That&#8217;s a well-thought-out answer to a challenging question</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3359457', 'comment-3359457', 'commentbody-3359457', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3359494">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/f30b5ba6400df6ae39abaa6a6f52cb51?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/f30b5ba6400df6ae39abaa6a6f52cb51?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3359494">#31</a> by <a id="commentauthor-3359494" href="http://autoquotesbyzip.com/health-insurance-quotes.html">expat health insurance</a> on 15 de janeiro de 2017 - 11:57 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3359494">
+          <p>Hello there, just became alert to your blog via Google, and located that it&#8217;s truly informative. I am gonna be careful for brussels. I’ll appreciate if you proceed this in future. Numerous other folks will likely be benefited from your writing. Cheers!</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3359494', 'comment-3359494', 'commentbody-3359494', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3359678">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/89452e99005bb65c78d3f995eb262d41?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/89452e99005bb65c78d3f995eb262d41?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3359678">#32</a> by <a id="commentauthor-3359678" href="http://autoquotesbyzip.com/health-insurance-quotes.html">looking for health care insurance</a> on 16 de janeiro de 2017 - 12:16 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3359678">
+          <p>What¦s Happening i am new to this, I stumbled upon this I have discovered It positively helpful and it has aided me out loads. I am hoping to contribute &amp; aid other users like its helped me. Great job.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3359678', 'comment-3359678', 'commentbody-3359678', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3359716">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/b07c6f7f686da38914dbb6d2eb82872c?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/b07c6f7f686da38914dbb6d2eb82872c?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3359716">#33</a> by <a id="commentauthor-3359716" href="http://autoinsurancequotesem.us/WA/Longview/free-auto-insurance-quotes/">free auto insurance quotes Longview WA</a> on 16 de janeiro de 2017 - 12:20 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3359716">
+          <p>To j.hovis:Click on Help in the top right corner of any youtube page. You will 5 columns of links across the bottom of the page. The first column in called &quot;youtube&quot; and &quot;Contact Us&quot; is the first link in that column.On the Contact Us page, the 4th entry under &quot;Specific Issues&quot; is:Abuse Issues: For any abuse issues on the site, please contact us through the Abuse and Policy Center (the name is a clickable link).</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3359716', 'comment-3359716', 'commentbody-3359716', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3359832">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/49ffa854d60c36ac1950bd0d6a824e24?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/49ffa854d60c36ac1950bd0d6a824e24?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3359832">#34</a> by <a id="commentauthor-3359832" href="http://www.eccoonlineshop.com">ecco shoes store locator</a> on 16 de janeiro de 2017 - 12:39 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3359832">
+          <p>Perhaps I may not be too amazed by this.<br />
+ecco shoes store locator <a href="http://www.eccoonlineshop.com" rel="nofollow">http://www.eccoonlineshop.com</a></p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3359832', 'comment-3359832', 'commentbody-3359832', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3359840">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/14b44c7975cf04626355930fc1733c74?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/14b44c7975cf04626355930fc1733c74?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3359840">#35</a> by <a id="commentauthor-3359840" href="http://carinsuranceratescto.info/NY/White-Plains/Direct-auto-insurance/">direct auto insurance White Plains NY</a> on 16 de janeiro de 2017 - 12:40 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3359840">
+          <p>If you want to get read, this is how you should write.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3359840', 'comment-3359840', 'commentbody-3359840', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3360294">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/a8625022a381de024959c04af50e10e5?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/a8625022a381de024959c04af50e10e5?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3360294">#36</a> by <a id="commentauthor-3360294" href="http://autoinsurancersr.top/VA/Norfolk/free-auto-insurance-quotes/">http://autoinsurancersr.top/VA/Norfolk/free-auto-insurance-quotes/</a> on 16 de janeiro de 2017 - 1:19 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3360294">
+          <p>Mr. Noface, what are the bigger battles against Racism?  Be specific.  Other than personal racism, which is a matter of the heart and not law, what are you talking about?  Please be specific.  Melvin Jones</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3360294', 'comment-3360294', 'commentbody-3360294', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3360383">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/91898364a8090445df2956df788c19ad?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/91898364a8090445df2956df788c19ad?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3360383">#37</a> by <a id="commentauthor-3360383" href="http://autoinsurancend.info/MI/Rockford/car-insurance-rates/">http://autoinsurancend.info/MI/Rockford/car-insurance-rates/</a> on 16 de janeiro de 2017 - 1:38 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3360383">
+          <p>Cora muchas gracias por tus buenos deseos, me encanta que me escribas y no dejes de venir al Centro Ser Mejor Ser, ahora con el programa estaremos mas en contacto. BesosSaludos MB</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3360383', 'comment-3360383', 'commentbody-3360383', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3360400">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/decf2a06711b0bdf92f4dd41c276c9dc?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/decf2a06711b0bdf92f4dd41c276c9dc?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3360400">#38</a> by <a id="commentauthor-3360400" href="http://cheapcarinsurancefc.top/NY/Bethpage/payless-auto-insurance/">http://cheapcarinsurancefc.top/NY/Bethpage/payless-auto-insurance/</a> on 16 de janeiro de 2017 - 1:41 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3360400">
+          <p>The accident of finding this post has brightened my day</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3360400', 'comment-3360400', 'commentbody-3360400', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3360450">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/6cdbd8025cff927c859fa1b2268ddd01?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/6cdbd8025cff927c859fa1b2268ddd01?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3360450">#39</a> by <a id="commentauthor-3360450" href="http://autoinsurancersr.top/CA/Menlo-Park/best-auto-insurance-in/">http://autoinsurancersr.top/CA/Menlo-Park/best-auto-insurance-in/</a> on 16 de janeiro de 2017 - 1:48 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3360450">
+          <p>That&#8217;s really thinking at a high level</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3360450', 'comment-3360450', 'commentbody-3360450', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3360802">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/a178e636ccebd8cfb033feea407453fb?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/a178e636ccebd8cfb033feea407453fb?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3360802">#40</a> by <a id="commentauthor-3360802" href="http://autoinsurancersr.top/FL/Atlantic-Beach/no-down-payment-car-insurance-in/">http://autoinsurancersr.top/FL/Atlantic-Beach/no-down-payment-car-insurance-in/</a> on 16 de janeiro de 2017 - 2:36 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3360802">
+          <p>Ce rezultat ne poti spune, Adela, dupa testele cu Biotherm? Ca si tine, parca in ultima vreme nici o formula nu ma mai avantajeaza. In sfarsit, pot spune ca am gasit totusi ceva: Etiaxil, unul dintre cele cateva produse dedicate achizionate din Paris.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3360802', 'comment-3360802', 'commentbody-3360802', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3360854">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/ce01c5f2260c49f2c3d90c355afeb9a3?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/ce01c5f2260c49f2c3d90c355afeb9a3?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3360854">#41</a> by <a id="commentauthor-3360854" href="http://carinsurancelit.top/CA/Antioch/auto-insurance-quotes/">auto insurance quotes Antioch CA</a> on 16 de janeiro de 2017 - 2:45 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3360854">
+          <p>Hi Anthony,Thank you for bringing Sayer Ji to the forefront of healthy eating and better understanding wheat intolerance and celiac disease.  I had not previously heard of him.  And certainly, since I have been following you for more than a year or so now, I know I can trust and rely on your alternative health and organic eating information as viable and trustworthy.Thanks!Happy Dating and Relationships,April Braswell</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3360854', 'comment-3360854', 'commentbody-3360854', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3360881">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/ec2cdc730ded421c07620d170979df22?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/ec2cdc730ded421c07620d170979df22?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3360881">#42</a> by <a id="commentauthor-3360881" href="http://autoinsurancend.info/FL/Spring-Hill/auto-insurance-quotes/">http://autoinsurancend.info/FL/Spring-Hill/auto-insurance-quotes/</a> on 16 de janeiro de 2017 - 2:48 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3360881">
+          <p>A pÃ©ldÃ¡dban szereplÅ‘ amund is egy akkor szakadÃ¡r vallÃ¡s kÃ¶vetÅ‘je lett. A hetedkori esemÃ©nyek igencsak megnehezÃ­tik a manifesztÃ¡ciÃ³t tÃºlÃ©lÅ‘ amundok helyzetÃ©t. PÃ¡r Ã©v mÃºlva talÃ¡n mÃ¡s lesz a helyzet &#8230; hiszen mÃ¡r most is 3712 van. Egy, a 20-as Ã©vekben jÃ¡tszÃ³dÃ³ kampÃ¡nyunkban mÃ¡r kifejezetten elÅ‘kelÅ‘ dolog az amund faj megjelenÃ©se, a Hradzs erÅ‘s hÃ¡tszelet adott nekik akkor. Persze egyszer az is Ã¶sszeomlik majd.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3360881', 'comment-3360881', 'commentbody-3360881', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3361124">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/1aadde7d6314576fbb560338ffbda525?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/1aadde7d6314576fbb560338ffbda525?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3361124">#43</a> by <a id="commentauthor-3361124" href="https://www.geekshosted.com/">buy web hosting</a> on 16 de janeiro de 2017 - 3:12 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3361124">
+          <p>Wonderful blog! I found it while searching on Yahoo News. Do you have any suggestions on how to get listed in Yahoo News? I&#8217;ve been trying for a while but I never seem to get there! Cheers</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3361124', 'comment-3361124', 'commentbody-3361124', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3361199">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/2b907644059aab272f95f0aef1048bc7?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/2b907644059aab272f95f0aef1048bc7?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3361199">#44</a> by <a id="commentauthor-3361199" href="http://cheapcarinsurancefc.top/OH/Lakewood/auto-owners-insurance/">http://cheapcarinsurancefc.top/OH/Lakewood/auto-owners-insurance/</a> on 16 de janeiro de 2017 - 3:17 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3361199">
+          <p>tres contente d avoir des nouvelles je me souviens que pour venir le chercher cela a ete laborieux pour vous ( panne de voiture ) vous l aimiez deja avant de l avoir une belle histoire</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3361199', 'comment-3361199', 'commentbody-3361199', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3361234">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/7c1035f9f2a9eac8bc185817145b2c0c?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/7c1035f9f2a9eac8bc185817145b2c0c?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3361234">#45</a> by <a id="commentauthor-3361234" href="https://www.facebook.com/Rosewholesale-Scam-1428828810722465/">Viagra</a> on 16 de janeiro de 2017 - 3:19 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3361234">
+          <p>Hello! I understand this is kind of off-topic however I had to ask. Does managing a well-established blog such as yours require a large amount of work? I am brand new to blogging but I do write in my journal everyday. I&#8217;d like to start a blog so I will be able to share my personal experience and feelings online. Please let me know if you have any kind of ideas or tips for brand new aspiring blog owners. Appreciate it!|</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3361234', 'comment-3361234', 'commentbody-3361234', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3361484">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/13341e9c417d5092a24eeeb405a59932?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/13341e9c417d5092a24eeeb405a59932?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3361484">#46</a> by <a id="commentauthor-3361484" href="http://www.fashionbrandmall.top">balmain mens biker jeans</a> on 16 de janeiro de 2017 - 3:39 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3361484">
+          <p>You are a very bright individual!<br />
+balmain mens biker jeans <a href="http://www.fashionbrandmall.top" rel="nofollow">http://www.fashionbrandmall.top</a></p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3361484', 'comment-3361484', 'commentbody-3361484', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-3361908">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/dc344dc9ffec219cb64226b370acef99?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/dc344dc9ffec219cb64226b370acef99?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3361908">#47</a> by <a id="commentauthor-3361908" href="http://easylife-101.blogspot.tw/2016/12/steve-harveys-inspirational-advice.html">Meditate To Reduce Stress</a> on 16 de janeiro de 2017 - 4:09 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3361908">
+          <p>Just wish to say your article is as surprising. The clarity in your post is just spectacular and i could assume you are an expert on this subject. Fine with your permission allow me to grab your feed to keep updated with forthcoming post. Thanks a million and please keep up the rewarding work.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3361908', 'comment-3361908', 'commentbody-3361908', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-3362404">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/9c26c0b4ed24947adfe5918ad3b57927?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/9c26c0b4ed24947adfe5918ad3b57927?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-3362404">#48</a> by <a id="commentauthor-3362404" href="http://www.blackfridaysale.store">herve leger dress sale</a> on 16 de janeiro de 2017 - 4:50 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-3362404">
+          <p>antoninus drank chaux fashionable roller hipkin fianni rhee neptune<br />
+herve leger dress sale <a href="http://www.blackfridaysale.store" rel="nofollow">http://www.blackfridaysale.store</a></p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-3362404', 'comment-3362404', 'commentbody-3362404', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+    </ol>
+           <div class="commentnavi">
+  	    <div class="commentpager">
+  	    	<a class="prev page-numbers" href="http://ploobs.com.br/arquivos/2419/comment-page-546#comments">&laquo; Anterior</a>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/2419/comment-page-1#comments'>1</a>
+<span class="page-numbers dots">&hellip;</span>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/2419/comment-page-545#comments'>545</a>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/2419/comment-page-546#comments'>546</a>
+<span class='page-numbers current'>547</span>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/2419/comment-page-548#comments'>548</a>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/2419/comment-page-549#comments'>549</a>
+<span class="page-numbers dots">&hellip;</span>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/2419/comment-page-563#comments'>563</a>
+<a class="next page-numbers" href="http://ploobs.com.br/arquivos/2419/comment-page-548#comments">Próximo &raquo;</a>  	    </div>
+       </div>
+          
+      <div id="respond">
+      <form action="http://ploobs.com.br/wp-comments-post.php" method="post" id="commentform">
+        <div class="cancel-comment-reply"><a rel="nofollow" id="cancel-comment-reply-link" href="/arquivos/2419/comment-page-547#respond" style="display:none;">Cancelar resposta</a></div>          	                <div id="author_info">
+            <div class="row">
+              <input type="text" name="author" id="author" class="textfield" value="" size="24" tabindex="1" />
+              <label for="author" class="small">Nome (necessário)</label>
+            </div>
+            <div class="row">
+              <input type="text" name="email" id="email" class="textfield" value="" size="24" tabindex="2" />
+              <label for="email" class="small">E-Mail (necessário)</label> <em>(não será publicado)</em>
+            </div>
+            <div class="row">
+              <input type="text" name="url" id="url" class="textfield" value="" size="24" tabindex="3" />
+              <label for="url" class="small">Website</label>
+            </div>
+  		  </div>
+                  
+        <!-- comment input -->
+        <div class="row">
+        	<textarea name="comment" id="comment" tabindex="4" rows="8" cols="50"></textarea>
+        	        	<input type='hidden' name='comment_post_ID' value='2419' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+
+                 <br />
+        </div>
+        <!-- /comment input -->
+
+        <!-- comment submit and rss -->
+        <div id="submitbox" class="left">
+         <span class="button submit"><a title="Mandar Comentário" href="javascript:jQuery('#commentform').submit();"><span><span>Mandar Comentário</span></span></a></span>
+         <input type="hidden" name="formInput" />
+        </div>
+        <div class="clear"></div>
+      </form>
+    </div>
+          </div>
+  <!-- /comments -->
+
+  <!-- trackbacks -->
+    <div id="tab-2">
+    <ol id="trackbacks">
+      <li id="comment-3359375"><a href='https://www.indiegogo.com/individuals/15822645' rel='external nofollow' class='url'>clock kits</a></li><!-- #comment-## -->
+ <li id="comment-3360138"><a href='http://www.instructables.com/member/onlinemarketingdiy/' rel='external nofollow' class='url'>search engine ranking factors</a></li><!-- #comment-## -->
+    </ol>
+  </div>
+    <!-- /trackbacks -->
+
+  <!-- related posts -->
+         <div id="tab-3">
+        <ol id="relatedposts">
+           		 <li><a href="http://ploobs.com.br/arquivos/2396" rel="bookmark" title="Permanent Link to C# Artemis Entity System Tutorial">C# Artemis Entity System Tutorial</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/2351" rel="bookmark" title="Permanent Link to Artemis Entity System for Games now on Nuget">Artemis Entity System for Games now on Nuget</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/2328" rel="bookmark" title="Permanent Link to New Version C# Entity System Artemis Released">New Version C# Entity System Artemis Released</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/2154" rel="bookmark" title="Permanent Link to C# Artemis Entity System News">C# Artemis Entity System News</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1765" rel="bookmark" title="Permanent Link to Artemis Entity Framework Ported to C#">Artemis Entity Framework Ported to C#</a></li>
+                 </ol>
+       </div>
+        <!-- /related posts -->
+
+</div>
+
+
+
+   </div>
+    <!-- mid content -->
+   </div>
+   <!-- /mid -->
+
+   
+<!-- sidebar -->
+<div id="sidebar">
+ <!-- sidebar 1st container -->
+ <div id="sidebar-wrap1">
+  <!-- sidebar 2nd container -->
+  <div id="sidebar-wrap2">
+     <ul id="sidelist">
+     	
+        <li><div id="fusion-search" class="widget fusion_SearchWidget">         <!-- wp search form -->
+          <div id="searchtab">
+            <div class="inside">
+              <form method="get" id="searchform" action="http://ploobs.com.br/">
+              <fieldset>
+                <input type="text" name="s" id="searchbox" class="searchfield" value="Procurar" onfocus="if(this.value == 'Procurar') {this.value = '';}" onblur="if (this.value == '') {this.value = 'Procurar';}" />
+                 <input type="submit" value="Go" class="searchbutton" />
+              </fieldset>
+              </form>
+            </div>
+          </div>
+         <!-- /wp search form -->
+  </div></li><li><div id="fusion-categories" class="widget fusion_CategoryWidget"> <!-- sidebar menu (categories) -->
+ <ul class="nav">
+   	<li  class="cat-item cat-item-1"><a href="http://ploobs.com.br/arquivos/category/geral" title="Todos os Posts do site"><span>All Posts <em>(107)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/geral/feed"></a>
+</li>
+	<li  class="cat-item cat-item-71"><a href="http://ploobs.com.br/arquivos/category/android" ><span>Android <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/android/feed"></a>
+</li>
+	<li  class="cat-item cat-item-168"><a href="http://ploobs.com.br/arquivos/category/artemis-2" ><span>Artemis <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/artemis-2/feed"></a>
+</li>
+	<li  class="cat-item cat-item-35"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica" ><span>Computacao Grafica <em>(43)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/feed"></a>
+<ul class='children'>
+	<li  class="cat-item cat-item-104"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/artigos-introdutorios" title="Artigos introdutorios a computacao grafica"><span>Artigos Introdutorios <em>(8)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/artigos-introdutorios/feed"></a>
+</li>
+	<li  class="cat-item cat-item-105"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/exemplos-source-code" title="Full Source Code and Explanation Samples"><span>Full Samples <em>(7)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/exemplos-source-code/feed"></a>
+</li>
+	<li  class="cat-item cat-item-89"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/shader-code-snippet" ><span>Shader Code Snippet <em>(12)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/shader-code-snippet/feed"></a>
+</li>
+</ul>
+</li>
+	<li  class="cat-item cat-item-133"><a href="http://ploobs.com.br/arquivos/category/developers-diary" ><span>Developers Diary <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/developers-diary/feed"></a>
+</li>
+	<li  class="cat-item cat-item-170"><a href="http://ploobs.com.br/arquivos/category/directx-11" ><span>DirectX 11 <em>(3)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/directx-11/feed"></a>
+</li>
+	<li  class="cat-item cat-item-115"><a href="http://ploobs.com.br/arquivos/category/divulgacao" ><span>Divulgação <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/divulgacao/feed"></a>
+</li>
+	<li  class="cat-item cat-item-26"><a href="http://ploobs.com.br/arquivos/category/ia" ><span>IA <em>(4)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ia/feed"></a>
+</li>
+	<li  class="cat-item cat-item-97"><a href="http://ploobs.com.br/arquivos/category/maxscript" ><span>MaxScript <em>(1)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/maxscript/feed"></a>
+</li>
+	<li  class="cat-item cat-item-21"><a href="http://ploobs.com.br/arquivos/category/ploobsengine" ><span>PloobsEngine <em>(27)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/feed"></a>
+<ul class='children'>
+	<li  class="cat-item cat-item-103"><a href="http://ploobs.com.br/arquivos/category/ploobsengine/releases" title="PloobsEngine Releases"><span>Releases <em>(4)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/releases/feed"></a>
+</li>
+	<li  class="cat-item cat-item-102"><a href="http://ploobs.com.br/arquivos/category/ploobsengine/tutoriais" title="Tutorais da PloobsEngine"><span>Tutorials <em>(15)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/tutoriais/feed"></a>
+</li>
+</ul>
+</li>
+	<li  class="cat-item cat-item-16"><a href="http://ploobs.com.br/arquivos/category/portfolio" ><span>Portfolio <em>(19)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/portfolio/feed"></a>
+</li>
+	<li  class="cat-item cat-item-9"><a href="http://ploobs.com.br/arquivos/category/xna" ><span>XNA <em>(36)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/xna/feed"></a>
+</li>
+     </ul>
+  <!-- /sidebar menu -->
+ </div></li><li><div id="text-4" class="widget widget_text">			<div class="textwidget"><div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div class="fb-like-box" data-href="http://www.facebook.com/pages/Ploobs-Games/101527043290136" data-width="250" data-show-faces="true" data-stream="false" data-header="true"></div></div>
+		</div></li>		<li><div id="recent-posts-3" class="widget widget_recent_entries">		<h2 class="title">Topicos Recentes</h2>		<ul>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2419">Free CI with GitHub, C# and Travis</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2396">C# Artemis Entity System Tutorial</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2378">Implementing a Render Queue for Games</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2364">BitField in Shaders (SM 3 and before)</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2351">Artemis Entity System for Games now on Nuget</a>
+						</li>
+				</ul>
+		</div></li>		     </ul>
+  </div>
+  <!-- /sidebar 2nd container -->
+ </div>
+ <!-- /sidebar 1st container -->
+</div>
+<!-- /sidebar -->
+
+
+
+  </div>
+  <!-- /side wrap -->
+ </div>
+ <!-- /mid column wrap -->
+</div>
+<!-- /main wrapper -->
+
+<!-- clear main & sidebar sections -->
+<div class="clearcontent"></div>
+<!-- /clear main & sidebar sections -->
+
+ 
+<!-- footer -->
+ <div id="footer">
+
+   
+   <!-- please do not remove this. respect the authors :) -->
+   <p>
+    Fusion theme by <a href="http://digitalnature.ro/projects/fusion">digitalnature</a> | powered by <a href="http://wordpress.org/">WordPress</a>    <br />
+   <a class="rss" href="http://ploobs.com.br/feed">Posts (RSS)</a> e <a href="http://ploobs.com.br/comments/feed">Comentários (RSS)</a> <a href="javascript:void(0);" id="toplink">^</a>
+   <!-- 46 queries. 0,924 seconds. -->
+   </p>
+ </div>
+ <!-- /footer -->
+   <div id="layoutcontrol">
+   <a href="javascript:void(0);" class="setFont" title="Aumentar/Diminuir tamanho do texto"><span>SetTextSize</span></a>
+   <a href="javascript:void(0);" class="setLiquid" title="Muda entre largura total e largura fixa"><span>SetPageWidth</span></a>
+ </div>
+ </div>
+<!-- /page -->
+
+</div>
+</div>
+<!-- /page wrappers -->
+
+
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/comment-reply.min.js?ver=4.4.6'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/wp-embed.min.js?ver=4.4.6'></script>
+</body>
+</html>

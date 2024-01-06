@@ -1,0 +1,790 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="keywords" content="barycentric, trinagle rasterizer, " />
+<meta name="description" content="Creators of Ploobs Engine, OpenSource XNA GameEngine and indie Game Development" />
+<meta name="google-site-verification" content="SHK4jeXj--ju-cPSerLDrbbhbEHEPgf_2Ckw8BClx8I" />
+
+<title>Triangle Rasterizer with Perspective Correction | Ploobs</title>
+
+<link rel="alternate" type="application/rss+xml" title="Ploobs RSS Feed" href="http://ploobs.com.br/feed" />
+<link rel="alternate" type="application/atom+xml" title="Ploobs Atom Feed" href="http://ploobs.com.br/feed/atom" />
+<link rel="pingback" href="http://ploobs.com.br/xmlrpc.php" />
+
+
+<style type="text/css" media="all">
+@import "http://ploobs.com.br/wp-content/themes/fusion/style.css";
+#page-wrap2{ background: #0a0d2e; }
+#page-wrap1{ background: none; }
+</style>
+
+
+<!--[if lte IE 6]>
+<script type="text/javascript">
+/* <![CDATA[ */
+   blankimgpath = 'http://ploobs.com.br/wp-content/themes/fusion/images/blank.gif';
+ /* ]]> */
+</script>
+<style type="text/css" media="screen">
+  @import "http://ploobs.com.br/wp-content/themes/fusion/ie6.css";
+  body{ behavior:url("http://ploobs.com.br/wp-content/themes/fusion/js/ie6hoverfix.htc"); }
+  img{ behavior: url("http://ploobs.com.br/wp-content/themes/fusion/js/ie6pngfix.htc"); }
+</style>
+<![endif]-->
+
+
+  
+
+<!-- All in One SEO Pack 2.3.4 by Michael Torbert of Semper Fi Web Design[547,616] -->
+<meta name="description"  content="The following code shows a barycentric Triangle Rasterizer" />
+
+<meta name="keywords"  content="barycentric,rasterizer,triangle,perspective,directx,opengl,c#,c++,code,example,trinagle rasterizer,all posts,computacao grafica,full samples" />
+
+<link rel="canonical" href="http://ploobs.com.br/arquivos/2281" />
+<!-- /all in one seo pack -->
+<link rel="alternate" type="application/rss+xml" title="Ploobs &raquo; Triangle Rasterizer with Perspective Correction  Feed de comentários" href="http://ploobs.com.br/arquivos/2281/feed" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/ploobs.com.br\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.4.8"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;return g&&g.fillText?(g.textBaseline="top",g.font="600 32px Arial","flag"===a?(g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3):"diversity"===a?(g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e):("simple"===a?g.fillText(h(55357,56835),0,0):g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0])):!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g;c.supports={simple:d("simple"),flag:d("flag"),unicode8:d("unicode8"),diversity:d("diversity")},c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.simple&&c.supports.flag&&c.supports.unicode8&&c.supports.diversity||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery.js?ver=1.11.3'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/themes/fusion/js/fusion.js?ver=4.4.8'></script>
+<link rel='https://api.w.org/' href='http://ploobs.com.br/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://ploobs.com.br/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://ploobs.com.br/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Weak Reference in C#' href='http://ploobs.com.br/arquivos/2234' />
+<link rel='next' title='Car Physics Simulation' href='http://ploobs.com.br/arquivos/2278' />
+<meta name="generator" content="WordPress 4.4.8" />
+<link rel='shortlink' href='http://ploobs.com.br/?p=2281' />
+<link rel="alternate" type="application/json+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2Farquivos%2F2281" />
+<link rel="alternate" type="text/xml+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2Farquivos%2F2281&#038;format=xml" />
+<meta property="og:site_name" content="Ploobs" />
+<meta property="og:title" content="Triangle Rasterizer with Perspective Correction" />
+<meta property="og:url" content="http://ploobs.com.br/arquivos/2281" />
+<meta property="og:type" content="article" />
+
+<script type="text/javascript">
+/* <![CDATA[ */
+ jQuery(document).ready(function(){
+  // body .safari class
+  if (jQuery.browser.safari) jQuery('body').addClass('safari');
+
+  // layout controls
+     jQuery("#layoutcontrol a").click(function() {
+     switch (jQuery(this).attr("class")) {
+	   case 'setFont' : setFontSize();	break;
+	   case 'setLiquid'	: setPageWidth();	break;
+	 }
+	 return false;
+    });
+   // set the font size from cookie
+   var font_size = jQuery.cookie('fontSize');
+   if (font_size == '.70em') { jQuery('body').css("font-size",".70em"); }
+   if (font_size == '.95em') { jQuery('body').css("font-size",".95em"); }
+   if (font_size == '.75em') { jQuery('body').css("font-size",".75em"); }
+
+   // set the page width from cookie
+   var page_width = jQuery.cookie('pageWidth');
+   if (page_width) jQuery('#page').css('width', page_width);
+  
+  jQuery('#post-extra-content').minitabs(333, 'slide');
+
+  if (document.all && !window.opera && !window.XMLHttpRequest && jQuery.browser.msie) { var isIE6 = true; }
+  else { var isIE6 = false;} ;
+  jQuery.browser.msie6 = isIE6;
+  if (!isIE6) {
+    initTooltips({
+		timeout: 6000
+   });
+  }
+  tabmenudropdowns();
+
+  // some jquery effects...
+  jQuery('#sidebar ul.nav li ul li a').mouseover(function () {
+   	jQuery(this).animate({ marginLeft: "4px" }, 100 );
+  });
+  jQuery('#sidebar ul.nav li ul li a').mouseout(function () {
+    jQuery(this).animate({ marginLeft: "0px" }, 100 );
+  });
+  // scroll to top
+  jQuery("a#toplink").click(function(){
+    jQuery('html').animate({scrollTop:0}, 'slow');
+  });
+
+  // set roles on some elements (for accessibility)
+  jQuery("#tabs").attr("role","navigation");
+  jQuery("#mid-content").attr("role","main");
+  jQuery("#sidebar").attr("role","complementary");
+  jQuery("#searchform").attr("role","search");
+
+ });
+
+ /* ]]> */
+</script>
+
+</head>
+<body class="implementing-a-triangle-rasterizer">
+  <!-- page wrappers (100% width) -->
+  <div id="page-wrap1">
+    <div id="page-wrap2">
+      <!-- page (actual site content, custom width) -->
+      <div id="page" class="with-sidebar">
+
+       <!-- main wrapper (side & main) -->
+       <div id="main-wrap">
+        <!-- mid column wrap -->
+    	<div id="mid-wrap">
+          <!-- sidebar wrap -->
+          <div id="side-wrap">
+            <!-- mid column -->
+    	    <div id="mid">
+              <!-- header -->
+              <div id="header">
+                <div id="topnav" class="description"> Creators of Ploobs Engine, OpenSource XNA GameEngine and indie Game Development</div>
+
+                                <a id="logo" href="http://ploobs.com.br/"><img src="http://ploobs.com.br/wp-content/uploads/logo2.png" title="Ploobs" alt="Ploobs" /></a>
+                
+                <!-- top tab navigation -->
+                <div id="tabs">
+                 <ul>
+                                     <li id="nav-homelink"><a href="http://ploobs.com.br" title="Clique para Início"><span><span>Início</span></span></a></li>
+                                   <li class="page_item page-item-2"><a href="http://ploobs.com.br/about"><span><span>About</span></span></a></li>
+<li class="page_item page-item-1353"><a href="http://ploobs.com.br/contatos"><span><span>Contact Us</span></span></a></li>
+<li class="page_item page-item-494"><a href="http://ploobs.com.br/forum"><span><span>Forum</span></span></a></li>
+<li class="page_item page-item-233 page_item_has_children"><a href="http://ploobs.com.br/ploobsengine"><span><span>PloobsEngine</span></span></a>
+<ul class='children'>
+	<li class="page_item page-item-1381"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-presentation"><span><span>PloobsEngine Presentation</span></span></a></li>
+	<li class="page_item page-item-1392"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-features"><span><span>PloobsEngine Features</span></span></a></li>
+	<li class="page_item page-item-1395"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-download"><span><span>PloobsEngine Download</span></span></a></li>
+	<li class="page_item page-item-1379"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-tutorials"><span><span>PloobsEngine Tutorials</span></span></a></li>
+	<li class="page_item page-item-465"><a href="http://ploobs.com.br/ploobsengine/galeria"><span><span>PloobsEngine Galery</span></span></a></li>
+	<li class="page_item page-item-1371"><a href="http://ploobs.com.br/ploobsengine/ploobs-license"><span><span>PloobsEngine Dual-License</span></span></a></li>
+</ul>
+</li>
+<li class="page_item page-item-656"><a href="http://ploobs.com.br/iniciantes"><span><span>Comp Gráfica Tutoriais</span></span></a></li>
+                 </ul>
+                </div>
+                <!-- /top tabs -->
+
+              </div><!-- /header -->
+  <!-- mid content -->
+  <div id="mid-content">
+      <div class="navigation">
+      <div class="alignleft">&laquo; <a href="http://ploobs.com.br/arquivos/2234" rel="prev">Weak Reference in C#</a></div>
+      <div class="alignright"><a href="http://ploobs.com.br/arquivos/2278" rel="next">Car Physics Simulation</a> &raquo;</div>
+      <div class="clear"></div>
+    </div>
+
+    <div id="post-2281" class="post-2281 post type-post status-publish format-standard hentry category-geral category-computacao-grafica category-exemplos-source-code tag-barycentric tag-trinagle-rasterizer">
+       <h2 class="title">Triangle Rasterizer with Perspective Correction</h2>       <br />
+	    <div class="entry">
+          <div class="postbody entry clearfix">
+	       
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2Farquivos%2F2281&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+<p><img alt="" src="http://joshbeam.com/articles/triangle_rasterization/trianglerast_f3.png" class="alignleft" width="70" height="70" />Some years ago i implemented a full Software Render (learning purpose) using just regular C#.<br />
+Some days ago i was desperate trying to find a good Triangle rasterizer with perspective correction and then i remembered about the code i had written !<br />
+<span id="more-2281"></span><br />
+The following code shows a barycentric Triangle Rasterizer (i did not put the auxiliar classes, but they are very very intuitive). Idea explained <a href="http://www.eng.utah.edu/~cs5600/media/Lecture%202%20-%20Barycentric%20Coordinates%20and%20Triangle%20Rasterization.pdf">here</a>.</p>
+<pre class="c-sharp">
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+
+namespace Etapa1.SofRender
+{    
+    /// <summary>
+    /// Baricentric Rasterizer COM perspective correction nos Textcoords[n]
+    /// </summary>
+    public class BaricentricRasterizer
+    {
+        public BaricentricRasterizer()
+        {
+            
+        }       
+
+        public List<VertexType> DrawTriangle(Triangle tri)
+        {
+            List<VertexType> vertices = new List<VertexType>();
+
+            Vector4 p0 = tri.P1[Slots.POSITION0];
+            Vector4 p1 = tri.P2[Slots.POSITION0];
+            Vector4 p2 = tri.P3[Slots.POSITION0];
+
+            Vector4[] vecs = new Vector4[] { p0, p1, p2 };
+            float minx = float.MaxValue;
+            float miny = float.MaxValue;
+            float maxx = float.MinValue;
+            float maxy = float.MinValue;
+
+            foreach (var item in vecs)
+            {
+                if (item.X < minx)
+                {
+                    minx = item.X;
+                }
+                if (item.X > maxx)
+                {
+                    maxx = item.X;
+                }
+
+                if (item.Y < miny)
+                {
+                    miny = item.Y;
+                }
+                if (item.Y > maxy)
+                {
+                    maxy = item.Y;
+                }
+            }
+
+            for (int i = (int)minx - 1; i <= (int)maxx + 1; i++)
+            {
+                for (int j = (int)miny - 1; j <= (int)maxy + 1; j++)
+                {
+                    float alpha = 0;
+                    float beta = 0;
+                    float gama = 0;
+                    ComputeAlphaBethaGama(ref alpha, ref beta, ref gama, tri.P1[Slots.POSITION0], tri.P2[Slots.POSITION0], tri.P3[Slots.POSITION0], i, j);
+
+                    if (alpha >= 0 && alpha <= 1 &#038;&#038; beta >= 0 && beta <= 1 &#038;&#038; gama >= 0 && gama <= 1)
+                    {
+                        VertexType vt = new VertexType();                        
+                        foreach (var item in tri.P1.VertexElements)
+                        {
+                            if (item == Slots.NORMAL0 || item == Slots.NORMAL1 || item == Slots.POSITION0 || item == Slots.POSITION1 || item == Slots.COLOR0 || item == Slots.COLOR1 )
+                            {
+                                vt[item] = alpha * tri.P1[item] + beta * tri.P2[item] + gama * tri.P3[item];                                
+                            }
+                            else
+                            {
+
+                                float w = (1f / tri.P1[Slots.POSITION0].W) * alpha
+                                        + (1f / tri.P2[Slots.POSITION0].W) * beta
+                                        + (1f / tri.P3[Slots.POSITION0].W) * gama;
+
+                                float xx = (tri.P1[item].X / tri.P1[Slots.POSITION0].W) * alpha
+                                    + (tri.P2[item].X / tri.P2[Slots.POSITION0].W) * beta
+                                    + (tri.P3[item].X / tri.P3[Slots.POSITION0].W) * gama;
+
+                                float yy = (tri.P1[item].Y / tri.P1[Slots.POSITION0].W) * alpha
+                                    + (tri.P2[item].Y / tri.P2[Slots.POSITION0].W) * beta
+                                    + (tri.P3[item].Y / tri.P3[Slots.POSITION0].W) * gama;
+
+                                float zz = (tri.P1[item].Z / tri.P1[Slots.POSITION0].W) * alpha
+                                    + (tri.P2[item].Z / tri.P2[Slots.POSITION0].W) * beta
+                                    + (tri.P3[item].Z / tri.P3[Slots.POSITION0].W) * gama;
+
+                                float ww = (tri.P1[item].W / tri.P1[Slots.POSITION0].W) * alpha
+                                    + (tri.P2[item].W / tri.P2[Slots.POSITION0].W) * beta
+                                    + (tri.P3[item].W / tri.P3[Slots.POSITION0].W) * gama;
+
+                                float correctedx = xx / w;
+                                float correctedy = yy / w;
+                                float correctedz = zz / w;
+                                float correctedw = ww / w;
+                                vt[item] = new Vector4(correctedx, correctedy, correctedz, correctedw);
+                            }
+                        }
+                        float z = alpha * p0.Z + beta * p1.Z + gama * p2.Z;                        
+                        vt[Slots.POSITION0] = new Vector4(i, j, z, 1);                                                
+                        vertices.Add(vt); 
+                    }
+                }                
+            }
+            return vertices;
+        }
+
+        void ComputeAlphaBethaGama(ref float alpha, ref float beta, ref float gama , Vector4 p0, Vector4 p1, Vector4 p2 , float x, float y)
+        {
+            alpha = ComputeFunction(x, y, p1, p2) / ComputeFunction(p0.X, p0.Y, p1, p2);
+            beta = ComputeFunction(x, y, p2, p0)  / ComputeFunction(p1.X, p1.Y, p2, p0);
+            gama = ComputeFunction(x, y, p0, p1)  / ComputeFunction(p2.X, p2.Y, p0, p1);
+        }
+
+        float ComputeFunction(float x, float y, Vector4 pa, Vector4 pb)
+        {
+            return (pa.Y - pb.Y) * x + (pb.X - pa.X) * y + pa.X * pb.Y - pb.X * pa.Y;
+        }
+
+    }
+}
+</pre>
+<p>I also implemented a "Span" Triangle rasterizer (without perspective correction), the code is also shown below: (idea explanation <a href="http://joshbeam.com/articles/triangle_rasterization/">http://joshbeam.com/articles/triangle_rasterization/</a>)</p>
+<pre class="c-sharp">
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+
+namespace Etapa1.SofRender
+{
+    /// <summary>
+    /// NAO LEVA EM CONTA A PROFUNDIDADE DOS TRIANGULOS (FORWARD DIFERRENCING)
+    /// DA PROBLEMA COM PROJECAO PERSPECTIVA
+    /// </summary>
+    public class Rasterizer
+    {        
+        public Rasterizer()
+        {
+            
+        }
+        List<VertexType> vos = new List<VertexType>();
+
+        public List<VertexType> DrawTriangle(Triangle t1)
+        {
+            vos.Clear();
+             Edge[] edges = new Edge[]{
+                new Edge(t1.P1,t1.P2) , new Edge(t1.P2,t1.P3), new Edge(t1.P3,t1.P1)};
+
+             int maxLength = 0;
+             int longEdge = 0;
+
+             // find edge with the greatest length in the y axis
+             for (int i = 0; i < 3; i++)
+             {
+                 int length = (int)edges[i].P2.Y - (int)edges[i].P1.Y;
+                 if (length > maxLength)
+                 {
+                     maxLength = length;
+                     longEdge = i;
+                 }
+             }
+
+             int shortEdge1 = (longEdge + 1) % 3;
+             int shortEdge2 = (longEdge + 2) % 3;
+
+             // draw spans between edges; the long edge can be drawn
+             // with the shorter edges to draw the full triangle
+             DrawSpansBetweenEdges(edges[longEdge], edges[shortEdge1]);
+             DrawSpansBetweenEdges(edges[longEdge], edges[shortEdge2]);
+             return vos;
+        
+        }
+
+        private void DrawSpansBetweenEdges(Edge e1, Edge e2)
+        {
+            // calculate difference between the y coordinates
+            // of the first edge and return if 0
+            float e1ydiff = (float)(e1.P2.Y - e1.P1.Y);
+            if (e1ydiff == 0.0f)
+                return;
+
+            // calculate difference between the y coordinates
+            // of the second edge and return if 0
+            float e2ydiff = (float)(e2.P2.Y - e2.P1.Y);
+            if (e2ydiff == 0.0f)
+                return;
+
+            // calculate differences between the x coordinates
+            // and colors of the points of the edges
+        float e1xdiff = (float)(e1.P2.X - e1.P1.X);
+        float e2xdiff = (float)(e2.P2.X - e2.P1.X);
+
+        Dictionary<Slots, Vector4> Data1 = new Dictionary<Slots, Vector4>();
+        Dictionary<Slots, Vector4> Data2 = new Dictionary<Slots, Vector4>();
+        foreach (var item in e1.VertexType2.VertexElements)
+        {
+            Vector4 e1colordiff  = e1.VertexType2[item] - e1.VertexType1[item];
+            Vector4 e2colordiff = e2.VertexType2[item] - e2.VertexType1[item];
+            Data1[item] = e1colordiff;
+            Data2[item] = e2colordiff;
+        }
+        
+
+         
+
+        // calculate factors to use for interpolation
+        // with the edges and the step values to increase
+        // them by after drawing each span
+        float factor1 = (float)(e2.P1.Y - e1.P1.Y) / e1ydiff;
+        float factorStep1 = 1.0f / e1ydiff;
+        float factor2 = 0.0f;
+        float factorStep2 = 1.0f / e2ydiff;
+
+            // loop through the lines between the edges and draw spans
+            for(int y = (int) e2.P1.Y; y < (int)e2.P2.Y; y++) {
+                // create and draw span    
+
+                Dictionary<Slots, Vector4> Datax1 = new Dictionary<Slots, Vector4>();
+                Dictionary<Slots, Vector4> Datax2 = new Dictionary<Slots, Vector4>();
+                foreach (var item in e1.VertexType2.VertexElements)
+                {
+                    Vector4 x1 =  e1.VertexType1[item] + Data1[item] * factor1;
+                    Vector4 x2 =  e2.VertexType1[item] + Data2[item] * factor2;
+                    Datax1[item] = x1;
+                    Datax2[item] = x2;
+                }
+
+                Span span = new Span(Datax1,
+                          (int)e1.P1.X + (int)(e1xdiff * factor1),
+                          Datax2,
+                          (int)e2.P1.X + (int)(e2xdiff * factor2));
+
+                DrawSpan(span, y);
+
+                // increase factors
+                factor1 += factorStep1;
+                factor2 += factorStep2;
+        }
+
+
+
+
+        }
+
+        private void DrawSpan(Span span, int y)
+        {
+            int xdiff = span.X2 - span.X1;
+            if (xdiff == 0)
+                return;
+
+            Dictionary<Slots, Vector4> Data = new Dictionary<Slots, Vector4>();
+            foreach (var item in span.d1.Keys)
+            {
+                Data[item] = span.d2[item] - span.d1[item];
+                //Color colordiff = span.Color2.SubColors(span.Color1);
+            }         
+            
+
+            float factor = 0.0f;
+            float factorStep = 1.0f / (float)xdiff;
+
+            // draw each pixel in the span
+            for (int x = span.X1; x < span.X2; x++)
+            {
+                VertexType vo = new VertexType();
+                foreach (var item in Data.Keys)
+                {
+                           
+                           vo[item] = span.d1[item] + Data[item] * factor;                            
+                           //span.Color1.AddColors(colordiff.MultByConstColor(factor))
+                }
+
+                vo[Slots.POSITION0] = new Vector4(x, y, vo[Slots.POSITION0].Z, 0);
+                vos.Add(vo);
+                //render.SetPixel(x, y, 10 ,span.Color1.AddColors(colordiff.MultByConstColor(factor)));
+                factor += factorStep;
+            }
+        }       
+        
+
+    }
+}
+
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+
+namespace Etapa1.SofRender
+{
+    public class Span
+    {    
+       public int X1, X2;
+       public Dictionary<Slots, Vector4> d1, d2;
+
+       public Span(Dictionary<Slots, Vector4> data1, int x1, Dictionary<Slots, Vector4> data2, int x2)
+       {
+           if (x1 < x2)
+           {
+               this.X1 = x1;
+               this.d1 = data1;
+               this.X2 = x2;
+               this.d2 = data2;
+           }
+           else
+           {
+               this.X1 = x2;
+               this.d1 = data2;
+               this.X2 = x1;
+               this.d2 = data1;
+           }
+       }
+
+    }
+}
+
+</pre>
+<p>The code for the full Software Render (not optimized, not well written, not  completely right (clipping implementation was a huge workaround), but very good for learning) can be found here <a href="http://softrender.codeplex.com/">http://softrender.codeplex.com/</a>.</p>
+
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2Farquivos%2F2281&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+          </div>
+                              <p class="tags"><a href="http://ploobs.com.br/arquivos/tag/barycentric" rel="tag">barycentric</a>, <a href="http://ploobs.com.br/arquivos/tag/trinagle-rasterizer" rel="tag">trinagle rasterizer</a></p>
+          <div class="clear"></div>
+                    <p class="postmetadata alt">
+			<small>
+                This entry was posted on 20 de novembro de 2012, 3:44 pm and is filed under <a href="http://ploobs.com.br/arquivos/category/geral" rel="category tag">All Posts</a>, <a href="http://ploobs.com.br/arquivos/category/computacao-grafica" rel="category tag">Computacao Grafica</a>, <a href="http://ploobs.com.br/arquivos/category/computacao-grafica/exemplos-source-code" rel="category tag">Full Samples</a>. You can follow any responses to this entry through <a href="http://ploobs.com.br/arquivos/2281/feed" title="RSS 2.0">RSS 2.0</a>.
+                Você pode <a href="#respond">deixar uma resposta</a>, ou <a href="http://ploobs.com.br/arquivos/2281/trackback" rel="trackback">citar</a> de seu próprio site.                            </small>
+		  </p>
+	   </div>
+    </div>
+	
+
+<div id="post-extra-content">
+      <!-- comments and trackback tabs -->
+    <ul class="secondary-tabs">
+      <li><a href="#tab-1"><span><span>Comentários (1)</span></span></a></li>
+                </ul>
+    <!-- /comments and trackback tabs -->
+    <!-- comments -->
+  <div id="tab-1">
+   <ol id="comments">
+     <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-4039651">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/287f1d4ce2c683bc1ec070d240f3af85?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/287f1d4ce2c683bc1ec070d240f3af85?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4039651">#1</a> by <a id="commentauthor-4039651" href="http://www.miami-dadenaacp.org/insurance-worcester.html">http://www.miami-dadenaacp.org/insurance-worcester.html</a> on 18 de março de 2017 - 6:26 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4039651">
+          <p>Perfect shot! Thanks for your post!</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4039651', 'comment-4039651', 'commentbody-4039651', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+    </ol>
+           <div class="commentnavi">
+  	    <div class="commentpager">
+  	    	<a class="prev page-numbers" href="http://ploobs.com.br/arquivos/2281/comment-page-658#comments">&laquo; Anterior</a>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/2281/comment-page-1#comments'>1</a>
+<span class="page-numbers dots">&hellip;</span>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/2281/comment-page-657#comments'>657</a>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/2281/comment-page-658#comments'>658</a>
+<span class='page-numbers current'>659</span>  	    </div>
+       </div>
+          
+      <div id="respond">
+      <form action="http://ploobs.com.br/wp-comments-post.php" method="post" id="commentform">
+        <div class="cancel-comment-reply"><a rel="nofollow" id="cancel-comment-reply-link" href="/arquivos/2281#respond" style="display:none;">Cancelar resposta</a></div>          	                <div id="author_info">
+            <div class="row">
+              <input type="text" name="author" id="author" class="textfield" value="" size="24" tabindex="1" />
+              <label for="author" class="small">Nome (necessário)</label>
+            </div>
+            <div class="row">
+              <input type="text" name="email" id="email" class="textfield" value="" size="24" tabindex="2" />
+              <label for="email" class="small">E-Mail (necessário)</label> <em>(não será publicado)</em>
+            </div>
+            <div class="row">
+              <input type="text" name="url" id="url" class="textfield" value="" size="24" tabindex="3" />
+              <label for="url" class="small">Website</label>
+            </div>
+  		  </div>
+                  
+        <!-- comment input -->
+        <div class="row">
+        	<textarea name="comment" id="comment" tabindex="4" rows="8" cols="50"></textarea>
+        	        	<input type='hidden' name='comment_post_ID' value='2281' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+
+                 <br />
+        </div>
+        <!-- /comment input -->
+
+        <!-- comment submit and rss -->
+        <div id="submitbox" class="left">
+         <span class="button submit"><a title="Mandar Comentário" href="javascript:jQuery('#commentform').submit();"><span><span>Mandar Comentário</span></span></a></span>
+         <input type="hidden" name="formInput" />
+        </div>
+        <div class="clear"></div>
+      </form>
+    </div>
+          </div>
+  <!-- /comments -->
+
+  <!-- trackbacks -->
+    <!-- /trackbacks -->
+
+  <!-- related posts -->
+    <!-- /related posts -->
+
+</div>
+
+
+
+   </div>
+    <!-- mid content -->
+   </div>
+   <!-- /mid -->
+
+   
+<!-- sidebar -->
+<div id="sidebar">
+ <!-- sidebar 1st container -->
+ <div id="sidebar-wrap1">
+  <!-- sidebar 2nd container -->
+  <div id="sidebar-wrap2">
+     <ul id="sidelist">
+     	
+        <li><div id="fusion-search" class="widget fusion_SearchWidget">         <!-- wp search form -->
+          <div id="searchtab">
+            <div class="inside">
+              <form method="get" id="searchform" action="http://ploobs.com.br/">
+              <fieldset>
+                <input type="text" name="s" id="searchbox" class="searchfield" value="Procurar" onfocus="if(this.value == 'Procurar') {this.value = '';}" onblur="if (this.value == '') {this.value = 'Procurar';}" />
+                 <input type="submit" value="Go" class="searchbutton" />
+              </fieldset>
+              </form>
+            </div>
+          </div>
+         <!-- /wp search form -->
+  </div></li><li><div id="fusion-categories" class="widget fusion_CategoryWidget"> <!-- sidebar menu (categories) -->
+ <ul class="nav">
+   	<li  class="cat-item cat-item-1"><a href="http://ploobs.com.br/arquivos/category/geral" title="Todos os Posts do site"><span>All Posts <em>(107)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/geral/feed"></a>
+</li>
+	<li  class="cat-item cat-item-71"><a href="http://ploobs.com.br/arquivos/category/android" ><span>Android <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/android/feed"></a>
+</li>
+	<li  class="cat-item cat-item-168"><a href="http://ploobs.com.br/arquivos/category/artemis-2" ><span>Artemis <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/artemis-2/feed"></a>
+</li>
+	<li  class="cat-item cat-item-35"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica" ><span>Computacao Grafica <em>(43)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/feed"></a>
+<ul class='children'>
+	<li  class="cat-item cat-item-104"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/artigos-introdutorios" title="Artigos introdutorios a computacao grafica"><span>Artigos Introdutorios <em>(8)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/artigos-introdutorios/feed"></a>
+</li>
+	<li  class="cat-item cat-item-105"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/exemplos-source-code" title="Full Source Code and Explanation Samples"><span>Full Samples <em>(7)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/exemplos-source-code/feed"></a>
+</li>
+	<li  class="cat-item cat-item-89"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/shader-code-snippet" ><span>Shader Code Snippet <em>(12)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/shader-code-snippet/feed"></a>
+</li>
+</ul>
+</li>
+	<li  class="cat-item cat-item-133"><a href="http://ploobs.com.br/arquivos/category/developers-diary" ><span>Developers Diary <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/developers-diary/feed"></a>
+</li>
+	<li  class="cat-item cat-item-170"><a href="http://ploobs.com.br/arquivos/category/directx-11" ><span>DirectX 11 <em>(3)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/directx-11/feed"></a>
+</li>
+	<li  class="cat-item cat-item-115"><a href="http://ploobs.com.br/arquivos/category/divulgacao" ><span>Divulgação <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/divulgacao/feed"></a>
+</li>
+	<li  class="cat-item cat-item-26"><a href="http://ploobs.com.br/arquivos/category/ia" ><span>IA <em>(4)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ia/feed"></a>
+</li>
+	<li  class="cat-item cat-item-97"><a href="http://ploobs.com.br/arquivos/category/maxscript" ><span>MaxScript <em>(1)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/maxscript/feed"></a>
+</li>
+	<li  class="cat-item cat-item-21"><a href="http://ploobs.com.br/arquivos/category/ploobsengine" ><span>PloobsEngine <em>(27)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/feed"></a>
+<ul class='children'>
+	<li  class="cat-item cat-item-103"><a href="http://ploobs.com.br/arquivos/category/ploobsengine/releases" title="PloobsEngine Releases"><span>Releases <em>(4)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/releases/feed"></a>
+</li>
+	<li  class="cat-item cat-item-102"><a href="http://ploobs.com.br/arquivos/category/ploobsengine/tutoriais" title="Tutorais da PloobsEngine"><span>Tutorials <em>(15)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/tutoriais/feed"></a>
+</li>
+</ul>
+</li>
+	<li  class="cat-item cat-item-16"><a href="http://ploobs.com.br/arquivos/category/portfolio" ><span>Portfolio <em>(19)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/portfolio/feed"></a>
+</li>
+	<li  class="cat-item cat-item-9"><a href="http://ploobs.com.br/arquivos/category/xna" ><span>XNA <em>(36)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/xna/feed"></a>
+</li>
+     </ul>
+  <!-- /sidebar menu -->
+ </div></li><li><div id="text-4" class="widget widget_text">			<div class="textwidget"><div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div class="fb-like-box" data-href="http://www.facebook.com/pages/Ploobs-Games/101527043290136" data-width="250" data-show-faces="true" data-stream="false" data-header="true"></div></div>
+		</div></li>		<li><div id="recent-posts-3" class="widget widget_recent_entries">		<h2 class="title">Topicos Recentes</h2>		<ul>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2419">Free CI with GitHub, C# and Travis</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2396">C# Artemis Entity System Tutorial</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2378">Implementing a Render Queue for Games</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2364">BitField in Shaders (SM 3 and before)</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2351">Artemis Entity System for Games now on Nuget</a>
+						</li>
+				</ul>
+		</div></li>		     </ul>
+  </div>
+  <!-- /sidebar 2nd container -->
+ </div>
+ <!-- /sidebar 1st container -->
+</div>
+<!-- /sidebar -->
+
+
+
+  </div>
+  <!-- /side wrap -->
+ </div>
+ <!-- /mid column wrap -->
+</div>
+<!-- /main wrapper -->
+
+<!-- clear main & sidebar sections -->
+<div class="clearcontent"></div>
+<!-- /clear main & sidebar sections -->
+
+ 
+<!-- footer -->
+ <div id="footer">
+
+   
+   <!-- please do not remove this. respect the authors :) -->
+   <p>
+    Fusion theme by <a href="http://digitalnature.ro/projects/fusion">digitalnature</a> | powered by <a href="http://wordpress.org/">WordPress</a>    <br />
+   <a class="rss" href="http://ploobs.com.br/feed">Posts (RSS)</a> e <a href="http://ploobs.com.br/comments/feed">Comentários (RSS)</a> <a href="javascript:void(0);" id="toplink">^</a>
+   <!-- 39 queries. 0,819 seconds. -->
+   </p>
+ </div>
+ <!-- /footer -->
+   <div id="layoutcontrol">
+   <a href="javascript:void(0);" class="setFont" title="Aumentar/Diminuir tamanho do texto"><span>SetTextSize</span></a>
+   <a href="javascript:void(0);" class="setLiquid" title="Muda entre largura total e largura fixa"><span>SetPageWidth</span></a>
+ </div>
+ </div>
+<!-- /page -->
+
+</div>
+</div>
+<!-- /page wrappers -->
+
+
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/comment-reply.min.js?ver=4.4.8'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/wp-embed.min.js?ver=4.4.8'></script>
+</body>
+</html>

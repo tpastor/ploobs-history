@@ -1,0 +1,559 @@
+
+<!DOCTYPE html>
+<html lang="en-US"
+ xmlns:og="http://opengraphprotocol.org/schema/"
+ xmlns:fb="http://www.facebook.com/2008/fbml">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="profile" href="http://gmpg.org/xfn/11">
+
+<title>Physics on Unity Pure ECS &#8211; Ploobs &#8211; Game Dev Blog</title>
+<link rel='dns-prefetch' href='//s.w.org' />
+<link rel="alternate" type="application/rss+xml" title="Ploobs - Game Dev Blog &raquo; Feed" href="http://ploobs.com.br/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Ploobs - Game Dev Blog &raquo; Comments Feed" href="http://ploobs.com.br/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Ploobs - Game Dev Blog &raquo; Physics on Unity Pure ECS Comments Feed" href="http://ploobs.com.br/2018/08/27/physics-on-unity-pure-ecs/feed/" />
+<!-- This site uses the Google Analytics by MonsterInsights plugin v7.7.1 - Using Analytics tracking - https://www.monsterinsights.com/ -->
+<!-- Note: MonsterInsights is not currently configured on this site. The site owner needs to authenticate with Google Analytics in the MonsterInsights settings panel. -->
+<!-- No UA code set -->
+<!-- / Google Analytics by MonsterInsights -->
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/11\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/11\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/ploobs.com.br\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.9.10"}};
+			!function(a,b,c){function d(a,b){var c=String.fromCharCode;l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,a),0,0);var d=k.toDataURL();l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,b),0,0);var e=k.toDataURL();return d===e}function e(a){var b;if(!l||!l.fillText)return!1;switch(l.textBaseline="top",l.font="600 32px Arial",a){case"flag":return!(b=d([55356,56826,55356,56819],[55356,56826,8203,55356,56819]))&&(b=d([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]),!b);case"emoji":return b=d([55358,56760,9792,65039],[55358,56760,8203,9792,65039]),!b}return!1}function f(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var g,h,i,j,k=b.createElement("canvas"),l=k.getContext&&k.getContext("2d");for(j=Array("flag","emoji"),c.supports={everything:!0,everythingExceptFlag:!0},i=0;i<j.length;i++)c.supports[j[i]]=e(j[i]),c.supports.everything=c.supports.everything&&c.supports[j[i]],"flag"!==j[i]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[j[i]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(h=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",h,!1),a.addEventListener("load",h,!1)):(a.attachEvent("onload",h),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),g=c.source||{},g.concatemoji?f(g.concatemoji):g.wpemoji&&g.twemoji&&(f(g.twemoji),f(g.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='gtranslate-style-css'  href='http://ploobs.com.br/wp-content/plugins/gtranslate/gtranslate-style16.css?ver=4.9.10' type='text/css' media='all' />
+<link rel='stylesheet' id='donovan-custom-fonts-css'  href='http://ploobs.com.br/wp-content/themes/donovan/assets/css/custom-fonts.css?ver=20180413' type='text/css' media='all' />
+<link rel='stylesheet' id='wp-block-library-css'  href='http://ploobs.com.br/wp-content/plugins/gutenberg/build/block-library/style.css?ver=1541844393' type='text/css' media='all' />
+<link rel='stylesheet' id='dashicons-css'  href='http://ploobs.com.br/wp-includes/css/dashicons.min.css?ver=4.9.10' type='text/css' media='all' />
+<link rel='stylesheet' id='post-views-counter-frontend-css'  href='http://ploobs.com.br/wp-content/plugins/post-views-counter/css/frontend.css?ver=1.2.14' type='text/css' media='all' />
+<link rel='stylesheet' id='wpt-twitter-feed-css'  href='http://ploobs.com.br/wp-content/plugins/wp-to-twitter/css/twitter-feed.css?ver=4.9.10' type='text/css' media='all' />
+<link rel='stylesheet' id='donovan-stylesheet-css'  href='http://ploobs.com.br/wp-content/themes/donovan/style.css?ver=1.2.1' type='text/css' media='all' />
+<link rel='stylesheet' id='enlighter-local-css'  href='http://ploobs.com.br/wp-content/plugins/enlighter/resources/EnlighterJS.min.css?ver=3.10.0' type='text/css' media='all' />
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery.js?ver=1.12.4'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var donovan_menu_title = "<svg class=\"icon icon-menu\" aria-hidden=\"true\" role=\"img\"> <use xlink:href=\"http:\/\/ploobs.com.br\/wp-content\/themes\/donovan\/assets\/icons\/genericons-neue.svg#menu\"><\/use> <\/svg>Menu";
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/themes/donovan/assets/js/navigation.js?ver=20171005'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/themes/donovan/assets/js/svgxuse.min.js?ver=1.2.4'></script>
+<link rel='https://api.w.org/' href='http://ploobs.com.br/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://ploobs.com.br/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://ploobs.com.br/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='First Configurations ECS Unity Project' href='http://ploobs.com.br/2018/08/26/first-steps-on-creating-a-pure-ecs-unity-project-part-2/' />
+<link rel='next' title='Plant Jumper &#8211; Player Moviment' href='http://ploobs.com.br/2018/08/28/plant-jumper-player-moviment/' />
+<meta name="generator" content="WordPress 4.9.10" />
+<link rel="canonical" href="http://ploobs.com.br/2018/08/27/physics-on-unity-pure-ecs/" />
+<link rel='shortlink' href='http://ploobs.com.br/?p=86' />
+<link rel="alternate" type="application/json+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2F2018%2F08%2F27%2Fphysics-on-unity-pure-ecs%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2F2018%2F08%2F27%2Fphysics-on-unity-pure-ecs%2F&#038;format=xml" />
+	<link href="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Styles/SyntaxHighlighter.css" type="text/css" rel="stylesheet" />
+	<meta property="og:site_name" content="Ploobs - Game Dev Blog" />
+<meta property="og:title" content="Physics on Unity Pure ECS" />
+<meta property="og:url" content="http://ploobs.com.br/2018/08/27/physics-on-unity-pure-ecs/" />
+<meta property="og:type" content="article" />
+<script type="text/javascript">
+	window._se_plugin_version = '8.1.9';
+</script>
+
+<!-- Protected by WP-SpamFree :: JS BEGIN -->
+<script type="text/javascript" src="http://ploobs.com.br/wp-content/plugins/wp-spamfree/js/wpsfv2-js.php"></script> 
+<!-- Protected by WP-SpamFree :: JS END -->
+
+<link rel="pingback" href="http://ploobs.com.br/xmlrpc.php">
+		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		<style type="text/css" id="custom-background-css">
+body.custom-background { background-color: #048c96; }
+</style>
+
+<!-- BEGIN ExactMetrics v5.3.8 Universal Analytics - https://exactmetrics.com/ -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-124485945-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- END ExactMetrics Universal Analytics -->
+</head>
+
+<body class="post-template-default single single-post postid-86 single-format-standard custom-background boxed-theme-layout blog-grid-layout">
+
+	<div id="page" class="site">
+		<a class="skip-link screen-reader-text" href="#content">Skip to content</a>
+
+		
+		<header id="masthead" class="site-header clearfix" role="banner">
+
+			<div class="header-main container clearfix">
+
+				<div id="logo" class="site-branding clearfix">
+
+										
+			<p class="site-title"><a href="http://ploobs.com.br/" rel="home">Ploobs &#8211; Game Dev Blog</a></p>
+
+							
+			<p class="site-description">Game Development Blog</p>
+
+		
+				</div><!-- .site-branding -->
+
+				
+			</div><!-- .header-main -->
+
+			
+<div id="main-navigation-wrap" class="primary-navigation-wrap">
+
+	<div id="main-navigation-container" class="primary-navigation-container container">
+
+		
+		<nav id="main-navigation" class="primary-navigation navigation clearfix" role="navigation">
+					</nav><!-- #main-navigation -->
+
+	</div>
+
+</div>
+
+			
+			
+		</header><!-- #masthead -->
+
+		<div id="content" class="site-content container">
+
+	<div id="primary" class="content-area">
+		<main id="main" class="site-main">
+
+		
+<article id="post-86" class="post-86 post type-post status-publish format-standard hentry category-programming tag-ecs tag-programming">
+
+	
+			<div class="post-image">
+							</div>
+
+		
+	<div class="post-content">
+
+		<header class="entry-header">
+
+			<h1 class="entry-title">Physics on Unity Pure ECS</h1>
+			<div class="entry-meta post-details"><span class="posted-on meta-date">Posted on <a href="http://ploobs.com.br/2018/08/27/physics-on-unity-pure-ecs/" rel="bookmark"><time class="entry-date published" datetime="2018-08-27T11:11:52+00:00">27 de August de 2018</time><time class="updated" datetime="2018-08-27T14:14:29+00:00">27 de August de 2018</time></a></span><span class="posted-by meta-author"> by <span class="author vcard"><a class="url fn n" href="http://ploobs.com.br/author/ploobs/" title="View all posts by ploobs" rel="author">ploobs</a></span></span></div>
+		</header><!-- .entry-header -->
+
+		<div class="entry-content clearfix">
+
+			
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2F2018%2F08%2F27%2Fphysics-on-unity-pure-ecs%2F&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+<p>If you don´t know, there is no implementation of a physics collision treatment if you are implementing pure ECS at this moment.<br/>But what can we do is create our own collision detection and each kind of physics treatment we need.</p>
+
+<h2><strong>Gravity System</strong></h2>
+
+<p>For my platform game i need to create an implementation for gravity. A good point of that approach it is that we can create different ways of understand gravity as Mario Galaxy for example.</p>
+
+<p>Im my case i implemented a very simple one</p>
+
+<pre class="wp-block-code"><code>
+using UnityEngine;
+using Unity.Entities;
+using Unity.Transforms;
+
+using Unity.Mathematics;
+
+public class RidigBodySystem : ComponentSystem
+{
+    public struct Data
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;Position> Position;
+        public ComponentDataArray&lt;CollisionComponent> Collision;
+        public ComponentDataArray&lt;RigidBodyComponent> RigidBody;
+
+        public ComponentDataArray&lt;Velocity> Velocity;
+    }
+
+    [Inject] private Data m_Data;
+
+    protected override void OnUpdate()
+    {
+        float3 gravity = new float3(0, -20, 0);
+        float dt = Time.deltaTime;
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            var position = m_Data.Position[index].Value;
+
+            if (m_Data.Collision[index].Value == 0)
+            {
+                Velocity velocity = new Velocity
+                {
+                    Value = m_Data.Velocity[index].Value + gravity * dt
+                };
+                m_Data.Velocity[index] = velocity;
+
+                position += (m_Data.Velocity[index].Value * dt + 0.5f * gravity * dt * dt);
+            }
+
+            m_Data.Position[index] = new Position { Value = position };
+        }
+    }
+}
+</code></pre>
+
+<p>In this code there is a important concept, the injection</p>
+
+<pre class="wp-block-code"><code>public struct Data
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;Position> Position;
+        public ComponentDataArray&lt;RigidBodyComponent> RigidBody;
+    }
+
+    [Inject] private Data m_Data;</code></pre>
+
+<p>Unity, has its dependencies injection that based on the struct we create, give us the data of all entities that cointains this components. The beauty of ECS it is that we don´t know which entity we are changing, actualy, that is the main concept, we don´t need to know. The systems must be created thinking in the data. So we design systems that changes data and not managers that change objects as we as used to.</p>
+
+<p>In this example, only the entities that contains the components Position and RigidBody will have its data changed.</p>
+
+<p>The component created for that contains only the mass information and can be used to  identify that the entity falls and in the future create collisions and momentun</p>
+
+<pre class="wp-block-code"><code>public struct RigidBodyComponent : IComponentData
+{
+    public float Mass;
+}</code></pre>
+
+<h2>Collision detection</h2>
+
+<p>I will initially create just a broadphase physics detection, using a simple AABB</p>
+
+<h4><strong>Computing AABB</strong></h4>
+
+<p>First of all we calculate the AABB of every entities that contains the component AABB</p>
+
+<pre class="wp-block-code"><code>public struct AABBComponent : IComponentData
+{
+    public float3 center;
+    public float3 halfwidths;
+}</code></pre>
+
+<pre class="wp-block-code"><code>
+using UnityEngine;
+using Unity.Entities;
+using Unity.Transforms;
+
+using Unity.Mathematics;
+
+
+public class ComputeColliderAABBSystem : ComponentSystem
+{
+    public struct Data
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;Position> Position;
+        public ComponentDataArray&lt;AABBComponent> AABB;
+    }
+
+    [Inject] private Data m_Data;
+
+    protected override void OnUpdate()
+    {
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            var position = m_Data.Position[index].Value;
+            float size = 2.5f;
+
+            AABBComponent aabb = new AABBComponent
+            {
+                center = position,
+                halfwidths = new float3(size, size, size)
+            };
+            m_Data.AABB[index] = aabb;
+        }
+    }
+}
+</code></pre>
+
+<p>The size it is still hardcoded. This values will be tunned further</p>
+
+<h4>Calculating broad collision</h4>
+
+<p>For a while the collision component it is very simple</p>
+
+<pre class="wp-block-code"><code>public struct CollisionComponent : IComponentData
+{
+    public float Value;
+}</code></pre>
+
+<p>For every entity that contains collision and AABB component we must compare to check if a collision occurred</p>
+
+<pre class="wp-block-code"><code>private bool checkAABB(AABBComponent a, AABBComponent b)
+    {
+        bool x = Mathf.Abs(a.center[0] - b.center[0]) &lt;= (a.halfwidths[0] + b.halfwidths[0]);
+        bool y = Mathf.Abs(a.center[1] - b.center[1]) &lt;= (a.halfwidths[1] + b.halfwidths[1]);
+        bool z = Mathf.Abs(a.center[2] - b.center[2]) &lt;= (a.halfwidths[2] + b.halfwidths[2]);
+
+        return x &amp;&amp; y &amp;&amp; z;
+    }</code></pre>
+
+<p>The update method of the system it is a simple comparison</p>
+
+<pre class="wp-block-code"><code>protected override void OnUpdate()
+    {
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            m_Data.Collision[index] = new CollisionComponent
+            {
+                Value = 0
+            };
+            for (int id = 0; id &lt; m_Data.Length; ++id)
+            {
+                if (index == id)
+                    continue;
+
+                if (checkAABB(m_Data.AABB[index], m_Data.AABB[id]))
+                {
+                    m_Data.Collision[index] = new CollisionComponent
+                    {
+                        Value = 1
+                    };
+                }
+            }
+        }
+    }</code></pre>
+
+<h4>Applying collision</h4>
+
+<p>The only collision we will check for a while it is of players with blocks while the player falls, then the gravity check must have a little changes </p>
+
+<p>We added a anotation in the class</p>
+
+<pre class="wp-block-code"><code>[UpdateAfter(typeof(BroadphaseSystem))]</code></pre>
+
+<p>Telling the ECS system to run after the collisions were checked in the broadphasesystem.</p>
+
+<p>Another change is in the update method</p>
+
+<pre class="wp-block-code"><code>protected override void OnUpdate()
+    {
+        float3 gravity = new float3(0, -20, 0);
+        float dt = Time.deltaTime;
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            var position = m_Data.Position[index].Value;
+
+            if (m_Data.Collision[index].Value == 0)
+            {
+                Velocity velocity = new Velocity
+                {
+                    Value = m_Data.Velocity[index].Value + gravity * dt
+                };
+                m_Data.Velocity[index] = velocity;
+
+                position += (m_Data.Velocity[index].Value * dt + 0.5f * gravity * dt * dt);
+            }
+
+            m_Data.Position[index] = new Position { Value = position };
+        }
+    }</code></pre>
+
+<p>As you can notice there is a comparison</p>
+
+<pre class="wp-block-code"><code>if (m_Data.Collision[index].Value == 0)</code></pre>
+
+<p>To check if the entity was hitted by a collision.</p>
+
+<p>This is a very simple approach of a collision. In future tutorials i will treat it better</p>
+
+<h2>References</h2>
+
+<ul><li>https://forum.unity.com/threads/physics-in-pure-ecs.531716/</li><li>https://medium.com/@tomasz.piowczyk/https-medium-com-tomasz-piowczyk-part-1-unity-ecs-briefly-about-ecs-c077f90efc9a</li></ul>
+
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2F2018%2F08%2F27%2Fphysics-on-unity-pure-ecs%2F&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+<div class="post-views post-86 entry-meta">
+			<span class="post-views-icon dashicons dashicons-chart-bar"></span>
+			<span class="post-views-label">Post Views: </span>
+			<span class="post-views-count">6,207</span>
+			</div><span style="clear:both;display:none;"><img src="http://ploobs.com.br/wp-content/plugins/wp-spamfree/img/wpsf-img.php" width="0" height="0" alt="" style="border-style:none;width:0px;height:0px;display:none;" /></span>
+			
+		</div><!-- .entry-content -->
+
+		
+	</div><!-- .post-content -->
+
+	<footer class="entry-footer post-details">
+		<div class="entry-categories"> <svg class="icon icon-category" aria-hidden="true" role="img"> <use xlink:href="http://ploobs.com.br/wp-content/themes/donovan/assets/icons/genericons-neue.svg#category"></use> </svg><a href="http://ploobs.com.br/category/programming/" rel="category tag">Programming</a></div>
+			<div class="entry-tags clearfix">
+				<svg class="icon icon-tag" aria-hidden="true" role="img"> <use xlink:href="http://ploobs.com.br/wp-content/themes/donovan/assets/icons/genericons-neue.svg#tag"></use> </svg>				<a href="http://ploobs.com.br/tag/ecs/" rel="tag">ECS</a>, <a href="http://ploobs.com.br/tag/programming/" rel="tag">Programming</a>			</div><!-- .entry-tags -->
+
+			</footer><!-- .entry-footer -->
+
+</article>
+
+	<nav class="navigation post-navigation" role="navigation">
+		<h2 class="screen-reader-text">Post navigation</h2>
+		<div class="nav-links"><div class="nav-previous"><a href="http://ploobs.com.br/2018/08/26/first-steps-on-creating-a-pure-ecs-unity-project-part-2/" rel="prev"><span class="nav-link-text">Previous Post</span><h3 class="entry-title">First Configurations ECS Unity Project</h3></a></div><div class="nav-next"><a href="http://ploobs.com.br/2018/08/28/plant-jumper-player-moviment/" rel="next"><span class="nav-link-text">Next Post</span><h3 class="entry-title">Plant Jumper &#8211; Player Moviment</h3></a></div></div>
+	</nav>
+<div id="comments" class="comments-area">
+
+		<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2018/08/27/physics-on-unity-pure-ecs/#respond" style="display:none;">Cancel reply</a></small></h3>			<form action="http://ploobs.com.br/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate>
+				<p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> Required fields are marked <span class="required">*</span></p><p class="comment-form-comment"><label for="comment">Comment</label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required="required"></textarea></p><p style="clear: both;" class="subscribe-to-comments">
+			<input type="checkbox" name="subscribe" id="subscribe" value="subscribe" style="width: auto;" />
+			<label for="subscribe">Notify me of followup comments via e-mail</label>
+			</p><p class="comment-form-author"><label for="author">Name <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" required='required' /></p>
+<p class="comment-form-email"><label for="email">Email <span class="required">*</span></label> <input id="email" name="email" type="email" value="" size="30" maxlength="100" aria-describedby="email-notes" required='required' /></p>
+<p class="comment-form-url"><label for="url">Website</label> <input id="url" name="url" type="url" value="" size="30" maxlength="200" /></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment" /> <input type='hidden' name='comment_post_ID' value='86' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+</p>	<script type='text/javascript'>
+	<!--
+	refJS = escape( document[ 'referrer' ] );
+	document.write("<input type='hidden' name='refJS' value='"+refJS+"'>");
+	// -->
+	</script>
+	<p style="font-size: 12px;clear:both;margin: 12px auto;text-align: center;">This blog is kept spam free by <a href="http://www.polepositionmarketing.com/library/wordpress-plugins/wpspam-free/" title="WP-SpamFree Anti-Spam WordPress Plugin" target="_blank">WP-SpamFree</a>.</p>			</form>
+			</div><!-- #respond -->
+	
+</div><!-- #comments -->
+
+		</main><!-- #main -->
+	</div><!-- #primary -->
+
+
+	<section id="secondary" class="sidebar widget-area clearfix" role="complementary">
+
+		<section id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="http://ploobs.com.br/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field"
+			placeholder="Search &hellip;"
+			value="" name="s"
+			title="Search for:" />
+	</label>
+	<button type="submit" class="search-submit">
+		<svg class="icon icon-search" aria-hidden="true" role="img"> <use xlink:href="http://ploobs.com.br/wp-content/themes/donovan/assets/icons/genericons-neue.svg#search"></use> </svg>		<span class="screen-reader-text">Search</span>
+	</button>
+</form>
+</section><section id="search-2" class="widget widget_search">
+<form role="search" method="get" class="search-form" action="http://ploobs.com.br/">
+	<label>
+		<span class="screen-reader-text">Search for:</span>
+		<input type="search" class="search-field"
+			placeholder="Search &hellip;"
+			value="" name="s"
+			title="Search for:" />
+	</label>
+	<button type="submit" class="search-submit">
+		<svg class="icon icon-search" aria-hidden="true" role="img"> <use xlink:href="http://ploobs.com.br/wp-content/themes/donovan/assets/icons/genericons-neue.svg#search"></use> </svg>		<span class="screen-reader-text">Search</span>
+	</button>
+</form>
+</section><section id="categories-2" class="widget widget_categories"><h4 class="widget-title">Categories</h4>		<ul>
+	<li class="cat-item cat-item-4"><a href="http://ploobs.com.br/category/game-design/" >Game Design</a> (2)
+</li>
+	<li class="cat-item cat-item-3"><a href="http://ploobs.com.br/category/programming/" >Programming</a> (10)
+</li>
+		</ul>
+</section><section id="archives-2" class="widget widget_archive"><h4 class="widget-title">Archives</h4>		<ul>
+			<li><a href='http://ploobs.com.br/2018/09/'>September 2018</a></li>
+	<li><a href='http://ploobs.com.br/2018/08/'>August 2018</a></li>
+		</ul>
+		</section>		<section id="recent-posts-2" class="widget widget_recent_entries">		<h4 class="widget-title">Recent Posts</h4>		<ul>
+											<li>
+					<a href="http://ploobs.com.br/2018/09/10/creating-system-spawners-to-populate-level/">Creating System Spawners to populate Level</a>
+									</li>
+											<li>
+					<a href="http://ploobs.com.br/2018/09/05/plant-jumper-creating-a-breakeble-and-moveable-block/">Plant Jumper &#8211; Creating a breakeble and a moveable Block</a>
+									</li>
+											<li>
+					<a href="http://ploobs.com.br/2018/09/04/plant-jumper-procedural-level-generation/">Plant Jumper &#8211; Procedural Level Generation</a>
+									</li>
+											<li>
+					<a href="http://ploobs.com.br/2018/08/30/plantjumper-input-system/">PlantJumper &#8211; Input System</a>
+									</li>
+											<li>
+					<a href="http://ploobs.com.br/2018/08/28/plant-jumper-player-moviment/">Plant Jumper &#8211; Player Moviment</a>
+									</li>
+					</ul>
+		</section><section id="recent-comments-2" class="widget widget_recent_comments"><h4 class="widget-title">Recent Comments</h4><ul id="recentcomments"></ul></section><section id="archives-2" class="widget widget_archive"><h4 class="widget-title">Archives</h4>		<ul>
+			<li><a href='http://ploobs.com.br/2018/09/'>September 2018</a></li>
+	<li><a href='http://ploobs.com.br/2018/08/'>August 2018</a></li>
+		</ul>
+		</section><section id="categories-2" class="widget widget_categories"><h4 class="widget-title">Categories</h4>		<ul>
+	<li class="cat-item cat-item-4"><a href="http://ploobs.com.br/category/game-design/" >Game Design</a> (2)
+</li>
+	<li class="cat-item cat-item-3"><a href="http://ploobs.com.br/category/programming/" >Programming</a> (10)
+</li>
+		</ul>
+</section><section id="meta-2" class="widget widget_meta"><h4 class="widget-title">Meta</h4>			<ul>
+						<li><a href="http://ploobs.com.br/wp-login.php">Log in</a></li>
+			<li><a href="http://ploobs.com.br/feed/">Entries <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="http://ploobs.com.br/comments/feed/">Comments <abbr title="Really Simple Syndication">RSS</abbr></a></li>
+			<li><a href="https://wordpress.org/" title="Powered by WordPress, state-of-the-art semantic personal publishing platform.">WordPress.org</a></li>			</ul>
+			</section>
+	</section><!-- #secondary -->
+
+
+	</div><!-- #content -->
+
+	
+	<div id="footer" class="footer-wrap">
+
+		<footer id="colophon" class="site-footer container clearfix" role="contentinfo">
+
+			
+			<div id="footer-line" class="site-info">
+								
+	<span class="credit-link">
+		Powered by <a href="http://wordpress.org" title="WordPress">WordPress</a> and <a href="https://themezee.com/themes/donovan/" title="Donovan WordPress Theme">Donovan</a>.	</span>
+
+				</div><!-- .site-info -->
+
+		</footer><!-- #colophon -->
+
+	</div>
+
+</div><!-- #page -->
+
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shCore.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushCSharp.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushPhp.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushJScript.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushJava.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushVb.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushSql.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushXml.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushDelphi.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushPython.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushRuby.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushCss.js"></script>
+<script class="javascript" src="http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/shBrushCpp.js"></script>
+<script class="javascript">
+dp.SyntaxHighlighter.ClipboardSwf = 'http://ploobs.com.br/wp-content/plugins/google-syntax-highlighter/Scripts/clipboard.swf';
+dp.SyntaxHighlighter.HighlightAll('code');
+</script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/comment-reply.min.js?ver=4.9.10'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/plugins/enlighter/resources/mootools-core-yc.js?ver=3.10.0'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/plugins/enlighter/resources/EnlighterJS.min.js?ver=3.10.0'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/wp-embed.min.js?ver=4.9.10'></script>
+<script type="text/javascript">/* <![CDATA[ */EnlighterJS_Config = {"selector":{"block":"pre.EnlighterJSRAW","inline":"code.EnlighterJSRAW"},"language":"csharp","theme":"enlighter","indent":4,"hover":"hoverEnabled","showLinenumbers":true,"rawButton":true,"infoButton":true,"windowButton":true,"rawcodeDoubleclick":false,"grouping":true,"cryptex":{"enabled":false,"email":"mail@example.tld"}};!function(){var a=function(a){var b="Enlighter Error: ";console.error?console.error(b+a):console.log&&console.log(b+a)};return window.addEvent?"undefined"==typeof EnlighterJS?void a("Javascript Resources not loaded yet!"):"undefined"==typeof EnlighterJS_Config?void a("Configuration not loaded yet!"):void window.addEvent("domready",function(){EnlighterJS.Util.Init(EnlighterJS_Config.selector.block,EnlighterJS_Config.selector.inline,EnlighterJS_Config)}):void a("MooTools Framework not loaded yet!")}();;/* ]]> */</script>
+</body>
+</html>

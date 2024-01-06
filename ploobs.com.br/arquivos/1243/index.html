@@ -1,0 +1,1004 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="keywords" content="bump map, computacao grafica, glow map, GPU, material ploobs material, normal map, ploobs, ploobsengine, Shader, specular map, tutorial, XNA, " />
+<meta name="description" content="Creators of Ploobs Engine, OpenSource XNA GameEngine and indie Game Development" />
+<meta name="google-site-verification" content="SHK4jeXj--ju-cPSerLDrbbhbEHEPgf_2Ckw8BClx8I" />
+
+<title>[PloobsEngine] Tutorial 7 - Ploobs Materials | Ploobs</title>
+
+<link rel="alternate" type="application/rss+xml" title="Ploobs RSS Feed" href="http://ploobs.com.br/feed" />
+<link rel="alternate" type="application/atom+xml" title="Ploobs Atom Feed" href="http://ploobs.com.br/feed/atom" />
+<link rel="pingback" href="http://ploobs.com.br/xmlrpc.php" />
+
+
+<style type="text/css" media="all">
+@import "http://ploobs.com.br/wp-content/themes/fusion/style.css";
+#page-wrap2{ background: #0a0d2e; }
+#page-wrap1{ background: none; }
+</style>
+
+
+<!--[if lte IE 6]>
+<script type="text/javascript">
+/* <![CDATA[ */
+   blankimgpath = 'http://ploobs.com.br/wp-content/themes/fusion/images/blank.gif';
+ /* ]]> */
+</script>
+<style type="text/css" media="screen">
+  @import "http://ploobs.com.br/wp-content/themes/fusion/ie6.css";
+  body{ behavior:url("http://ploobs.com.br/wp-content/themes/fusion/js/ie6hoverfix.htc"); }
+  img{ behavior: url("http://ploobs.com.br/wp-content/themes/fusion/js/ie6pngfix.htc"); }
+</style>
+<![endif]-->
+
+
+  
+
+<!-- All in One SEO Pack 2.3.4 by Michael Torbert of Semper Fi Web Design[655,727] -->
+<meta name="description"  content="Hi, This tutorial is the first from the series Advanced Tutorials. It will talk about how to use Normal, specular, glow and paralax mapping with PloobsEngine." />
+
+<meta name="keywords"  content="ploobs,material,bump,normal,bump mapping,normal mapping,paralax,paralax mapping,glow,glow mapping,ploobsengine,ploobsengine material,tutorial,how to,customize,expand,bump map,computacao grafica,glow map,gpu,material ploobs material,normal map,shader,specular map,xna,all posts,portfolio,tutorials" />
+
+<link rel="canonical" href="http://ploobs.com.br/arquivos/1243" />
+<!-- /all in one seo pack -->
+<link rel="alternate" type="application/rss+xml" title="Ploobs &raquo; [PloobsEngine] Tutorial 7 &#8211; Ploobs Materials  Feed de comentários" href="http://ploobs.com.br/arquivos/1243/feed" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/ploobs.com.br\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.4.5"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;return g&&g.fillText?(g.textBaseline="top",g.font="600 32px Arial","flag"===a?(g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3):"diversity"===a?(g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e):("simple"===a?g.fillText(h(55357,56835),0,0):g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0])):!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g;c.supports={simple:d("simple"),flag:d("flag"),unicode8:d("unicode8"),diversity:d("diversity")},c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.simple&&c.supports.flag&&c.supports.unicode8&&c.supports.diversity||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery.js?ver=1.11.3'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/themes/fusion/js/fusion.js?ver=4.4.5'></script>
+<link rel='https://api.w.org/' href='http://ploobs.com.br/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://ploobs.com.br/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://ploobs.com.br/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='XNA Point,Spot and Directional Light Samples' href='http://ploobs.com.br/arquivos/1190' />
+<link rel='next' title='XNA 4.0 Gamma Corrected Pipeline' href='http://ploobs.com.br/arquivos/1207' />
+<meta name="generator" content="WordPress 4.4.5" />
+<link rel='shortlink' href='http://ploobs.com.br/?p=1243' />
+<link rel="alternate" type="application/json+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2Farquivos%2F1243" />
+<link rel="alternate" type="text/xml+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2Farquivos%2F1243&#038;format=xml" />
+<meta property="og:site_name" content="Ploobs" />
+<meta property="og:title" content="[PloobsEngine] Tutorial 7 – Ploobs Materials" />
+<meta property="og:url" content="http://ploobs.com.br/arquivos/1243" />
+<meta property="og:type" content="article" />
+
+<script type="text/javascript">
+/* <![CDATA[ */
+ jQuery(document).ready(function(){
+  // body .safari class
+  if (jQuery.browser.safari) jQuery('body').addClass('safari');
+
+  // layout controls
+     jQuery("#layoutcontrol a").click(function() {
+     switch (jQuery(this).attr("class")) {
+	   case 'setFont' : setFontSize();	break;
+	   case 'setLiquid'	: setPageWidth();	break;
+	 }
+	 return false;
+    });
+   // set the font size from cookie
+   var font_size = jQuery.cookie('fontSize');
+   if (font_size == '.70em') { jQuery('body').css("font-size",".70em"); }
+   if (font_size == '.95em') { jQuery('body').css("font-size",".95em"); }
+   if (font_size == '.75em') { jQuery('body').css("font-size",".75em"); }
+
+   // set the page width from cookie
+   var page_width = jQuery.cookie('pageWidth');
+   if (page_width) jQuery('#page').css('width', page_width);
+  
+  jQuery('#post-extra-content').minitabs(333, 'slide');
+
+  if (document.all && !window.opera && !window.XMLHttpRequest && jQuery.browser.msie) { var isIE6 = true; }
+  else { var isIE6 = false;} ;
+  jQuery.browser.msie6 = isIE6;
+  if (!isIE6) {
+    initTooltips({
+		timeout: 6000
+   });
+  }
+  tabmenudropdowns();
+
+  // some jquery effects...
+  jQuery('#sidebar ul.nav li ul li a').mouseover(function () {
+   	jQuery(this).animate({ marginLeft: "4px" }, 100 );
+  });
+  jQuery('#sidebar ul.nav li ul li a').mouseout(function () {
+    jQuery(this).animate({ marginLeft: "0px" }, 100 );
+  });
+  // scroll to top
+  jQuery("a#toplink").click(function(){
+    jQuery('html').animate({scrollTop:0}, 'slow');
+  });
+
+  // set roles on some elements (for accessibility)
+  jQuery("#tabs").attr("role","navigation");
+  jQuery("#mid-content").attr("role","main");
+  jQuery("#sidebar").attr("role","complementary");
+  jQuery("#searchform").attr("role","search");
+
+ });
+
+ /* ]]> */
+</script>
+
+</head>
+<body class="ploobsengine-tutorial-7-ploobs-materials">
+  <!-- page wrappers (100% width) -->
+  <div id="page-wrap1">
+    <div id="page-wrap2">
+      <!-- page (actual site content, custom width) -->
+      <div id="page" class="with-sidebar">
+
+       <!-- main wrapper (side & main) -->
+       <div id="main-wrap">
+        <!-- mid column wrap -->
+    	<div id="mid-wrap">
+          <!-- sidebar wrap -->
+          <div id="side-wrap">
+            <!-- mid column -->
+    	    <div id="mid">
+              <!-- header -->
+              <div id="header">
+                <div id="topnav" class="description"> Creators of Ploobs Engine, OpenSource XNA GameEngine and indie Game Development</div>
+
+                                <a id="logo" href="http://ploobs.com.br/"><img src="http://ploobs.com.br/wp-content/uploads/logo2.png" title="Ploobs" alt="Ploobs" /></a>
+                
+                <!-- top tab navigation -->
+                <div id="tabs">
+                 <ul>
+                                     <li id="nav-homelink"><a href="http://ploobs.com.br" title="Clique para Início"><span><span>Início</span></span></a></li>
+                                   <li class="page_item page-item-2"><a href="http://ploobs.com.br/about"><span><span>About</span></span></a></li>
+<li class="page_item page-item-1353"><a href="http://ploobs.com.br/contatos"><span><span>Contact Us</span></span></a></li>
+<li class="page_item page-item-494"><a href="http://ploobs.com.br/forum"><span><span>Forum</span></span></a></li>
+<li class="page_item page-item-233 page_item_has_children"><a href="http://ploobs.com.br/ploobsengine"><span><span>PloobsEngine</span></span></a>
+<ul class='children'>
+	<li class="page_item page-item-1381"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-presentation"><span><span>PloobsEngine Presentation</span></span></a></li>
+	<li class="page_item page-item-1392"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-features"><span><span>PloobsEngine Features</span></span></a></li>
+	<li class="page_item page-item-1395"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-download"><span><span>PloobsEngine Download</span></span></a></li>
+	<li class="page_item page-item-1379"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-tutorials"><span><span>PloobsEngine Tutorials</span></span></a></li>
+	<li class="page_item page-item-465"><a href="http://ploobs.com.br/ploobsengine/galeria"><span><span>PloobsEngine Galery</span></span></a></li>
+	<li class="page_item page-item-1371"><a href="http://ploobs.com.br/ploobsengine/ploobs-license"><span><span>PloobsEngine Dual-License</span></span></a></li>
+</ul>
+</li>
+<li class="page_item page-item-656"><a href="http://ploobs.com.br/iniciantes"><span><span>Comp Gráfica Tutoriais</span></span></a></li>
+                 </ul>
+                </div>
+                <!-- /top tabs -->
+
+              </div><!-- /header -->
+  <!-- mid content -->
+  <div id="mid-content">
+      <div class="navigation">
+      <div class="alignleft">&laquo; <a href="http://ploobs.com.br/arquivos/1190" rel="prev">XNA Point,Spot and Directional Light Samples</a></div>
+      <div class="alignright"><a href="http://ploobs.com.br/arquivos/1207" rel="next">XNA 4.0 Gamma Corrected Pipeline</a> &raquo;</div>
+      <div class="clear"></div>
+    </div>
+
+    <div id="post-1243" class="post-1243 post type-post status-publish format-standard hentry category-geral category-ploobsengine category-portfolio category-tutoriais tag-bump-map tag-computacao-grafica-2 tag-glow-map tag-gpu tag-material-ploobs-material tag-normal-map tag-ploobs tag-ploobsengine-2 tag-shader tag-specular-map tag-tutorial tag-xna">
+       <h2 class="title">[PloobsEngine] Tutorial 7 &#8211; Ploobs Materials</h2>       <br />
+	    <div class="entry">
+          <div class="postbody entry clearfix">
+	       
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2Farquivos%2F1243&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+<p><a href="http://ploobs.com.br/wp-content/uploads/2010/08/Logo.jpg"><img class="alignleft size-thumbnail wp-image-593" title="Logo" src="http://ploobs.com.br/wp-content/uploads/2010/08/Logo-150x149.jpg" alt="" width="116" height="117" /></a>Hi, This tutorial is the first from the series: PloobsEngine Advanced Tutorials. It will talk about how to use normal, specular, glow and paralax mapping with PloobsEngine.  (<a href="http://ploobs.com.br/?page_id=233">tutorials series here</a>)</p>
+<p>One of the greatest beneficts of Deferred Shading is the possibility of separating the light and geometry calculation. For us, in simple way, this mean that we dont need to rewrite all the phong calculation in every shader we build. The materials are just different ways of processing the geometry, the lighting evaluations remains exactely the same.</p>
+<p><span id="more-1243"></span>This article will show how to use and more important: how to extend the ploobs engine materials.</p>
+<p>We did not implement lots of materials for Forward Rendering (only the very basic XNABasicEffect), almost all are in Deferred Rendering.</p>
+<p>As we showed in previous tutorials, all IObjects have an IMaterial instance and all IMaterial instances have an IShader instance. The Ploobs Materials are just implementations of the IShader abstract class.</p>
+<p>We have basicaly two types of IShader Implementations (both extends IShader), the ones used for deferred rendering and those used for forward rendering. You know the type of them using a MaterialType property of the IShader or by looking at the class name (the deferred shaders starts with Deferred + &#8220;ShaderName&#8221; + Shader Ex: DeferredNormalShader and the forward starts with Forward +  &#8220;ShaderName&#8221; + Shader &#8212; this is just our convention to make things easier =P).</p>
+<p>The Deferred Shaders can only be used with the DeferredRenderTechnich (explained in previous tutorials) and the Forward Shaders can be used both in DeferredRenderTechnich (they wont be affected by the lights) and in ForwardRenderTechnich.</p>
+<p>In this article we will talk more about Deferred Materials, the Forward ones are very simple and follow the same pattern. You can learn more about them in the <a href="http://ploobs.com.br/wp-content/plugins/download-monitor/download.php?id=28">Advanced Packages Demos</a>.</p>
+<p><strong>Normal Mapping</strong></p>
+<p>Normal mapping is a technique in <a title="Computer graphics" href="http://en.wikipedia.org/wiki/Computer_graphics">computer graphics</a> for simulating bumps and wrinkles on the surface of an object. This is achieved by perturbing the <a title="Surface normal" href="http://en.wikipedia.org/wiki/Surface_normal">surface normals</a> of the object and using the perturbed normal during illumination calculations. The result is an apparently bumpy surface rather than a perfectly smooth surface although the surface of the underlying object is not actually changed. Theorically there is a difference between Normal mapping and Bump mapping, however we will use both meaning the same thing (pertubing surface normals -&gt; normal mapping). Rigorouly, a bump map is a texture that defines the height of bumps on a surface, on a per-pixel basis. Bump maps encode the height as a gray-scale image and a normal map is a texture that defines which way light bounces off a surface, on a per-pixel basis. Normal maps encode the &#8220;direction of light reflections&#8221; (not exactely this, but this is enough for most uses) using RGB colors. (the &#8220;directions&#8221; can be in object space or tangent space). PloobsEngine uses Tangent space (more common nowadays)  Normal Mapping.</p>
+<p>The model in which the Normal Mapping will be applyied MUST have Normals and Tangents in their vertices atributes (if they do not exist, an exception will be throw). The XNA importer can create those informations for you, just check the option as shown in the following image:</p>
+<p><a href="http://ploobs.com.br/wp-content/uploads/2011/06/prop.png"><img class="aligncenter size-full wp-image-1254" title="Properties" src="http://ploobs.com.br/wp-content/uploads/2011/06/prop.png" alt="Content Processor Properties" width="255" height="455" srcset="http://ploobs.com.br/wp-content/uploads/2011/06/prop-168x300.png 168w, http://ploobs.com.br/wp-content/uploads/2011/06/prop.png 255w" sizes="(max-width: 255px) 100vw, 255px" /></a></p>
+<p>Also, we need to attach the Normal Map texture to the corresponding IModelo (where the IShader will search for the texture). The following code shows how to create a simple object that uses normal mapping.</p>
+<pre class="c-sharp">                IModelo model = new SimpleModel(factory, "ModelName", "DiffuseTextureName", "NormalMapName");
+                IPhysicObject po = new TriangleMeshObject(model, Vector3.Zero, Matrix.Identity, Vector3.One, MaterialDescription.DefaultBepuMaterial());
+                DeferredCustomShader shader = new DeferredCustomShader(false, true, false, false); ///activate only the normal mapping
+                DeferredMaterial dm = new DeferredMaterial(shader);
+                IObject obj = new IObject(dm, model, po);</pre>
+<p>The DeferredCustomShader is used for all the &#8220;mappings&#8221; (normal, glow,specular and paralax). In this sample we just activate the normal mappings.</p>
+<p><strong>Specular Mapping</strong></p>
+<p>Specular mapping is just a texture that specifies in pixel-level the &#8220;shinness&#8221; and the intensity of the surfaces (used in the Phong lightining evaluations). The usage is very similar to the Normal Mapping, you just need to attach the specular texture to the model and create the right shader. A code sample is provided below:</p>
+<pre class="c-sharp">                IModelo model = new SimpleModel(factory, "ModelName", "DiffuseTextureName");
+                model.SetTexture("SpecularMapName", TextureType.SPECULAR);
+                IPhysicObject po = new TriangleMeshObject(model, Vector3.Zero, Matrix.Identity, Vector3.One, MaterialDescription.DefaultBepuMaterial());
+                DeferredCustomShader shader = new DeferredCustomShader(false, false, true, false);
+                DeferredMaterial dm = new DeferredMaterial(shader);
+                IObject obj = new IObject(dm, model, po);</pre>
+<p>In this sample we used a Model function to add the texture (other way to do the same stuff we did in the normal map sample=P) and changed the shader constructor parameters.</p>
+<p><strong>Paralax Mapping</strong></p>
+<p>Parallax mapping (also called offset mapping or virtual displacement mapping) is an enhancement of the <a title="Bump mapping" href="http://en.wikipedia.org/wiki/Bump_mapping">bump mapping</a> or <a title="Normal mapping" href="http://en.wikipedia.org/wiki/Normal_mapping">normal mapping</a> techniques applied to textures in 3D <a title="Rendering (computer graphics)" href="http://en.wikipedia.org/wiki/Rendering_(computer_graphics)">rendering</a> applications such as <a title="Video game" href="http://en.wikipedia.org/wiki/Video_game">video games</a>. To the end user, this means that <a title="Texture mapping" href="http://en.wikipedia.org/wiki/Texture_mapping">textures</a> such as stone walls will have more apparent depth and thus greater realism with less of an influence on the performance of the simulation. Parallax mapping was introduced by Tomomichi Kaneko in 2001.</p>
+<p>Parallax mapping is implemented by displacing the texture coordinates at a point on the rendered <a title="Polygon" href="http://en.wikipedia.org/wiki/Polygon">polygon</a> by a function of the view angle in tangent space (the angle relative to the surface normal) and the value of the height map at that point. At steeper view-angles, the texture coordinates are displaced more, giving the illusion of depth due to <a title="Parallax" href="http://en.wikipedia.org/wiki/Parallax">parallax</a> effects as the view changes.</p>
+<p>Parallax mapping described by Kaneko is a single step process that does not account for occlusion. Subsequent enhancements have been made to the algorithm incorporating iterative approaches to allow for occlusion and accurate silhouette rendering. PloobsEngine uses only the basic paralax algorithm.</p>
+<p>The usage is pretty much the same as Normal and Specular. Our implementation uses Normal mapping and Paralax together, so you need to provide BOTH, the normal texture and the paralax texture. The Advanced Demos has a sample showing how to use and tune the paralax parameters.</p>
+<p>A basic Paralax setup is shown below:</p>
+<pre class="c-sharp">                ///Need to load the height, the normal texture and the difuse texture
+                SimpleModel sm = new SimpleModel(factory,"..\\Content\\Model\\cubo", "..\\Content\\Textures\\color_map");
+                sm.SetTexture("Textures\\normal_map", TextureType.BUMP);
+                sm.SetTexture("Textures\\height_map", TextureType.PARALAX);                
+
+                BoxObject pi = new BoxObject(new Vector3(200, 110, 0),1,1 ,1, 5, new Vector3(100, 100, 100),Matrix.Identity,MaterialDescription.DefaultBepuMaterial());
+                ///Enable paralax and Normal Mapping;
+                paralax = new DeferredCustomShader(false, true, false, true);
+                paralax.SpecularIntensity = 0.2f;
+                paralax.SpecularPower = 30;
+                IMaterial mat = new DeferredMaterial(paralax);
+                IObject obj3 = new IObject(mat, sm, pi);
+                this.World.AddObject(obj3);</pre>
+<p><strong>Glow Mapping</strong></p>
+<p>Glow map is a texture that specifies self luminance areas ( that resists to illumination changes) of an object in per pixel level. Our Glow technich also apply some tricks to improve the appearance of the glow area.</p>
+<p>The usage is a bit different, you need to do the common stuffs (add the texture to the model and set the right shader) and add a PostEffect. For now you only need to know that a post effect is something that &#8220;process&#8221; the final 2D framebuffer image (will be explained in more details in next tutorials).</p>
+<p>The whole process is shown below:</p>
+<pre class="c-sharp">                SimpleModel sm = new SimpleModel(factory,"..\\Content\\Model\\cubo", "..\\Content\\Textures\\color_map");
+                sm.SetTexture("Textures\\glow", TextureType.GLOW);                
+
+                BoxObject pi = new BoxObject(new Vector3(200, 110, 0),1,1 ,1, 5, new Vector3(100, 100, 100),Matrix.Identity,MaterialDescription.DefaultBepuMaterial());
+                Shader = new DeferredCustomShader(true, false, false, false);
+                IMaterial mat = new DeferredMaterial(paralax);
+                IObject obj3 = new IObject(mat, Shader, pi);
+                this.World.AddObject(obj3);            
+
+            this.RenderTechnic.AddPostEffect(new GlowPostEffect());</pre>
+<p>Attention to the Added post effect and to the CustomShader parameters. Remember that you can always combine different maps in the same object. A single object can have Specular and Normal mappings. To see the Materials in action, check the<a href="http://ploobs.com.br/wp-content/plugins/download-monitor/download.php?id=28"> PloobsAdvanced Demos</a>.</p>
+<h2>Extending the PloobsEngine Materials</h2>
+<p>Although ploobsengine has some pre-builded materials, it does not fill all of our need as a game developer. So it is very important to know how to create your own shaders/materials with the engine.</p>
+<p><strong>Creating a Forward Shader</strong></p>
+<p>Before talking about Forward shader extendions, lets explain the basic class that all shaders must extend:</p>
+<pre class="c-sharp">    //     Base Class For all Shaders
+    public abstract class IShader
+    {
+        public IShader();
+        public abstract MaterialType MaterialType { get; }
+        public float ShaderId { get; set; }
+        public virtual void BasicDraw(GameTime gt, IObject obj, Matrix view, Matrix projection, IList lights, RenderHelper render, Plane? clippingPlane, bool useAlphaBlending = false);
+        public virtual void DepthExtractor(GameTime gt, IObject obj, Matrix View, Matrix projection, RenderHelper render);
+        public virtual void Draw(GameTime gt, IObject obj, RenderHelper render, ICamera cam, IList lights);
+        public virtual void Initialize(GraphicInfo ginfo, GraphicFactory factory, IObject obj);
+        public virtual void PosDrawPhase(GameTime gt, IObject obj, RenderHelper render, ICamera cam, IList lights);
+        public virtual void PreDrawPhase(GameTime gt, IWorld world, IObject obj, RenderHelper render, ICamera cam);
+        public virtual void PreUpdate(IObject ent, IList lights);
+        public virtual void Update(GameTime gt, IObject ent, IList lights);
+    }</pre>
+<p>The property MaterialType must be extendend and defines if the shader is deferred or forward.</p>
+<p>The property ShaderId is not used in the ForwardShading, only in deferred. (will be explained)</p>
+<p>The Initialize Method is used to load resources (including the effect, auxiliar textures &#8230;) and create resoruces (like render targets &#8230;)</p>
+<p>The PreUpdate Method is called ONCE (before the first update) in the IShader lifetime and is used to make specialized initializations</p>
+<p>The Update Method is called every frame (update part of the main loop)</p>
+<p>The PreDraw Method is called all frames BEFORE all Draw methods of every object (the engine call all PreDraw in a loop and after it calls the Draw). Here you can do thinks like render the scene from diferent point of view (for dynamic reflection technics for example). The current render target setted is not the framebuffer necessarily, dont put informations on it, cause it will be erased.</p>
+<p>The Draw Method is where you draw the model. Here you put the main shader with all light calculation &#8230; (in forward rendering)</p>
+<p>The PosDraw Method is pretty similar to the PreDraw, the difference is that it is called after ALL the Draws and also WRITES in the Framebuffer. It is used for some special technichs like Glow (we dont use this aproach for glow in  ploobsengine =P, but is possible)</p>
+<p>The DepthExtractor method is called when necessary by the shadow renderer. The purpouse of this method is to render the depth in projected space (Z/W). We provide an implementation (the method is virtual) that fits almost all circustances (only cases like animation and billboards needs another implementation). See the IShader code to understand how it is done =P</p>
+<p>The BasicDraw method is called when necessary by the reflection/refractor renderer (same idea of th DepthExtractor). The purpose of this method it to render a simplification of the scene with clipping planes enabled. Again, the engine provides an implementation that fits 99% of the cases.. See the IShader code to understand how it is done.</p>
+<p>You actually only need to override the MaterialType property, everything else is virtual, but normally we override the methods Initialize and Draw and the property MaterialType.</p>
+<p>The following code shows a simple example of a new material (we also show the effect shader code, so you can see all the stuffs combined =P )</p>
+<p>Effect shader (simple phong evaluation for a single directional light)</p>
+<pre class="c-sharp">///Constantes
+float4x4	World;
+float4x4	View;
+float4x4	Projection;
+float3      LightDirection;
+float4		LightColor;
+
+float3      camPosition;
+
+float4		SpecularColor;
+float		SpecularPower;
+float		SpecularIntensity;
+
+float4      AmbientColor;
+float		AmbientIntensity;
+
+float		DiffuseIntensity;
+
+///Textura e Samples para a textura Diffuse
+texture DiffuseTexture;
+sampler2D DiffuseSampler = sampler_state
+{
+	Texture = ;
+    ADDRESSU = CLAMP;
+	ADDRESSV = CLAMP;
+	MAGFILTER = ANISOTROPIC;
+	MINFILTER = ANISOTROPIC;
+	MIPFILTER = LINEAR;
+};
+
+///Entrada do VertexShader
+struct VertexShaderInput
+{
+    float3 Position : POSITION0;
+	float3 Normal : Normal0;
+	float2 TexCoord : TexCoord0;
+};
+
+///Saida do Vertex Shader
+struct VertexShaderOutput
+{
+    float4 Position			: POSITION0;
+    float3 N				: TEXCOORD0;
+    float2 TextureCoord  		: TEXCOORD1;
+    float3 V				: TEXCOORD2;
+};
+
+///VertexShader
+VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
+{
+    VertexShaderOutput output;
+
+    ///Transforma os vertices
+    float4 worldPosition = mul(float4(input.Position,1), World);
+    float4 viewPosition = mul(worldPosition, View);
+    output.Position = mul(viewPosition, Projection);
+
+    output.N = mul(float4(input.Normal,0), World);
+    output.TextureCoord = input.TexCoord;
+    output.V = camPosition -  worldPosition;
+    return output;
+}
+
+//I=Ai*Ac+Di*Dc*N.L+Si*Sc*(R.V)^n
+//R=2*(N.L)*N-L
+///Pixel Shader
+float4 PixelShaderAmbientFunction(VertexShaderOutput input) : COLOR0
+{
+    float3 Normal = normalize(input.N);
+    float3 LightDir = -normalize(LightDirection);
+    float3 ViewDir = normalize(input.V);
+    float4 diffuseColor = tex2D(DiffuseSampler,input.TextureCoord);
+
+    float Diff = saturate(dot(Normal, LightDir));
+    // R = 2 * (N.L) * N – L
+    float3 Reflect = normalize(2 * Diff * Normal - LightDir);
+    float Specular = pow(saturate(dot(Reflect, ViewDir)), SpecularPower);
+    // I = Dc*A + Dcolor * Dintensity * N.L + Sintensity * Scolor * (R.V)n
+    return AmbientColor*AmbientIntensity + LightColor * DiffuseIntensity * diffuseColor * Diff + SpecularIntensity * SpecularColor * Specular;
+}
+
+///Pixel shader bonus que utiliza a propria cor diffuse como AmbientColor
+float4 PixelShaderDiffuseAsAmbientFunction(VertexShaderOutput input) : COLOR0
+{
+    float3 Normal = normalize(input.N);
+    float3 LightDir = -normalize(LightDirection);
+    float3 ViewDir = normalize(input.V);
+    float4 diffuseColor = tex2D(DiffuseSampler,input.TextureCoord);
+
+    float Diff = saturate(dot(Normal, LightDir));
+    // R = 2 * (N.L) * N – L
+    float3 Reflect = normalize(2 * Diff * Normal - LightDir);
+    float Specular = pow(saturate(dot(Reflect, ViewDir)), SpecularPower);
+    // I = Dc*A + Dcolor * Dintensity * N.L + Sintensity * Scolor * (R.V)n
+    return diffuseColor*AmbientIntensity + LightColor* DiffuseIntensity * diffuseColor * Diff + SpecularIntensity * SpecularColor * Specular;
+}
+
+technique TechniqueNormal
+{
+    pass Pass1
+    {
+        VertexShader = compile vs_3_0 VertexShaderFunction();
+        PixelShader = compile ps_3_0 PixelShaderAmbientFunction();
+    }
+}</pre>
+<p>IShader implementation</p>
+<pre class="c-sharp">namespace Tutorial2.Shaders
+{
+    public class BasicPhong : IShader
+    {
+        public BasicPhong(Vector3 LightDirection,Color LightColor,Color SpecularColor,float SpecularPower, float SpecularIntensity, Color AmbientColor,float AmbientIntensity, float DiffuseIntensity)
+        {
+            this.lightDirection = Vector3.Normalize(LightDirection);
+            this.LightColor = LightColor;
+            this.specularColor = SpecularColor;
+            this.specularPower = SpecularPower;
+            this.specularIntensity = SpecularIntensity;
+            this.ambientColor = AmbientColor;
+            this.ambientIntensity = AmbientIntensity;
+            this.diffuseIntensity = DiffuseIntensity;
+        }
+
+        private Effect phong;
+
+        Vector3 lightDirection;
+
+        public Vector3 LightDirection
+        {
+            get { return lightDirection; }
+            set { lightDirection = Vector3.Normalize(value); }
+        }
+        Color specularColor;
+
+        Color lightColor;
+
+        public Color LightColor
+        {
+            get { return lightColor; }
+            set { lightColor = value; }
+        }
+
+        public Color SpecularColor
+        {
+            get { return specularColor; }
+            set { specularColor = value; }
+        }
+        float specularPower;
+
+        public float SpecularPower
+        {
+            get { return specularPower; }
+            set { specularPower = value; }
+        }
+        float specularIntensity;
+
+        public float SpecularIntensity
+        {
+            get { return specularIntensity; }
+            set { specularIntensity = value; }
+        }
+        Color ambientColor;
+
+        public Color AmbientColor
+        {
+            get { return ambientColor; }
+            set { ambientColor = value; }
+        }
+        float ambientIntensity;
+
+        public float AmbientIntensity
+        {
+            get { return ambientIntensity; }
+            set { ambientIntensity = value; }
+        }
+        float diffuseIntensity;
+
+        public float DiffuseIntensity
+        {
+            get { return diffuseIntensity; }
+            set { diffuseIntensity = value; }
+        }
+
+        public override void Draw(Microsoft.Xna.Framework.GameTime gt, PloobsEngine.SceneControl.IObject obj, PloobsEngine.SceneControl.RenderHelper render, PloobsEngine.Cameras.ICamera cam, IList lights)
+        {
+            ///
+            IModelo modelo = obj.Modelo;
+            ///Recupera a transformacao do Objecto
+            Matrix objTransform = obj.WorldMatrix;
+
+            ///Sera os parametros do shader
+            phong.Parameters["LightDirection"].SetValue(LightDirection);
+            phong.Parameters["LightColor"].SetValue(LightColor.ToVector4());
+            phong.Parameters["SpecularColor"].SetValue(SpecularColor.ToVector4());
+            phong.Parameters["SpecularPower"].SetValue(SpecularPower);
+            phong.Parameters["SpecularIntensity"].SetValue(SpecularIntensity);
+            phong.Parameters["AmbientColor"].SetValue(AmbientColor.ToVector4());
+            phong.Parameters["AmbientIntensity"].SetValue(AmbientIntensity);
+            phong.Parameters["DiffuseIntensity"].SetValue(DiffuseIntensity);
+
+            phong.Parameters["camPosition"].SetValue(cam.Position);
+            phong.Parameters["DiffuseTexture"].SetValue(modelo.getTexture(TextureType.DIFFUSE));
+            phong.Parameters["View"].SetValue(cam.View);
+            phong.Parameters["Projection"].SetValue(cam.Projection);
+
+            ///Desenha o IModelo,
+            ///O IModelo contem diversos meshes, e cada mesh contem um array de BatchInformation
+            for (int i = 0; i &lt; modelo.MeshNumber; i++)
+            {
+                BatchInformation[] bi = modelo.GetBatchInformation(i);
+                for (int j = 0; j &lt; bi.Count(); j++)
+                {
+                    ///Compoe a World Matrix do Objecto como uma Combinacao da Matriz LocalTransformation
+                    ///do modelo (que vem dos softwares de modelagem) e a matrix objTransform do objeto (transformacao do objeto no espaco fisico)
+                    phong.Parameters["World"].SetValue(bi[j].ModelLocalTransformation * objTransform);
+                    ///renderiza o modelo utilizando o efeito Phong
+                    render.RenderBatch(bi[j],phong);
+                }
+            }
+
+        }
+
+        public override void Initialize(PloobsEngine.Engine.GraphicInfo ginfo, PloobsEngine.Engine.GraphicFactory factory, PloobsEngine.SceneControl.IObject obj)
+        {
+            base.Initialize(ginfo, factory, obj);
+            phong = factory.GetEffect("Effects/phong",true);
+            phong.CurrentTechnique = phong.Techniques["TechniqueNormal"];
+        }
+
+        public override MaterialType MaterialType
+        {
+            get { return PloobsEngine.Material.MaterialType.FORWARD; }
+        }
+    }
+
+}</pre>
+<p>For some samples about extending ForwardRendering check our <a href="http://ploobs.com.br/?p=1190">Phong samples</a>.</p>
+<p><strong>Deferred Material</strong></p>
+<p>Extending Deferred Material is a bit diferent. The main problem is the Draw method.</p>
+<p>In deferred Rendering, the Draw method does not render the model to the screen. Instead, it only extract some informations from the geometry and render them to the GBuffer. The easiest way to understand this is by example.</p>
+<p>The following code is our classic deferred shader code : (Effect)</p>
+<pre class="c-sharp">float4x4 World;
+float4x4 ViewProjection;
+float specularIntensity = 0;
+float specularPower = 0;
+float id;
+
+texture Texture;
+sampler diffuseSampler = sampler_state
+{
+    Texture = (Texture);
+};
+
+struct VertexShaderInput
+{
+    float3 Position : POSITION0;
+    float3 Normal : NORMAL0;
+    float2 TexCoord : TEXCOORD0;
+};
+
+struct VertexShaderOutput
+{
+    float4  Position : POSITION0;
+    float2 TexCoord : TEXCOORD0;
+    float3 Normal : TEXCOORD1;
+    float2 Depth : TEXCOORD2;
+};
+
+VertexShaderOutput VertexShaderFunction(VertexShaderInput input)
+{
+    VertexShaderOutput output;
+    float4 worldPosition = mul( float4(input.Position,1), World);
+    output.Position  = mul(worldPosition, ViewProjection);
+    output.TexCoord = input.TexCoord;                             //pass the texture coordinates further
+    output.Normal =mul(input.Normal,World);                       //get normal into world space
+    output.Depth.x = output.Position.z;
+    output.Depth.y = output.Position.w;
+    return output;    
+
+}
+struct PixelShaderOutput
+{
+    float4 Color : COLOR0;
+    float4 Normal : COLOR1;
+    float4 Depth : COLOR2;
+    float4 Extra1 : COLOR3;
+};
+
+PixelShaderOutput PixelShaderFunction(VertexShaderOutput input)
+{
+    PixelShaderOutput output;
+    output.Color = tex2D(diffuseSampler, input.TexCoord);					   //output Color
+    output.Color.a = specularIntensity;                                        //output SpecularIntensity
+    output.Normal.rgb = 0.5f * (normalize(input.Normal) + 1.0f);               //transform normal domain
+    output.Normal.a = specularPower;                                           //output SpecularPower
+    output.Depth = input.Depth.x / input.Depth.y;                              //output Depth
+    output.Extra1.rgb =  0;
+    output.Extra1.a =  id;  
+
+    return output;
+}
+
+technique Technique1
+{
+    pass Pass1
+    {
+        VertexShader = compile vs_2_0 VertexShaderFunction();
+        PixelShader = compile ps_2_0 PixelShaderFunction();
+    }
+}</pre>
+<p>As you sow, the shader write in four targets at the same time (Pixel shader outputs for ColorX semantics), and in each of one we put diferent informations.</p>
+<p>In the Color0 Semantic RGB channels we put the Diffuse color and in A we put the specular intensity<br />
+In the Color1 Semanctis RGB channels we put the Normal in World Space and in A we put the specular power</p>
+<p>In Color2 Semantic we put the Depth (Pos projected Z/W). It is a 32 bits render target, so there is only one channel R.</p>
+<p>In Color3 Semantics RGB channels we put the Glow Map (and 0 if not used) and in A we put the ShaderID</p>
+<p>The shader ID is just a Tag that we can put in all the objects, the ploobsengine has one special tag, every object with ShaderID &gt; 0.9 wont be affected by light. You can use the ShaderID to apply post process only in specific objects. (will be explained in future tutorials, for now, let it be the default 0)</p>
+<p>Here is the IShader implementation that interacts with the effect</p>
+<pre class="c-sharp">#if !WINDOWS_PHONE
+namespace PloobsEngine.Material
+{
+    public class DeferredNormalShader : IShader
+    {
+        private Effect _shader;
+        EffectParameter ViewProjectionParameter;
+        EffectParameter TextureParameter;
+        EffectParameter SpecularPowerParameter;
+        EffectParameter SpecularIntensityParameter;
+        EffectParameter IdParameter;
+        EffectParameter WorldParameter;
+
+        public DeferredNormalShader(float specularIntensity = 0, float specularPower = 0)
+        {
+            if (specularPower &lt; 0)
+            {
+                ActiveLogger.LogMessage("specularPower cannot be negative, setting to 0", LogLevel.RecoverableError);
+                specularPower = 0;
+            }
+            if (specularIntensity &lt; 0)
+            {
+                ActiveLogger.LogMessage("specularIntensity cannot be negative, setting to 0", LogLevel.RecoverableError);
+                specularIntensity = 0;
+            }
+            this.specularIntensity = specularIntensity;
+            this.specularPower = specularPower;
+        }
+
+        private float specularIntensity = 0f;
+
+        public float SpecularIntensity
+        {
+            get { return specularIntensity; }
+            set { specularIntensity = value; }
+        }
+        private float specularPower = 0f;
+
+        public float SpecularPower
+        {
+            get { return specularPower; }
+            set { specularPower = value; }
+        }
+
+        public override void Draw(GameTime gt, IObject obj, RenderHelper render, ICamera camera, IList lights)
+        {
+                IModelo modelo = obj.Modelo;
+                IdParameter.SetValue(shaderId);
+                SpecularIntensityParameter.SetValue(specularIntensity);
+                SpecularPowerParameter.SetValue(specularPower);
+                ViewProjectionParameter.SetValue(camera.ViewProjection);
+
+                for (int i = 0; i &lt; modelo.MeshNumber; i++)
+                {
+                    BatchInformation[] bi = modelo.GetBatchInformation(i);
+                    for (int j = 0; j &lt; bi.Count(); j++)
+                    {
+                        TextureParameter.SetValue(modelo.getTexture(TextureType.DIFFUSE,i,j));
+                        WorldParameter.SetValue(bi[j].ModelLocalTransformation * obj.WorldMatrix);
+                        render.RenderBatch(bi[j], _shader);
+                    }
+                }
+        }
+
+        public override void Initialize(Engine.GraphicInfo ginfo, Engine.GraphicFactory factory, IObject obj)
+        {
+            this._shader = factory.GetEffect("RenderGBuffer",false,true);
+            ViewProjectionParameter = this._shader.Parameters["ViewProjection"];
+            TextureParameter = this._shader.Parameters["Texture"];
+            IdParameter = this._shader.Parameters["id"];
+            SpecularIntensityParameter = this._shader.Parameters["specularIntensity"];
+            SpecularPowerParameter = this._shader.Parameters["specularPower"];
+            WorldParameter = this._shader.Parameters["World"];
+            base.Initialize(ginfo, factory, obj);
+        }
+        public override MaterialType MaterialType
+        {
+            get { return MaterialType.DEFERRED; }
+        }
+    }
+}
+#endif</pre>
+<p>This is all for today =P</p>
+<p>The next tutorial probably will be about our PloobsImporter (loading scenes from 3DS MAX)</p>
+<p>Links</p>
+<div id="sectionSectionID0EBAAA">
+<ul>
+<li>PloobsEngine Alpha Xna 4.0: <a href="http://ploobs.com.br/?p=725" target="_blank">http://ploobs.com.br/?p=725</a></li>
+<li>Project Site: <a href="http://ploobsengine.codeplex.com/" target="_blank">http://ploobsengine.codeplex.com/</a></li>
+<li>Our Blog: <a href="http://ploobs.com.br/" target="_blank">http://ploobs.com.br/</a> (most of the contents is in portuguese, try translating =P)</li>
+<li>Our Forum: <a href="http://www.ploobs.com.br/forum/" target="_blank">http://www.ploobs.com.br/forum/</a></li>
+<li>Our Twiter: @ploobsengine</li>
+<li>Contact: <a href="mailto:contato@ploobs.com.br">contato@ploobs.com.br</a></li>
+<li>PloobsEngine Release in portuguese: <a href="http://www.bitabit.eng.br/2011/03/23/apresentando-ploobs-engine/" target="_blank">http://www.bitabit.eng.br/2011/03/23/apresentando-ploobs-engine/</a></li>
+</ul>
+</div>
+
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2Farquivos%2F1243&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+          </div>
+                              <p class="tags"><a href="http://ploobs.com.br/arquivos/tag/bump-map" rel="tag">bump map</a>, <a href="http://ploobs.com.br/arquivos/tag/computacao-grafica-2" rel="tag">computacao grafica</a>, <a href="http://ploobs.com.br/arquivos/tag/glow-map" rel="tag">glow map</a>, <a href="http://ploobs.com.br/arquivos/tag/gpu" rel="tag">GPU</a>, <a href="http://ploobs.com.br/arquivos/tag/material-ploobs-material" rel="tag">material ploobs material</a>, <a href="http://ploobs.com.br/arquivos/tag/normal-map" rel="tag">normal map</a>, <a href="http://ploobs.com.br/arquivos/tag/ploobs" rel="tag">ploobs</a>, <a href="http://ploobs.com.br/arquivos/tag/ploobsengine-2" rel="tag">ploobsengine</a>, <a href="http://ploobs.com.br/arquivos/tag/shader" rel="tag">Shader</a>, <a href="http://ploobs.com.br/arquivos/tag/specular-map" rel="tag">specular map</a>, <a href="http://ploobs.com.br/arquivos/tag/tutorial" rel="tag">tutorial</a>, <a href="http://ploobs.com.br/arquivos/tag/xna" rel="tag">XNA</a></p>
+          <div class="clear"></div>
+                    <p class="postmetadata alt">
+			<small>
+                This entry was posted on 29 de junho de 2011, 10:00 am and is filed under <a href="http://ploobs.com.br/arquivos/category/geral" rel="category tag">All Posts</a>, <a href="http://ploobs.com.br/arquivos/category/ploobsengine" rel="category tag">PloobsEngine</a>, <a href="http://ploobs.com.br/arquivos/category/portfolio" rel="category tag">Portfolio</a>, <a href="http://ploobs.com.br/arquivos/category/ploobsengine/tutoriais" rel="category tag">Tutorials</a>. You can follow any responses to this entry through <a href="http://ploobs.com.br/arquivos/1243/feed" title="RSS 2.0">RSS 2.0</a>.
+                Você pode <a href="#respond">deixar uma resposta</a>, ou <a href="http://ploobs.com.br/arquivos/1243/trackback" rel="trackback">citar</a> de seu próprio site.                            </small>
+		  </p>
+	   </div>
+    </div>
+	
+
+<div id="post-extra-content">
+      <!-- comments and trackback tabs -->
+    <ul class="secondary-tabs">
+      <li><a href="#tab-1"><span><span>Comentários (2)</span></span></a></li>
+            <li><a href="#tab-3"><span><span>Related Posts</span></span></a></li>    </ul>
+    <!-- /comments and trackback tabs -->
+    <!-- comments -->
+  <div id="tab-1">
+   <ol id="comments">
+     <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-2765287">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/715c0ed75d74a53f51f4c1a89e295a23?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/715c0ed75d74a53f51f4c1a89e295a23?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-2765287">#1</a> by <a id="commentauthor-2765287" href="https://www.li-ya.co.il/bgdi-hrivn.html">&#1489;&#1490;&#1491;&#1497; &#1492;&#1512;&#1497;&#1493;&#1503;</a> on 30 de novembro de 2016 - 7:20 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-2765287">
+          <p>very few sites that take place to be detailed below, from our point of view are undoubtedly effectively worth checking out</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-2765287', 'comment-2765287', 'commentbody-2765287', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-2765457">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/e408adfe9f068fc040819bf35930da83?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/e408adfe9f068fc040819bf35930da83?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-2765457">#2</a> by <a id="commentauthor-2765457" href="http://www.easyinboxmailer.com/coach/">coach factory outlet online store sale</a> on 30 de novembro de 2016 - 7:33 am         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-2765457">
+          <p>Thanks a ton for blogging this, it was very informative and told quite a bit<br />
+coach factory outlet online store sale <a href="http://www.easyinboxmailer.com/coach/" rel="nofollow">http://www.easyinboxmailer.com/coach/</a></p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-2765457', 'comment-2765457', 'commentbody-2765457', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+    </ol>
+           <div class="commentnavi">
+  	    <div class="commentpager">
+  	    	<a class="prev page-numbers" href="http://ploobs.com.br/arquivos/1243/comment-page-212#comments">&laquo; Anterior</a>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/1243/comment-page-1#comments'>1</a>
+<span class="page-numbers dots">&hellip;</span>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/1243/comment-page-211#comments'>211</a>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/1243/comment-page-212#comments'>212</a>
+<span class='page-numbers current'>213</span>  	    </div>
+       </div>
+          
+      <div id="respond">
+      <form action="http://ploobs.com.br/wp-comments-post.php" method="post" id="commentform">
+        <div class="cancel-comment-reply"><a rel="nofollow" id="cancel-comment-reply-link" href="/arquivos/1243#respond" style="display:none;">Cancelar resposta</a></div>          	                <div id="author_info">
+            <div class="row">
+              <input type="text" name="author" id="author" class="textfield" value="" size="24" tabindex="1" />
+              <label for="author" class="small">Nome (necessário)</label>
+            </div>
+            <div class="row">
+              <input type="text" name="email" id="email" class="textfield" value="" size="24" tabindex="2" />
+              <label for="email" class="small">E-Mail (necessário)</label> <em>(não será publicado)</em>
+            </div>
+            <div class="row">
+              <input type="text" name="url" id="url" class="textfield" value="" size="24" tabindex="3" />
+              <label for="url" class="small">Website</label>
+            </div>
+  		  </div>
+                  
+        <!-- comment input -->
+        <div class="row">
+        	<textarea name="comment" id="comment" tabindex="4" rows="8" cols="50"></textarea>
+        	        	<input type='hidden' name='comment_post_ID' value='1243' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+
+                 <br />
+        </div>
+        <!-- /comment input -->
+
+        <!-- comment submit and rss -->
+        <div id="submitbox" class="left">
+         <span class="button submit"><a title="Mandar Comentário" href="javascript:jQuery('#commentform').submit();"><span><span>Mandar Comentário</span></span></a></span>
+         <input type="hidden" name="formInput" />
+        </div>
+        <div class="clear"></div>
+      </form>
+    </div>
+          </div>
+  <!-- /comments -->
+
+  <!-- trackbacks -->
+    <!-- /trackbacks -->
+
+  <!-- related posts -->
+         <div id="tab-3">
+        <ol id="relatedposts">
+           		 <li><a href="http://ploobs.com.br/arquivos/2364" rel="bookmark" title="Permanent Link to BitField in Shaders (SM 3 and before)">BitField in Shaders (SM 3 and before)</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/2136" rel="bookmark" title="Permanent Link to Gaussian Blur with Depth Preservation">Gaussian Blur with Depth Preservation</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/2060" rel="bookmark" title="Permanent Link to C# Wrapper for RVO2 3D (for Crowd Simulation) Released">C# Wrapper for RVO2 3D (for Crowd Simulation) Released</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/2005" rel="bookmark" title="Permanent Link to 3D Billboards On Windows Phone 7">3D Billboards On Windows Phone 7</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1996" rel="bookmark" title="Permanent Link to PloobsEngine News">PloobsEngine News</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1868" rel="bookmark" title="Permanent Link to Code Snippet : Fog Shader">Code Snippet : Fog Shader</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1750" rel="bookmark" title="Permanent Link to Picking Objects in 3D">Picking Objects in 3D</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1732" rel="bookmark" title="Permanent Link to Code Snipped: Night Vision Shader">Code Snipped: Night Vision Shader</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1707" rel="bookmark" title="Permanent Link to [PloobsEngine] Tutorial 10 &#8211; Finite State Machine">[PloobsEngine] Tutorial 10 &#8211; Finite State Machine</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1673" rel="bookmark" title="Permanent Link to Code Snipped: Contrast Shader">Code Snipped: Contrast Shader</a></li>
+                 </ol>
+       </div>
+        <!-- /related posts -->
+
+</div>
+
+
+
+   </div>
+    <!-- mid content -->
+   </div>
+   <!-- /mid -->
+
+   
+<!-- sidebar -->
+<div id="sidebar">
+ <!-- sidebar 1st container -->
+ <div id="sidebar-wrap1">
+  <!-- sidebar 2nd container -->
+  <div id="sidebar-wrap2">
+     <ul id="sidelist">
+     	
+        <li><div id="fusion-search" class="widget fusion_SearchWidget">         <!-- wp search form -->
+          <div id="searchtab">
+            <div class="inside">
+              <form method="get" id="searchform" action="http://ploobs.com.br/">
+              <fieldset>
+                <input type="text" name="s" id="searchbox" class="searchfield" value="Procurar" onfocus="if(this.value == 'Procurar') {this.value = '';}" onblur="if (this.value == '') {this.value = 'Procurar';}" />
+                 <input type="submit" value="Go" class="searchbutton" />
+              </fieldset>
+              </form>
+            </div>
+          </div>
+         <!-- /wp search form -->
+  </div></li><li><div id="fusion-categories" class="widget fusion_CategoryWidget"> <!-- sidebar menu (categories) -->
+ <ul class="nav">
+   	<li  class="cat-item cat-item-1"><a href="http://ploobs.com.br/arquivos/category/geral" title="Todos os Posts do site"><span>All Posts <em>(107)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/geral/feed"></a>
+</li>
+	<li  class="cat-item cat-item-71"><a href="http://ploobs.com.br/arquivos/category/android" ><span>Android <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/android/feed"></a>
+</li>
+	<li  class="cat-item cat-item-168"><a href="http://ploobs.com.br/arquivos/category/artemis-2" ><span>Artemis <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/artemis-2/feed"></a>
+</li>
+	<li  class="cat-item cat-item-35"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica" ><span>Computacao Grafica <em>(43)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/feed"></a>
+<ul class='children'>
+	<li  class="cat-item cat-item-104"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/artigos-introdutorios" title="Artigos introdutorios a computacao grafica"><span>Artigos Introdutorios <em>(8)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/artigos-introdutorios/feed"></a>
+</li>
+	<li  class="cat-item cat-item-105"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/exemplos-source-code" title="Full Source Code and Explanation Samples"><span>Full Samples <em>(7)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/exemplos-source-code/feed"></a>
+</li>
+	<li  class="cat-item cat-item-89"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/shader-code-snippet" ><span>Shader Code Snippet <em>(12)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/shader-code-snippet/feed"></a>
+</li>
+</ul>
+</li>
+	<li  class="cat-item cat-item-133"><a href="http://ploobs.com.br/arquivos/category/developers-diary" ><span>Developers Diary <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/developers-diary/feed"></a>
+</li>
+	<li  class="cat-item cat-item-170"><a href="http://ploobs.com.br/arquivos/category/directx-11" ><span>DirectX 11 <em>(3)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/directx-11/feed"></a>
+</li>
+	<li  class="cat-item cat-item-115"><a href="http://ploobs.com.br/arquivos/category/divulgacao" ><span>Divulgação <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/divulgacao/feed"></a>
+</li>
+	<li  class="cat-item cat-item-26"><a href="http://ploobs.com.br/arquivos/category/ia" ><span>IA <em>(4)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ia/feed"></a>
+</li>
+	<li  class="cat-item cat-item-97"><a href="http://ploobs.com.br/arquivos/category/maxscript" ><span>MaxScript <em>(1)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/maxscript/feed"></a>
+</li>
+	<li  class="cat-item cat-item-21"><a href="http://ploobs.com.br/arquivos/category/ploobsengine" ><span>PloobsEngine <em>(27)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/feed"></a>
+<ul class='children'>
+	<li  class="cat-item cat-item-103"><a href="http://ploobs.com.br/arquivos/category/ploobsengine/releases" title="PloobsEngine Releases"><span>Releases <em>(4)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/releases/feed"></a>
+</li>
+	<li  class="cat-item cat-item-102"><a href="http://ploobs.com.br/arquivos/category/ploobsengine/tutoriais" title="Tutorais da PloobsEngine"><span>Tutorials <em>(15)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/tutoriais/feed"></a>
+</li>
+</ul>
+</li>
+	<li  class="cat-item cat-item-16"><a href="http://ploobs.com.br/arquivos/category/portfolio" ><span>Portfolio <em>(19)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/portfolio/feed"></a>
+</li>
+	<li  class="cat-item cat-item-9"><a href="http://ploobs.com.br/arquivos/category/xna" ><span>XNA <em>(36)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/xna/feed"></a>
+</li>
+     </ul>
+  <!-- /sidebar menu -->
+ </div></li><li><div id="text-4" class="widget widget_text">			<div class="textwidget"><div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div class="fb-like-box" data-href="http://www.facebook.com/pages/Ploobs-Games/101527043290136" data-width="250" data-show-faces="true" data-stream="false" data-header="true"></div></div>
+		</div></li>		<li><div id="recent-posts-3" class="widget widget_recent_entries">		<h2 class="title">Topicos Recentes</h2>		<ul>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2419">Free CI with GitHub, C# and Travis</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2396">C# Artemis Entity System Tutorial</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2378">Implementing a Render Queue for Games</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2364">BitField in Shaders (SM 3 and before)</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2351">Artemis Entity System for Games now on Nuget</a>
+						</li>
+				</ul>
+		</div></li>		     </ul>
+  </div>
+  <!-- /sidebar 2nd container -->
+ </div>
+ <!-- /sidebar 1st container -->
+</div>
+<!-- /sidebar -->
+
+
+
+  </div>
+  <!-- /side wrap -->
+ </div>
+ <!-- /mid column wrap -->
+</div>
+<!-- /main wrapper -->
+
+<!-- clear main & sidebar sections -->
+<div class="clearcontent"></div>
+<!-- /clear main & sidebar sections -->
+
+ 
+<!-- footer -->
+ <div id="footer">
+
+   
+   <!-- please do not remove this. respect the authors :) -->
+   <p>
+    Fusion theme by <a href="http://digitalnature.ro/projects/fusion">digitalnature</a> | powered by <a href="http://wordpress.org/">WordPress</a>    <br />
+   <a class="rss" href="http://ploobs.com.br/feed">Posts (RSS)</a> e <a href="http://ploobs.com.br/comments/feed">Comentários (RSS)</a> <a href="javascript:void(0);" id="toplink">^</a>
+   <!-- 44 queries. 0,688 seconds. -->
+   </p>
+ </div>
+ <!-- /footer -->
+   <div id="layoutcontrol">
+   <a href="javascript:void(0);" class="setFont" title="Aumentar/Diminuir tamanho do texto"><span>SetTextSize</span></a>
+   <a href="javascript:void(0);" class="setLiquid" title="Muda entre largura total e largura fixa"><span>SetPageWidth</span></a>
+ </div>
+ </div>
+<!-- /page -->
+
+</div>
+</div>
+<!-- /page wrappers -->
+
+
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/comment-reply.min.js?ver=4.4.5'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/wp-embed.min.js?ver=4.4.5'></script>
+</body>
+</html>

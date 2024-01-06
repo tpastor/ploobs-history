@@ -1,0 +1,171 @@
+
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>Game Design &#8211; Ploobs &#8211; Game Dev Blog</title>
+	<atom:link href="http://ploobs.com.br/category/game-design/feed/" rel="self" type="application/rss+xml" />
+	<link>http://ploobs.com.br</link>
+	<description>Game Development Blog</description>
+	<lastBuildDate>Mon, 10 Sep 2018 20:34:37 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>hourly</sy:updatePeriod>
+	<sy:updateFrequency>1</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=4.9.9</generator>
+	<item>
+		<title>Plant Jumper &#8211; Player Moviment</title>
+		<link>http://ploobs.com.br/2018/08/28/plant-jumper-player-moviment/</link>
+		<comments>http://ploobs.com.br/2018/08/28/plant-jumper-player-moviment/#respond</comments>
+		<pubDate>Tue, 28 Aug 2018 12:00:38 +0000</pubDate>
+		<dc:creator><![CDATA[ploobs]]></dc:creator>
+				<category><![CDATA[Game Design]]></category>
+		<category><![CDATA[Programming]]></category>
+		<category><![CDATA[ECS]]></category>
+		<category><![CDATA[PlantJumper]]></category>
+
+		<guid isPermaLink="false">http://ploobs.com.br/?p=30</guid>
+		<description><![CDATA[The player moviment using ECS as another systems must be designed to be data driven. At the beginning our player]]></description>
+				<content:encoded><![CDATA[<p>The player moviment using ECS as another systems must be designed to be data driven.</p>
+
+<p>At the beginning our player will jump and change direction. So we need the following components</p>
+
+<p>Position &#8211; will describe its position<br/>Heading2D &#8211; will describe if it is pointing right ou left<br/>Velocity &#8211; will describe the jump and fall moviment</p>
+
+<h4>Auto Jump System</h4>
+
+<p>In the jumpter game, the player is always jumping, so i created an auto jump system</p>
+
+<pre class="wp-block-code"><code>
+using UnityEngine;
+using Unity.Entities;
+using Unity.Transforms;
+using Unity.Collections;
+
+using Unity.Mathematics;
+
+
+[UpdateAfter(typeof(ComputeColliderAABBSystem))]
+public class AutoJumpSystem : ComponentSystem
+{
+    public struct Data
+    {
+        public readonly int Length;
+        public ComponentDataArray&lt;Heading> Heading;
+        public ComponentDataArray&lt;Player> Player;
+
+        public ComponentDataArray&lt;Velocity> Velocity;
+
+        public ComponentDataArray&lt;CollisionComponent> CollisionComponent;
+
+    }
+
+    [Inject] private Data m_Data;
+
+    public AutoJumpSystem()
+    {
+    }
+
+    private float amountY = 20;
+    private float amountX = 5;
+    protected override void OnUpdate()
+    {
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            if (m_Data.CollisionComponent[index].Value > 0)
+            {
+                float3 velocity = new float3(0, amountY, 0);
+                velocity += (amountX * m_Data.Heading[index].Value);
+
+                m_Data.Velocity[index] = new Velocity { Value = velocity };
+            }
+        }
+    }
+}</code></pre>
+
+<p>As you can noticed we are not changing position, just the velocity data. This is due to the RigidBody system been already treating velocity changes, but for that i have to make a little change in the rigidbody system</p>
+
+<pre class="wp-block-code"><code>protected override void OnUpdate()
+    {
+        float dt = Time.deltaTime;
+        for (int index = 0; index &lt; m_Data.Length; ++index)
+        {
+            float3 gravity = new float3(0, -20, 0);
+
+            var position = m_Data.Position[index].Value;
+            if (m_Data.Collision[index].Value > 0)
+            {
+                gravity = float3.zero;
+            }
+
+            Velocity velocity = new Velocity
+            {
+                Value = m_Data.Velocity[index].Value + gravity * dt
+            };
+            m_Data.Velocity[index] = velocity;
+
+            position += (m_Data.Velocity[index].Value * dt + 0.5f * gravity * dt * dt);
+
+            m_Data.Position[index] = new Position { Value = position };
+        }
+    }</code></pre>
+
+<p>The method onUpdate now will apply the velocity every cicle and if there is a collision, not apply gravity. I know this is a very simple aproximation but for this game, it is enough.</p>
+]]></content:encoded>
+			<wfw:commentRss>http://ploobs.com.br/2018/08/28/plant-jumper-player-moviment/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+		<item>
+		<title>Plant Jumper</title>
+		<link>http://ploobs.com.br/2018/08/22/plant-jumper/</link>
+		<comments>http://ploobs.com.br/2018/08/22/plant-jumper/#respond</comments>
+		<pubDate>Wed, 22 Aug 2018 19:00:22 +0000</pubDate>
+		<dc:creator><![CDATA[ploobs]]></dc:creator>
+				<category><![CDATA[Game Design]]></category>
+		<category><![CDATA[Programming]]></category>
+		<category><![CDATA[ECS]]></category>
+
+		<guid isPermaLink="false">http://ploobs.com.br/?p=39</guid>
+		<description><![CDATA[As the first minigame, i will build a simple jumper game. Features Simple BlocksWater going up to catch the playerPlayer]]></description>
+				<content:encoded><![CDATA[<figure class="wp-block-image"><img src="http://ploobs.com.br/wp-content/uploads/2018/08/Plant-Jumper.png" alt="" class="wp-image-38" srcset="http://ploobs.com.br/wp-content/uploads/2018/08/Plant-Jumper.png 220w, http://ploobs.com.br/wp-content/uploads/2018/08/Plant-Jumper-169x300.png 169w" sizes="(max-width: 220px) 100vw, 220px" /></figure>
+
+<p>As the first minigame, i will build a simple jumper game.</p>
+
+<h2>Features</h2>
+
+<ul><li>Simple Blocks</li><li>Water going up to catch the player</li><li>Player that jumps</li><li>Simple Controllers by clicking in the left or right of the screen</li><li>Simple procedural level generation</li><li>Using Pure ECS</li></ul>
+
+<p>Throughout the development I will post short posts describing how this will be done.</p>
+
+<h2>Entities, Components and Systems first idea</h2>
+
+<p>My first guess of Entities, Components and Systems are the list below, but probably while implementing i will notice another needs</p>
+
+<p><em><strong>Entities</strong></em></p>
+
+<ul><li>Player</li><li>Block</li><li>Water</li></ul>
+
+<p><em><strong>Components</strong></em></p>
+
+<ul><li>Position</li><li>Player (tags)</li><li>Block(tag)</li><li>Collision</li><li>PlayerInput</li><li>ParticleDispatcher</li><li>Jump</li><li>AutomaticAction</li></ul>
+
+<p><em><strong>Systems</strong></em></p>
+
+<ul><li>PlayerInputSystem</li><li>PlayerHitSystem</li><li>AutomaticJumpSystem</li></ul>
+
+<h2>Considerations</h2>
+
+<p>Decide the considerations on the granularity of components and systems will be a good challenge that we are going to face together</p>
+
+<p><em><strong></strong></em></p>
+]]></content:encoded>
+			<wfw:commentRss>http://ploobs.com.br/2018/08/22/plant-jumper/feed/</wfw:commentRss>
+		<slash:comments>0</slash:comments>
+		</item>
+	</channel>
+</rss>

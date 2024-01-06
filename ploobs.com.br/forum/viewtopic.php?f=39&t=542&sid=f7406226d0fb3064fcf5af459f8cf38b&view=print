@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="pt-br" xml:lang="pt-br">
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta http-equiv="content-style-type" content="text/css" />
+<meta http-equiv="content-language" content="pt-br" />
+<meta http-equiv="imagetoolbar" content="no" />
+<meta name="resource-type" content="document" />
+<meta name="distribution" content="global" />
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<meta name="robots" content="noindex" />
+
+<title>Ploobs Engine &bull; Exibir tópico - Bug fix for EntityManager</title>
+
+<link href="./styles/prosilver/theme/print.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body id="phpbb">
+<div id="wrap">
+	<a id="top" name="top" accesskey="t"></a>
+
+	<div id="page-header">
+		<h1>Ploobs Engine</h1>
+		<p>Ploobs Engine Forum<br /><a href="http://ploobs.com.br/forum/">http://ploobs.com.br/forum/</a></p>
+
+		<h2>Bug fix for EntityManager</h2>
+		<p><a href="http://ploobs.com.br/forum/viewtopic.php?f=39&amp;t=542">http://ploobs.com.br/forum/viewtopic.php?f=39&amp;t=542</a></p>
+	</div>
+
+	<div id="page-body">
+		<div class="page-number">Página <b>1</b> de <b>1</b></div>
+		
+			<div class="post">
+				<h3>Bug fix for EntityManager</h3>
+				<div class="date"><img src="./styles/prosilver/imageset/icon_post_target.gif" width="11" height="9" alt="Mensagem" title="Mensagem" />Enviado: <strong>08 Mai 2013, 11:48</strong></div>
+				<div class="author">por <strong>tone</strong></div>
+				<div class="content">Hi,<br /><br />I have a bug fix for you for the GetComponent method in artemis_CSharp/Artemis_XNA_INDEPENDENT/Manager/EntityManager.cs<br />It's a small 4 line cut and paste in your existing code and I'm not familiar at all with Git. Is it ok I submit it this way?<br /><br />The bug arises when a new ComponentType gets added and the componentsByType bag is at it's size limit. If you're checking for a the presence of the component in one of your systems and it hasn't been added to an entity you get an index out of range error. The fix details (in the GetComponent method)<br /><br />The lines:<br /><dl class="codebox"><dt>Código: <a href="#" onclick="selectCode(this); return false;">Selecionar todos</a></dt><dd><code>if (componentType.Id &gt;= this.componentsByType.Capacity)<br />{<br />&nbsp; &nbsp; return null;<br />}</code></dd></dl><br />need to be moved before the line:<br />    <dl class="codebox"><dt>Código: <a href="#" onclick="selectCode(this); return false;">Selecionar todos</a></dt><dd><code>Bag&lt;IComponent&gt; bag = this.componentsByType.Get(componentType.Id);</code></dd></dl><br /><br />So the full code of the method is now:<br /><br /><dl class="codebox"><dt>Código: <a href="#" onclick="selectCode(this); return false;">Selecionar todos</a></dt><dd><code>internal IComponent GetComponent(Entity entity, ComponentType componentType)<br />{<br />&nbsp; &nbsp; Debug.Assert(entity != null, &quot;Entity must not be null.&quot;);<br />&nbsp; &nbsp; Debug.Assert(componentType != null, &quot;Component type must not be null.&quot;);<br /><br />&nbsp; &nbsp; if (componentType.Id &gt;= this.componentsByType.Capacity)<br />&nbsp; &nbsp; {<br />&nbsp; &nbsp; &nbsp; &nbsp; return null;<br />&nbsp; &nbsp; }<br /><br />&nbsp; &nbsp; int entityId = entity.Id;<br />&nbsp; &nbsp; Bag&lt;IComponent&gt; bag = this.componentsByType.Get(componentType.Id);<br />&nbsp; &nbsp; if (bag != null &amp;&amp; entityId &lt; bag.Capacity)<br />&nbsp; &nbsp; {<br />&nbsp; &nbsp; &nbsp; &nbsp; return bag.Get(entityId);<br />&nbsp; &nbsp; }<br /><br />&nbsp; &nbsp; return null;<br />}</code></dd></dl></div>
+			</div>
+			<hr />
+		
+			<div class="post">
+				<h3>Re: Bug fix for EntityManager</h3>
+				<div class="date"><img src="./styles/prosilver/imageset/icon_post_target.gif" width="11" height="9" alt="Mensagem" title="Mensagem" />Enviado: <strong>08 Mai 2013, 14:55</strong></div>
+				<div class="author">por <strong>ploobsadmin</strong></div>
+				<div class="content">hi,<br />really thanks !!!<br /><br />I will add this fix asap.</div>
+			</div>
+			<hr />
+		
+			<div class="post">
+				<h3>Re: Bug fix for EntityManager</h3>
+				<div class="date"><img src="./styles/prosilver/imageset/icon_post_target.gif" width="11" height="9" alt="Mensagem" title="Mensagem" />Enviado: <strong>08 Mai 2013, 17:45</strong></div>
+				<div class="author">por <strong>ploobsadmin</strong></div>
+				<div class="content">fixed in the main branch.</div>
+			</div>
+			<hr />
+		
+	</div>
+
+	<div id="page-footer">
+		<div class="page-number">Todos os horários são GMT - 3 horas <br />Página <b>1</b> de <b>1</b></div>
+		<div class="copyright">Powered by phpBB&reg; Forum Software &copy; phpBB Group<br />http://www.phpbb.com/</div>
+	</div>
+</div>
+
+</body>
+</html>

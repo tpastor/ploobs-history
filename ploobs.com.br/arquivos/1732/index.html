@@ -1,0 +1,1098 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+
+<head profile="http://gmpg.org/xfn/11">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="keywords" content="hlsl, post effect, Shader, source code, " />
+<meta name="description" content="Creators of Ploobs Engine, OpenSource XNA GameEngine and indie Game Development" />
+<meta name="google-site-verification" content="SHK4jeXj--ju-cPSerLDrbbhbEHEPgf_2Ckw8BClx8I" />
+
+<title>Night Vision Shader | Ploobs</title>
+
+<link rel="alternate" type="application/rss+xml" title="Ploobs RSS Feed" href="http://ploobs.com.br/feed" />
+<link rel="alternate" type="application/atom+xml" title="Ploobs Atom Feed" href="http://ploobs.com.br/feed/atom" />
+<link rel="pingback" href="http://ploobs.com.br/xmlrpc.php" />
+
+
+<style type="text/css" media="all">
+@import "http://ploobs.com.br/wp-content/themes/fusion/style.css";
+#page-wrap2{ background: #0a0d2e; }
+#page-wrap1{ background: none; }
+</style>
+
+
+<!--[if lte IE 6]>
+<script type="text/javascript">
+/* <![CDATA[ */
+   blankimgpath = 'http://ploobs.com.br/wp-content/themes/fusion/images/blank.gif';
+ /* ]]> */
+</script>
+<style type="text/css" media="screen">
+  @import "http://ploobs.com.br/wp-content/themes/fusion/ie6.css";
+  body{ behavior:url("http://ploobs.com.br/wp-content/themes/fusion/js/ie6hoverfix.htc"); }
+  img{ behavior: url("http://ploobs.com.br/wp-content/themes/fusion/js/ie6pngfix.htc"); }
+</style>
+<![endif]-->
+
+
+  
+
+<!-- All in One SEO Pack 2.3.4 by Michael Torbert of Semper Fi Web Design[553,608] -->
+<meta name="description"  content="This post effect is pretty cool and simple to build. We tried to achieve two things, make the green like effect and add some random noise to the final image." />
+
+<meta name="keywords"  content="night vision,hlsl,shader,code,source,post effect,source code,all posts,shader code snippet" />
+
+<link rel="canonical" href="http://ploobs.com.br/arquivos/1732" />
+<!-- /all in one seo pack -->
+<link rel="alternate" type="application/rss+xml" title="Ploobs &raquo; Code Snipped: Night Vision Shader  Feed de comentários" href="http://ploobs.com.br/arquivos/1732/feed" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/ploobs.com.br\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.4.9"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;return g&&g.fillText?(g.textBaseline="top",g.font="600 32px Arial","flag"===a?(g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3):"diversity"===a?(g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e):("simple"===a?g.fillText(h(55357,56835),0,0):g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0])):!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g;c.supports={simple:d("simple"),flag:d("flag"),unicode8:d("unicode8"),diversity:d("diversity")},c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.simple&&c.supports.flag&&c.supports.unicode8&&c.supports.diversity||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery.js?ver=1.11.3'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-content/themes/fusion/js/fusion.js?ver=4.4.9'></script>
+<link rel='https://api.w.org/' href='http://ploobs.com.br/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://ploobs.com.br/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://ploobs.com.br/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='[PloobsEngine] Tutorial 10 &#8211; Finite State Machine' href='http://ploobs.com.br/arquivos/1707' />
+<link rel='next' title='Generating Perlin Noise in C#' href='http://ploobs.com.br/arquivos/1742' />
+<meta name="generator" content="WordPress 4.4.9" />
+<link rel='shortlink' href='http://ploobs.com.br/?p=1732' />
+<link rel="alternate" type="application/json+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2Farquivos%2F1732" />
+<link rel="alternate" type="text/xml+oembed" href="http://ploobs.com.br/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fploobs.com.br%2Farquivos%2F1732&#038;format=xml" />
+<meta property="og:site_name" content="Ploobs" />
+<meta property="og:title" content="Code Snipped: Night Vision Shader" />
+<meta property="og:url" content="http://ploobs.com.br/arquivos/1732" />
+<meta property="og:type" content="article" />
+
+<script type="text/javascript">
+/* <![CDATA[ */
+ jQuery(document).ready(function(){
+  // body .safari class
+  if (jQuery.browser.safari) jQuery('body').addClass('safari');
+
+  // layout controls
+     jQuery("#layoutcontrol a").click(function() {
+     switch (jQuery(this).attr("class")) {
+	   case 'setFont' : setFontSize();	break;
+	   case 'setLiquid'	: setPageWidth();	break;
+	 }
+	 return false;
+    });
+   // set the font size from cookie
+   var font_size = jQuery.cookie('fontSize');
+   if (font_size == '.70em') { jQuery('body').css("font-size",".70em"); }
+   if (font_size == '.95em') { jQuery('body').css("font-size",".95em"); }
+   if (font_size == '.75em') { jQuery('body').css("font-size",".75em"); }
+
+   // set the page width from cookie
+   var page_width = jQuery.cookie('pageWidth');
+   if (page_width) jQuery('#page').css('width', page_width);
+  
+  jQuery('#post-extra-content').minitabs(333, 'slide');
+
+  if (document.all && !window.opera && !window.XMLHttpRequest && jQuery.browser.msie) { var isIE6 = true; }
+  else { var isIE6 = false;} ;
+  jQuery.browser.msie6 = isIE6;
+  if (!isIE6) {
+    initTooltips({
+		timeout: 6000
+   });
+  }
+  tabmenudropdowns();
+
+  // some jquery effects...
+  jQuery('#sidebar ul.nav li ul li a').mouseover(function () {
+   	jQuery(this).animate({ marginLeft: "4px" }, 100 );
+  });
+  jQuery('#sidebar ul.nav li ul li a').mouseout(function () {
+    jQuery(this).animate({ marginLeft: "0px" }, 100 );
+  });
+  // scroll to top
+  jQuery("a#toplink").click(function(){
+    jQuery('html').animate({scrollTop:0}, 'slow');
+  });
+
+  // set roles on some elements (for accessibility)
+  jQuery("#tabs").attr("role","navigation");
+  jQuery("#mid-content").attr("role","main");
+  jQuery("#sidebar").attr("role","complementary");
+  jQuery("#searchform").attr("role","search");
+
+ });
+
+ /* ]]> */
+</script>
+
+</head>
+<body class="code-snipped-night-vision-shader">
+  <!-- page wrappers (100% width) -->
+  <div id="page-wrap1">
+    <div id="page-wrap2">
+      <!-- page (actual site content, custom width) -->
+      <div id="page" class="with-sidebar">
+
+       <!-- main wrapper (side & main) -->
+       <div id="main-wrap">
+        <!-- mid column wrap -->
+    	<div id="mid-wrap">
+          <!-- sidebar wrap -->
+          <div id="side-wrap">
+            <!-- mid column -->
+    	    <div id="mid">
+              <!-- header -->
+              <div id="header">
+                <div id="topnav" class="description"> Creators of Ploobs Engine, OpenSource XNA GameEngine and indie Game Development</div>
+
+                                <a id="logo" href="http://ploobs.com.br/"><img src="http://ploobs.com.br/wp-content/uploads/logo2.png" title="Ploobs" alt="Ploobs" /></a>
+                
+                <!-- top tab navigation -->
+                <div id="tabs">
+                 <ul>
+                                     <li id="nav-homelink"><a href="http://ploobs.com.br" title="Clique para Início"><span><span>Início</span></span></a></li>
+                                   <li class="page_item page-item-2"><a href="http://ploobs.com.br/about"><span><span>About</span></span></a></li>
+<li class="page_item page-item-1353"><a href="http://ploobs.com.br/contatos"><span><span>Contact Us</span></span></a></li>
+<li class="page_item page-item-494"><a href="http://ploobs.com.br/forum"><span><span>Forum</span></span></a></li>
+<li class="page_item page-item-233 page_item_has_children"><a href="http://ploobs.com.br/ploobsengine"><span><span>PloobsEngine</span></span></a>
+<ul class='children'>
+	<li class="page_item page-item-1381"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-presentation"><span><span>PloobsEngine Presentation</span></span></a></li>
+	<li class="page_item page-item-1392"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-features"><span><span>PloobsEngine Features</span></span></a></li>
+	<li class="page_item page-item-1395"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-download"><span><span>PloobsEngine Download</span></span></a></li>
+	<li class="page_item page-item-1379"><a href="http://ploobs.com.br/ploobsengine/ploobsengine-tutorials"><span><span>PloobsEngine Tutorials</span></span></a></li>
+	<li class="page_item page-item-465"><a href="http://ploobs.com.br/ploobsengine/galeria"><span><span>PloobsEngine Galery</span></span></a></li>
+	<li class="page_item page-item-1371"><a href="http://ploobs.com.br/ploobsengine/ploobs-license"><span><span>PloobsEngine Dual-License</span></span></a></li>
+</ul>
+</li>
+<li class="page_item page-item-656"><a href="http://ploobs.com.br/iniciantes"><span><span>Comp Gráfica Tutoriais</span></span></a></li>
+                 </ul>
+                </div>
+                <!-- /top tabs -->
+
+              </div><!-- /header -->
+  <!-- mid content -->
+  <div id="mid-content">
+      <div class="navigation">
+      <div class="alignleft">&laquo; <a href="http://ploobs.com.br/arquivos/1707" rel="prev">[PloobsEngine] Tutorial 10 &#8211; Finite State Machine</a></div>
+      <div class="alignright"><a href="http://ploobs.com.br/arquivos/1742" rel="next">Generating Perlin Noise in C#</a> &raquo;</div>
+      <div class="clear"></div>
+    </div>
+
+    <div id="post-1732" class="post-1732 post type-post status-publish format-standard hentry category-geral category-shader-code-snippet tag-hlsl tag-post-effect tag-shader tag-source-code">
+       <h2 class="title">Code Snipped: Night Vision Shader</h2>       <br />
+	    <div class="entry">
+          <div class="postbody entry clearfix">
+	       
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2Farquivos%2F1732&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+<p><img class="alignleft" title="dsfasdfasd" src="http://1.bp.blogspot.com/_vUKS5WjRYRs/TOAWZcgSL4I/AAAAAAAAAZE/ozcQyMVQ6_8/s1600/NightVision.jpg" alt="" width="155" height="105" />This post effect is pretty cool and simple to build.<br />
+We tried to achieve two things, make the green like effect and add some random noise to the final image.</p>
+<p>Different from almost all Code Snipped, we will try to explain this effect in a simple way.</p>
+<p><span id="more-1732"></span></p>
+<p>The noise is the easy part, just pass a noise texture (like <a href="http://www.filterforge.com/filters/4516.jpg">this</a>, be carefull choosing the texture, different effects can be achieved just changing it a bit) and animate its uv using the time parameter. The recoved texel is used to &#8220;disturb&#8221; the final image UV reading.</p>
+<p>The green effect is also simple, we recover the color, amplificate the luminance in parts where it is not big enough and them modulate the color using a &#8220;green like&#8221; filter.</p>
+<p>The shader code for all of this is:</p>
+<pre class="c-sharp">sampler TextureSampler;
+
+texture tex;
+sampler noiseTex = sampler_state
+{
+   Texture = ;
+   AddressU  = Wrap; AddressV = Wrap;
+};
+
+struct PS_INPUT
+{
+	float2 TexCoord : TEXCOORD0;
+};
+
+float elapsedTime;
+float luminanceThreshold = 0.1;
+float colorAmplification = 4;
+
+float4 UnderWater( PS_INPUT Input ) : COLOR0
+{ 
+
+	float2 uv;
+    uv.x = 0.4*sin(elapsedTime*50.0);
+    uv.y = 0.4*cos(elapsedTime*50.0);
+    float3 n = tex2D(noiseTex,
+                 (Input.TexCoord*3.5) + uv).rgb;
+    float3 c = tex2D(TextureSampler, Input.TexCoord + n.xy*0.005).rgb;	                       
+
+    float lum = dot(float3(0.30, 0.59, 0.11), c);
+    if (lum &lt; luminanceThreshold)
+      c *= colorAmplification; 
+
+    float3 visionColor = float3(0.1, 0.95, 0.2);
+	return  float4((c + (n*0.2)) * visionColor ,1);
+}
+
+technique NighVision
+{
+	pass P0
+	{
+		PixelShader = compile ps_2_0 NightVisionShader();
+	}
+}</pre>
+
+<!-- Facebook Like Button v1.9.6 BEGIN [http://blog.bottomlessinc.com] -->
+<iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fploobs.com.br%2Farquivos%2F1732&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;colorscheme=light" scrolling="no" frameborder="0" allowTransparency="true" style="border:none; overflow:hidden; width:450px; height: 30px; align: left; margin: 2px 0px 2px 0px"></iframe>
+<!-- Facebook Like Button END -->
+          </div>
+                              <p class="tags"><a href="http://ploobs.com.br/arquivos/tag/hlsl" rel="tag">hlsl</a>, <a href="http://ploobs.com.br/arquivos/tag/post-effect" rel="tag">post effect</a>, <a href="http://ploobs.com.br/arquivos/tag/shader" rel="tag">Shader</a>, <a href="http://ploobs.com.br/arquivos/tag/source-code" rel="tag">source code</a></p>
+          <div class="clear"></div>
+                    <p class="postmetadata alt">
+			<small>
+                This entry was posted on 1 de outubro de 2011, 10:00 am and is filed under <a href="http://ploobs.com.br/arquivos/category/geral" rel="category tag">All Posts</a>, <a href="http://ploobs.com.br/arquivos/category/computacao-grafica/shader-code-snippet" rel="category tag">Shader Code Snippet</a>. You can follow any responses to this entry through <a href="http://ploobs.com.br/arquivos/1732/feed" title="RSS 2.0">RSS 2.0</a>.
+                Você pode <a href="#respond">deixar uma resposta</a>, ou <a href="http://ploobs.com.br/arquivos/1732/trackback" rel="trackback">citar</a> de seu próprio site.                            </small>
+		  </p>
+	   </div>
+    </div>
+	
+
+<div id="post-extra-content">
+      <!-- comments and trackback tabs -->
+    <ul class="secondary-tabs">
+      <li><a href="#tab-1"><span><span>Comentários (19)</span></span></a></li>
+      <li><a href="#tab-2"><span><span>Citações (3)</span></span></a></li>      <li><a href="#tab-3"><span><span>Related Posts</span></span></a></li>    </ul>
+    <!-- /comments and trackback tabs -->
+    <!-- comments -->
+  <div id="tab-1">
+   <ol id="comments">
+     <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-4689042">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/3f05babd1521018a0c0ed4ee5f4ae755?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/3f05babd1521018a0c0ed4ee5f4ae755?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4689042">#1</a> by <a id="commentauthor-4689042" href="https://goo.gl/AEM9Oz">vales de descuento</a> on 7 de maio de 2017 - 4:50 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4689042">
+          <p>This is my first time go to see at here and i am truly pleassant to read everthing at alone place.</p>
+<p>vales de descuento<br />
+<a href="https://goo.gl/AEM9Oz" rel="nofollow">https://goo.gl/AEM9Oz</a></p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4689042', 'comment-4689042', 'commentbody-4689042', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-4689174">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/6f6206e97f95756214c5bb2824d62176?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/6f6206e97f95756214c5bb2824d62176?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4689174">#2</a> by <a id="commentauthor-4689174" href="https://wirisi.com/flats-casual-1609210011.html">Elisha Sojourner</a> on 7 de maio de 2017 - 5:03 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4689174">
+          <p>heels online shopping</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4689174', 'comment-4689174', 'commentbody-4689174', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-4689244">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/cedc62f3ecddff76533657dde3933fdc?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/cedc62f3ecddff76533657dde3933fdc?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4689244">#3</a> by <a id="commentauthor-4689244" href="http://Riadfeskettani.com/node/442033">Recommended Reading</a> on 7 de maio de 2017 - 5:10 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4689244">
+          <p>As the country of India with its large potential of<br />
+internet gaming market of over a billion people gets severe about poker, one state in that country has lastly gotten actual severe and became the first one to formally<br />
+award a license to a homegrown poker web site.<br />
+Largely Indians are enjoying at these poker rooms and because of the truth, that<br />
+Poker and Texas Maintain&#8217;em are comparatively new games in India, the competition is tender and<br />
+the video games are very juicy. Moreover this, I spend a<br />
+good amount of time attempting to further understand the<br />
+mathematics behind various conditions in poker,&#8221; says the star, who&#8217;s now gearing as much as tackle the World Series of Poker subsequent yr. Younger professionals are mentioned to be enthralled by the game since it provides the joy of earning real cash but also requires the use of intellect. Online gaming business is booming in India and it will be a multi billion dollar trade in India.Â In an effort to seize this market the online poker entrepreneurs should comply with all the relevant laws of India and seek the advice of some good techno legal firm earlier than launching their web sites.</p>
+<p>Within the event you beloved this informative article and also you need to obtain extra info as regards to online poker i implore you to go to our personal web site. If you wish to be taught and master on-line poker game then you&#8217;ll be able to choose to play free on-line poker and enjoy the sport in the very best manner. Enjoy our Poker tournaments.A verification link has been despatched to your e mail deal with. Team Thrill India already had its first tournament success when Haresh Kukreja took down the opening occasion on the current APT Manila pageant. Reach out to our coaches, get access to specialised poker studying assets and be taught the methods of the sport to become a champion poker participant. The State has by means of Sikkim On-line Gaming (Regulation) Rules, 2009, made video games like Roulette, Black Jack, Pontoon, Punto Banco, Bingo, On line casino Brag, Poker, Poker Dice, Baccarat, Chemin-de-for, Backgammon, Keno, and Tremendous Pan 9 authorized.</p>
+<p>Get the Cartamundi James Bond poker set and engage in a fun poker sport with Skyfall inspired poker chips and playing cards. The listing we have now prepared represents the best on-line poker in India on the Internet by reviewing and rating dozens of such sites. These companies add a center layer to disguise the character of transactions, enabling customers to get around the blocks by first depositing to an ewallet after which utilizing that ewallet to fund an online betting account in Rupees. Because of a ruling last month concerning rummy for actual money, operators of online poker websites have develop into extra assured with their companies and are starting to market extra aggressively. Stay coverage and reporting on newest video games and updated poker news and forum to ask all the things associated to poker is not solely producing more new gamers to do this game but additionally refining the expertise of present gamers who play poker on-line.</p>
+<p>This Indian Poker room is operated and owned by WYZ Games India Non-public Limited and claims to supply protected and safe payment gateways. For a starter in the event you&#8217;re new to the game, the web page you will need is the high stage introduction to poker page. Charles has been an avid poker player for various years, both stay and online. Right here is superb app Play Poker at Poker Square for learning and playing on-line poker legally in India. In any other case it wouldn&#8217;t be how I make my living.&#8221; Hustlers are all the time banging on about going<br />
+legit&#8221;, but to enthusiasts around the globe, poker isn&#8217;t a degenerate vice, not even a sport of craft and ability. Muskan, began playing poker online to take her thoughts off her mother&#8217;s premature loss of life.</p>
+<p>So first off welcome to PokerNews India and we hope for loads of good issues to happen with your presence in the area of interest however rising poker fraternity of this nation. For the avid poker player, there may be absolutely no larger thrill than battling via to the latter stages of a high prize poker tournament (and in case you&#8217;re a new player, any match!). Reputation is important in every part, particularly when you find yourself dealing with money. Slightly completely completely different from Texas Holdem, Omaha is most popular amongst poker games for the challenge it affords. These teams will probably be selected by 70+ qualifying rounds held throughout numerous cities over almost 3 months, as well as by way of online tournaments that will start early in 2017.</p>
+<p>Gamers must battle their technique to first bust the cash bubble and subsequently add to their earnings with an extra prize in the form of a 20k Big Recreation seat. He pulled me to the desk and started working via every hand that he was enjoying, as I was eagerly watching; I acquired slowly pulled into the magnetic impact of this sport where gamers had been making an attempt to out-do one another with poker and dialog skills. Now there are fairly nicely-recognized gaming web sites which even claim lakhs of online poker gamers. Whereas official licensing is out there for online poker rooms, the standards to obtain one is strict, and thus only some playing operators have obtained them. As these web sites have their locations of work in overseas nations just like the UK, they don&#8217;t seem to be ruled by Indian legal guidelines regarding on-line playing.</p>
+<p>Together with payments, we look for sites that offer a very good variety of deposit and withdraw options to make banking simpler. These 108 gamers for 12 groups would be selected through 70+ rounds which might happen over a period of 3 months beginning February subsequent 12 months. In main metros like Delhi and Mumbai, , which describes itself as India&#8217;s largest online poker web site and claims to have over 6 lakh registered customers, has begun an promoting marketing campaign on taxis. On-line poker is passing by the use of an attention-grabbing half in Unites States (U.S.). Nonetheless, it is nonetheless to be seen whether or not or not on-line poker might be banned or allowed in U.S. New Jersey has reported an excellent beginning for on-line playing throughout the state.</p>
+<p>A standard talking level in poker site evaluations is at all times the softness of the video games as a result of most players are looking out for simple to beat games. Gamers who qualify to the 12 groups will then play within the Mega Finals, where the perfect of India&#8217;s poker expertise will probably be invited to a display of skill and leisure Burman said that in the first 12 months, the ultimate can be aired on Fb and Youtube solely. As a result, it&#8217;s extremely tough to find out exactly what&#8217;s legal and what&#8217;s not in India. This makes it laborious to determine, for example, whether or not betting on a sport of cricket is illegal in the same way as betting on the roll of a cube is perhaps. It could possibly be argued that cricket betting is skill based mostly, and therefore not covered by the act, whereas betting on the roll of a cube is pure likelihood.</p>
+<p>The Public Gambling Act of 1867 passed 150 years in the past prohibits gambling in India. The current Indian gambling law dates again to 1867 A state fee is at the moment reviewing how it may be amended to bring it updated. Online Poker in India, PokerBaazi a enterprise of Baazi Networks Non-public Restricted is an internet portal aimed toward providing a user pleasant atmosphere of ability gaming. Lately Nagaland turned the first Indian State to go the Nagaland Prohibition of Playing and Promotion and Regulation of Online Games of Talent Invoice 2015.&#8221; We met up with Vaibhav Gaggar, Managing Partner at Gaggar and Associates to discuss the<br />
+same. Ask any Mumbaikar between the ages<br />
+of 25 and forty if he plays poker in India and you&#8217;ll be on the receiving end of a proud smile.</p>
+<p>The resolve dominated that wagers involving money are illegal and that though the video video games proposed to be provided may<br />
+require ability, banks and financial institutions would possibly refuse servicing websites that would offer such video games.<br />
+The Supreme Court judges in India are anticipated to concern a ruling on a case that began in Madras, India in 2012.<br />
+Law favors poker operators to function their poker sites throughout the legal frameworks.<br />
+Over 50,000 people play online with these homegrown&#8221; on-line poker startups and ninety five p.c of India&#8217;s expert players are<br />
+male. However, due to an excellent poker face, some<br />
+very observant reading of Riess&#8217;s play, some daring moves and most significantly, a well-timed<br />
+and consistent bluff, Farber received, and the way!</p>
+<p>It might be argued that working a gambling web site in India is deemed illegal below the terms of this act, given its wording, however<br />
+this is far from clear. Aditya, who has been enjoying on PokerStars since<br />
+2014, hopes that he will inspire more folks in India<br />
+to play and enjoy poker. For many, this mistress has develop into an obsession, even when players are down on their knees bleeding<br />
+chips. They try to provde the most secure and memorable experience whereas playing on-line Multi-Player Video games and Tournaments.<br />
+To continue, plenty of fee aggregators or processors, within the<br />
+framework of the RBI (Reserve Bank of India) are providing deposit and withdrawal facilities for playing on-line<br />
+rummy and online poker in India.</p>
+<p>True to its vision of harnessing expertise throughout India, the Poker Sports<br />
+activities League will offer gamers an opportunity to play and be taught from a number<br />
+of the finest gamers in India. Now I like to think about myself as a professional on the recreation and lots of have instructed<br />
+me to play at a poker championship. Launched in Oct 2013, the Amator<br />
+is the results of detailed legal study by Vipin Chaudhary, a passionate poker participant and lawyer by profession. Take a look at<br />
+our Poker Player of the Year race, in addition to years of information of poker participant outcomes and casino poker match pay-outs.<br />
+This can be very vital to analysis all the choices out there to you prior to deciding on a particular room to play real money<br />
+poker online.</p>
+<p>The video games supplied on to play with Actual Money are<br />
+Texas Maintain&#8217;em, Omaha, Seven Stud and these are video games<br />
+which definitely require ability and intelligence.<br />
+This was my alternative to be forward of the curve and be one of the first<br />
+people who took the sport severely, in India. The current potential<br />
+income of Indian online poker websites is round Rs 100 crore per 12 months and this is expected to double or treble in the subsequent couple<br />
+of years,&#8221; Gupta mentioned. The penalty for being caught playing on-line has been a high quality of Rs. 9,0000 per day since 2009. Thanks for the superb subjects on poker you talk about right here and likewise for this piece of good information. Nevertheless, the cell software builders in India is not going to be complying with Indian laws as on date.</p>
+<p>One thing which is not good about this poker set is playing playing cards will not be manufactured from plastic. Globally, economists, statisticians and chess grandmasters, together with Garry Kasparov and Steven Levitt, swear by the fact that poker involves great talent and is maybe even more difficult than chess. Indian authorities has banned the games like teen patti (flush) nonetheless, however, taking part in rummy will not be punishable. A gaggle, named the Public Interest Litigation, filed a case towards varied gaming organizations including the Mahalaxmi Cultural Affiliation, Madras Metropolis Membership (India) Pvt Ltd, Madras Darkhorse Farm &amp; Land Development Pvt Ltd, and Madras Sakthi Recreation Centre. The entire poker rooms run from inside India listed above will accept Rupee deposits.</p>
+<p>Every on-line Video Poker game uses customary poker hand hierarchy to decide on whether you&#8217;re a winner, with the harder to attain arms awarding bigger payouts. Saurabh, another regular on the circuit confesses that poker has taken over his life. Casino fans get entry to over 40 tables for gaming and betting in round 30,000 sq. ft of play space. Delta Corp is being suggested by specialist law firm AZB &amp; Partners while the authorized counsel for Gaussian Networks is Khaitan &amp; Co. and Gaggar &amp; Associates. Ever since the court docket determination, there was a sudden proliferation of Indian poker websites. PSL will see 12 groups, playing with 9 gamers each, combating for the prize cash of Rs 3.36 crore. The poker site organizes GAPL 4 occasions a 12 months in affiliation with different partner like adda52.</p>
+<p>It&#8217;s a patch start, however Karnataka, West Bengal and Nagaland are the one states to have given a clear verdict, classifying poker as a ability-based mostly recreation. A huge neighborhood of Indian poker players throng these Indian poker sites now with Adda52 attracting the maximum Indian poker site visitors. Simply going to a on line casino in Sikkim and taking part in poker you possibly can see this isn&#8217;t true, and we like to gamble! Given the stage the player as well as his favourite sport is at presently, Clawin thinks it&#8217;s only pure that he change into an architect of the trajectory the game will take, in India. So these promotions can range from particular tournaments, prize giveaways, and draws, through to poker points races, enhanced VIP schemes, and plenty of others.</p>
+<p>As and when this question will arise, we are going to take care of that, but in the present day there is no subject to be decided,&#8221; noticed a bench<br />
+because it disposes a clutch of petitions by online rummy web sites.<br />
+With an ever-rising variety of Indian gamers taking on on-line poker, sites have been clamoring to attract customers from the nation with a spread of extremely tempting offers.<br />
+As such this doesn&#8217;t, by itself, mean that utilizing a gambling<br />
+site from inside India is authorized. They&#8217;re safe and<br />
+trusted, and offer great poker gaming with a variety of bonuses, tournaments,<br />
+and completely different poker sport types. Now the ball is<br />
+in Indian authorities&#8217;s court docket docket and it has to offer you guidelines and laws regarding on-line recreation and online<br />
+playing actions in India.</p>
+<p>Should you install full Shahi India poker Android<br />
+app, you will play for hours and just won&#8217;t be<br />
+capable of tear yourself away from your gadget. One main event was the<br />
+Asian Poker Basic which took place on certainly one of India&#8217;s on line<br />
+casino ships (the Maharajah Casino). The amazing poker set comes<br />
+with 2 decks of enjoying playing cards, 500 pcs poker chips, aluminum<br />
+poker chip case, 1 dealer button, keys, and 5 dices.<br />
+Prime members now get pleasure from unlimited video streaming,<br />
+FREE One-Day and Two-Day Delivery on eligible gadgets, 30-minute early entry to offers and extra.<br />
+In its first season, the Poker Sports League will include 12 teams,<br />
+seven of which have already been sold and the remaining five shall be made obtainable for sale shortly.</p>
+<p>You can choose to play using downloaded or flash variations<br />
+of our software, and might opt for both actual money recreation for real cash payouts<br />
+or Instantaneous Play video games using digital chips. All of us are former<br />
+Poker gamers who are avid followers of the sport, strives to offer you the perfect experience.<br />
+New players and enthusiastic players are additionally studying to play<br />
+on-line poker game to allow them to play on-line for actual<br />
+cash. Our games are designed to supply hours of leisure and<br />
+provide the perfect worth for cash with their reliability,<br />
+security measures and the quality of graphics and sport play.<br />
+Therefore, now we have designed our web site to record every little thing on the primary<br />
+page where you may select the poker sport you wish to play.</p>
+<p>The very subsequent day I made a decision to be<br />
+part of the motion and check out my hand at a live cash game.</p>
+<p>Rummy has already been pronounced to be a Recreation of Skill&#8221; by Indian Supreme Courtroom on quite a few counts and there could also be nothing new about this Settled Legal Place&#8221; within the<br />
+present litigation. Any authoritative pronouncement kind the Supreme Court docket concerning legality or illegality of online poker, on-line rummy,<br />
+online card games, and so forth is dominated out<br />
+for one more decade within the current circumstances and<br />
+till that point these on-line video games suppliers could be in a legally susceptible place.<br />
+We think about that poker is comparatively new in India and hence supply<br />
+our gamers to get accustomed to the positioning and poker recreation.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4689244', 'comment-4689244', 'commentbody-4689244', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-4689318">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/9840e81754596fc4c29dbc03c11ad983?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/9840e81754596fc4c29dbc03c11ad983?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4689318">#4</a> by <a id="commentauthor-4689318" href="http://news.cartierlovebraceletreplica.xyz/cartierlovebraceletreplicaxyz/231.asp">http://news.cartierlovebraceletreplica.xyz/cartierlovebraceletreplicaxyz/231.asp</a> on 7 de maio de 2017 - 5:17 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4689318">
+          <p>This particular device is with that great pricing I by no means considered the particular high quality would be so excellent. It&#8217;s awesome. It mom will prefer it in Xmas early morning whenever she opens gift therefore appears as though I spent more, still prices was really awesome!!</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4689318', 'comment-4689318', 'commentbody-4689318', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-4689492">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/895f54437ab413e817c4122bfa0face9?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/895f54437ab413e817c4122bfa0face9?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4689492">#5</a> by <a id="commentauthor-4689492" href="http://www.keygoodjp.com/acrobat-x-11.html">coreajr</a> on 7 de maio de 2017 - 5:33 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4689492">
+          <p>世界人权宣言《世界人权宣言》是人权史上具有里程碑意义的文件。 既存のサ゗トコレクション内のサブサ゗トを作成します。 [url=http://www.keygoodjp.com/windows-8-1-enterprise-x32.html]windows8.1 ストア アプリ[/url]<br />
+作業中、定期的に休憩時間を入れるとストレスが減って、作業効率も増すという研究結果があります。 ＡＤＳＬをわざと遅くして、嫌がらせしてるのかと疑ったり・・光に替えろって言うサインか？疑ったり・・復元をやったのが原因かと考えたりもして。<br />
+[url=http://www.keygoodjp.com/microsoft-office-professional-2013-plus64.html]office2013 personal 価格[/url] target=&quot;_blank にほんブログ村 自作PC。 また、ご紹介の中味は、その時々により、非常に簡単なことで、短い内容でしかないこともありますので、ご容赦ください。<br />
+[url=http://www.keygoodjp.com/office2013-pro-32.html]office 2013 価格[/url]<br />
+１Ｆで使用している家族共用のパソコン…もともとWinVistaをWin7にした物なので、スペックそれなり！毎月定例のアップデートがやってきましたが、今回は少し遅めでしたね。 まぁ金額が低いから騙されてみてもいいんだけどなんかね。 [url=http://www.keygoodjp.com/windows7-06.html]windows 7 アップグレード[/url]<br />
+rop@rop:~$ sudo apt install nasm[sudo] password for rop:以下略rop@rop:~$構築完了テキストエディタは好きなものを使ってください。 　　　駅前から見える…白鷺城…ホンマ真っ白け！　スマホ望遠はピン甘ボケ。<br />
+[url=http://www.keygoodjp.com/office-home-and-business-2016.html]office2016 メディア 購入[/url] 　ドゥテルテ大統領は、米兵の撤退時期および撤退人数については　具体的に言及しなかったものの、フィリピンが欧米と協力体制を　敷いていることがイスラム過激派が活動し続ける要因となっている　と主張。 　記：2016/03/27・翻訳センター(2483)JQスタンダード 翻訳・通訳サービス翻訳業界最大手。<br />
+[url=http://www.keygoodjp.com/antivirus.html]ノートン 再インストール[/url]</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4689492', 'comment-4689492', 'commentbody-4689492', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-4689498">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/ff76c6f2971c4fb895a8485d1ed9bf70?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/ff76c6f2971c4fb895a8485d1ed9bf70?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4689498">#6</a> by <a id="commentauthor-4689498" href="http://news.vancleefreplica.xyz/vancleefreplicaxyz/256.asp">http://news.vancleefreplica.xyz/vancleefreplicaxyz/256.asp</a> on 7 de maio de 2017 - 5:34 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4689498">
+          <p>I&#8217;ve bought that brand name out of bracelet a few days.  Every a person is super adorable, made very well, cannot tarnish to significant depending on which kind of a person you purchase additionally whom people offer that it towards.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4689498', 'comment-4689498', 'commentbody-4689498', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-4689801">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/8b3781d82c80786cb17e07d7e8c76984?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/8b3781d82c80786cb17e07d7e8c76984?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4689801">#7</a> by <a id="commentauthor-4689801" href="http://breaktheloop.net/KY/Elizabethtown/cheap-non-owners-insurance-in/">cheap non owners insurance in Elizabethtown KY</a> on 7 de maio de 2017 - 6:02 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4689801">
+          <p>Hey. Same careful blog!! Guy .. Excellent .. Superb .. I&#8217;ll bookmark your website and assume the feeds also&#8230;I am satisfied to find frequent beneficial information here contained by the post. Thank you for sharing.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4689801', 'comment-4689801', 'commentbody-4689801', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-4690018">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/d0ae47a1f87a07fea94817c9261ba166?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/d0ae47a1f87a07fea94817c9261ba166?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4690018">#8</a> by <a id="commentauthor-4690018" href="http://www.cheappatagonia.online">cheap patagonia</a> on 7 de maio de 2017 - 6:23 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4690018">
+          <p>Very good suggestions, you just gained a brand new reader. What would you suggest in regards to your post that you made a few days ago?<br />
+ <a href="http://www.cheappatagonia.online" rel="nofollow">cheap patagonia</a></p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4690018', 'comment-4690018', 'commentbody-4690018', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-4690057">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/f85f2fe2d20785c5e36c5ff81f929c48?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/f85f2fe2d20785c5e36c5ff81f929c48?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4690057">#9</a> by <a id="commentauthor-4690057" href="http://www.cabletvinternetserviceproviders.com/cabletv-spectrum-nebraska/cabletv-spectrum-newcastle-ne.html">charter spectrum internet</a> on 7 de maio de 2017 - 6:26 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4690057">
+          <p>I constantly emailed this webpage post page to all my associates, because if like to read it then my contacts will too.|</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4690057', 'comment-4690057', 'commentbody-4690057', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-4690105">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/82045ea53ce64f073131a24dbb619b1b?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/82045ea53ce64f073131a24dbb619b1b?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4690105">#10</a> by <a id="commentauthor-4690105" href="http://blueturtlebeachhouse.com/AL/Auburn/cheap-auto-insurance-quotes/">cheap auto insurance quotes Auburn AL</a> on 7 de maio de 2017 - 6:31 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4690105">
+          <p>Hi, I do believe this is an excellent website. I stumbledupon it   I&#8217;m going to revisit once again since i have saved as a favorite it. Money and freedom is the best way to change, may you be rich and continue to guide other people.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4690105', 'comment-4690105', 'commentbody-4690105', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-4690412">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://2.gravatar.com/avatar/e3a2253d85b18fd670346a32554ae88b?s=64&#038;d=mm&#038;r=g' srcset='http://2.gravatar.com/avatar/e3a2253d85b18fd670346a32554ae88b?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4690412">#11</a> by <a id="commentauthor-4690412" href="http://www.minibus-shuttle.com/userfiles/html/434.html">http://www.minibus-shuttle.com/userfiles/html/434.html</a> on 7 de maio de 2017 - 7:53 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4690412">
+          <p>This particular headset is since stunning since in the image. Things appeared promptly. I&#8217;d encourage getting a towel above each layer as you click it outside w / the best steam iron. It doesn&#8217;t vapor outside with merely a steamer. All iron had been appropriate. It is very fine, so if you don&#8217;t trust your self with all the towel furthermore steam iron, and then accept that it to a pro. Perfect seem.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4690412', 'comment-4690412', 'commentbody-4690412', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-4690599">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/1d0f8f730d04af408a5390c81f5bb100?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/1d0f8f730d04af408a5390c81f5bb100?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4690599">#12</a> by <a id="commentauthor-4690599" href="http://ncr-uk.com/CA/Newport-Beach/cheapest-auto-insurance/">cheapest auto insurance Newport Beach CA</a> on 7 de maio de 2017 - 8:12 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4690599">
+          <p>GlÃ¼ckwunsch CJHast du eigentlich schon einen festen Vertrag bei SPON?Ich finds klasse das deine auÃŸerordentlich gute Arbeit endlich die Anerkennung findet die du schon lange verdient hast.Mach weiter so.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4690599', 'comment-4690599', 'commentbody-4690599', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-4690717">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/05f27105f5969e900681ee7ba1c9b39b?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/05f27105f5969e900681ee7ba1c9b39b?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4690717">#13</a> by <a id="commentauthor-4690717" href="http://ncr-uk.com/WI/Hudson/cheap-full-coverage-auto-insurance/">cheap full coverage auto insurance Hudson WI</a> on 7 de maio de 2017 - 8:25 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4690717">
+          <p>Please get your facts straight.  Yes, President Obama, 2 days after taking office, did sign an Executive Order which CONGRESS overturned.  It was first the Democratic controlled Congress&#8230;and then the do-nothing Republican controlled Congress did the same thing.  Why don&#8217;t you point out that it is only CONGRESS that did this&#8230;and only CONGRESS that can shut it down.  Shame on you.VA:F [1.9.18_1163](from 2 votes)</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4690717', 'comment-4690717', 'commentbody-4690717', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-4691326">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/fb07fa80d32a188e9584ce8bb98bf84d?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/fb07fa80d32a188e9584ce8bb98bf84d?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4691326">#14</a> by <a id="commentauthor-4691326" href="http://news.hermesreplica.win/hermesreplicawin/475.asp">http://news.hermesreplica.win/hermesreplicawin/475.asp</a> on 7 de maio de 2017 - 9:26 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4691326">
+          <p>The headset is while stunning as in the image. They came immediately. I would advise utilizing a towel through every level as you click this out w / letter vapor iron. It doesn&#8217;t steam outside along with only a steamer. The actual iron ended up being important. It is very delicate, so if you do not trust personally with the towel as well as vapor iron, subsequently just take information technology up to a expert. Awesome audio.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4691326', 'comment-4691326', 'commentbody-4691326', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-4691333">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/ab2a5fa3e8010fed869c8c290bee53e2?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/ab2a5fa3e8010fed869c8c290bee53e2?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4691333">#15</a> by <a id="commentauthor-4691333" href="http://news.louboutinreplica.pw/louboutinreplicapw/466.asp">http://news.louboutinreplica.pw/louboutinreplicapw/466.asp</a> on 7 de maio de 2017 - 9:26 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4691333">
+          <p>This headset is since stunning just as within the photo. Information technology arrived immediately. I&#8217;d suggest choosing a towel over every coating while you hit it away w / a steam iron. It does not vapor away along with only a steamer. Your iron was appropriate. It is very delicate, when you don&#8217;t trust yourself with the towel plus vapor iron, subsequently take they up to a professional. Pretty noise.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4691333', 'comment-4691333', 'commentbody-4691333', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-4691337">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/9299bbb300aeeb66a74859c7153683a1?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/9299bbb300aeeb66a74859c7153683a1?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4691337">#16</a> by <a id="commentauthor-4691337" href="http://news.hermesreplica.pw/hermesreplicapw/171.asp">http://news.hermesreplica.pw/hermesreplicapw/171.asp</a> on 7 de maio de 2017 - 9:27 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4691337">
+          <p>Your headset ended up being like beautiful because in image. Things came promptly. I would suggest using a towel during every one level as you hit things off w / your vapor iron. It doesn&#8217;t steam away alongside only a steamer. On iron ended up being necessary. It is very delicate, when you never trust personally because of the towel as well as steam iron, and then choose that it up to a expert. Awesome audio.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4691337', 'comment-4691337', 'commentbody-4691337', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-4691340">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/10ef0a3b91b7157a1e7efeb1e8747683?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/10ef0a3b91b7157a1e7efeb1e8747683?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4691340">#17</a> by <a id="commentauthor-4691340" href="http://news.promgirldresses.xyz/promgirldressesxyz/3.asp">http://news.promgirldresses.xyz/promgirldressesxyz/3.asp</a> on 7 de maio de 2017 - 9:27 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4691340">
+          <p>Your headset is just as beautiful while in the visualize. This arrived immediately. I would suggest utilizing a towel done each layer as you push it outside w / the steam iron. It does not vapor off through only a steamer. That iron is important. It is very delicate, so if you don&#8217;t trust yourself aided by the towel and vapor iron, next take that it up to a certified. Striking appear.</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4691340', 'comment-4691340', 'commentbody-4691340', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment odd alt thread-odd thread-alt depth-1 with-avatars" id="comment-4691728">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://0.gravatar.com/avatar/3547b57fd8cb090524615f07ae879a9a?s=64&#038;d=mm&#038;r=g' srcset='http://0.gravatar.com/avatar/3547b57fd8cb090524615f07ae879a9a?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4691728">#18</a> by <a id="commentauthor-4691728" href="http://mrbitsandbytes.com/chat/html/461.html">http://mrbitsandbytes.com/chat/html/461.html</a> on 7 de maio de 2017 - 10:07 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4691728">
+          <p>Your system ended up being in such a great rates I did not attention the grade is so exceptional. It&#8217;s breathtaking. This mom will appreciate this upon Christmas time morning whenever she opens present therefore appears like I spent alot more, then again rates ended up being simply very good!!</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4691728', 'comment-4691728', 'commentbody-4691728', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+ <!-- comment entry -->
+	<li class="comment even thread-even depth-1 with-avatars" id="comment-4691802">
+      <div class="wrap tiptrigger">
+              <div class="avatar">
+         <a class="gravatar"><img alt='' src='http://1.gravatar.com/avatar/4adf8cd0dec7b3882bbea248e39aa761?s=64&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/4adf8cd0dec7b3882bbea248e39aa761?s=128&amp;d=mm&amp;r=g 2x' class='avatar avatar-64 photo' height='64' width='64' /></a>
+       </div>
+              <div class="details regularcomment">
+        <p class="head">
+         <span class="info">
+          <a href="#comment-4691802">#19</a> by <a id="commentauthor-4691802" href="http://www.cabletvinternetserviceproviders.com/cabletv-spectrum-illinois/cabletv-spectrum-little-york-il.html">spectrum internet</a> on 7 de maio de 2017 - 10:15 pm         </span>
+        </p>
+        <!-- comment contents -->
+        <div class="text">
+		 		 <div id="commentbody-4691802">
+          <p>I visited several web sites but the audio feature for audio songs existing at this site is truly excellent.|</p>
+         </div>
+       </div>
+       <!-- /comment contents -->
+       </div>
+   	   <div class="act tip">
+                 	     <span class="button reply"></span>
+                  <span class="button quote"><a title="Citar" href="javascript:void(0);" onclick="MGJS_CMT.quote('commentauthor-4691802', 'comment-4691802', 'commentbody-4691802', 'comment');"><span><span>Citar</span></span></a></span>
+                	   </div>
+
+      </div>
+</li><!-- #comment-## -->
+    </ol>
+           <div class="commentnavi">
+  	    <div class="commentpager">
+  	    	<a class="prev page-numbers" href="http://ploobs.com.br/arquivos/1732/comment-page-657#comments">&laquo; Anterior</a>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/1732/comment-page-1#comments'>1</a>
+<span class="page-numbers dots">&hellip;</span>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/1732/comment-page-656#comments'>656</a>
+<a class='page-numbers' href='http://ploobs.com.br/arquivos/1732/comment-page-657#comments'>657</a>
+<span class='page-numbers current'>658</span>  	    </div>
+       </div>
+          
+      <div id="respond">
+      <form action="http://ploobs.com.br/wp-comments-post.php" method="post" id="commentform">
+        <div class="cancel-comment-reply"><a rel="nofollow" id="cancel-comment-reply-link" href="/arquivos/1732#respond" style="display:none;">Cancelar resposta</a></div>          	                <div id="author_info">
+            <div class="row">
+              <input type="text" name="author" id="author" class="textfield" value="" size="24" tabindex="1" />
+              <label for="author" class="small">Nome (necessário)</label>
+            </div>
+            <div class="row">
+              <input type="text" name="email" id="email" class="textfield" value="" size="24" tabindex="2" />
+              <label for="email" class="small">E-Mail (necessário)</label> <em>(não será publicado)</em>
+            </div>
+            <div class="row">
+              <input type="text" name="url" id="url" class="textfield" value="" size="24" tabindex="3" />
+              <label for="url" class="small">Website</label>
+            </div>
+  		  </div>
+                  
+        <!-- comment input -->
+        <div class="row">
+        	<textarea name="comment" id="comment" tabindex="4" rows="8" cols="50"></textarea>
+        	        	<input type='hidden' name='comment_post_ID' value='1732' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+
+                 <br />
+        </div>
+        <!-- /comment input -->
+
+        <!-- comment submit and rss -->
+        <div id="submitbox" class="left">
+         <span class="button submit"><a title="Mandar Comentário" href="javascript:jQuery('#commentform').submit();"><span><span>Mandar Comentário</span></span></a></span>
+         <input type="hidden" name="formInput" />
+        </div>
+        <div class="clear"></div>
+      </form>
+    </div>
+          </div>
+  <!-- /comments -->
+
+  <!-- trackbacks -->
+    <div id="tab-2">
+    <ol id="trackbacks">
+      <li id="comment-4689429"><a href='http://connect.lulu.com/t5/user/viewprofilepage/user-id/2255038' rel='external nofollow' class='url'>gravatar</a></li><!-- #comment-## -->
+ <li id="comment-4690630"><a href='http://margaretclark15.wallinside.com/' rel='external nofollow' class='url'>oxycodone</a></li><!-- #comment-## -->
+ <li id="comment-4691670"><a href='http://caesarscasinoindianaati.blogspot.de/2017/03/best-modern-wedding-music-ideas.html' rel='external nofollow' class='url'>Best wedding music ceremony ideas</a></li><!-- #comment-## -->
+    </ol>
+  </div>
+    <!-- /trackbacks -->
+
+  <!-- related posts -->
+         <div id="tab-3">
+        <ol id="relatedposts">
+           		 <li><a href="http://ploobs.com.br/arquivos/2364" rel="bookmark" title="Permanent Link to BitField in Shaders (SM 3 and before)">BitField in Shaders (SM 3 and before)</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1868" rel="bookmark" title="Permanent Link to Code Snippet : Fog Shader">Code Snippet : Fog Shader</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1673" rel="bookmark" title="Permanent Link to Code Snipped: Contrast Shader">Code Snipped: Contrast Shader</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1661" rel="bookmark" title="Permanent Link to Code Snippet: Radial Blur shader">Code Snippet: Radial Blur shader</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1499" rel="bookmark" title="Permanent Link to Code Snippet: HSV to RGB and Vice versa in Shader">Code Snippet: HSV to RGB and Vice versa in Shader</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1470" rel="bookmark" title="Permanent Link to Code Snippet: Classic Effects (Bump, Specular and Paralax) in Shader [HLSL]">Code Snippet: Classic Effects (Bump, Specular and Paralax) in Shader [HLSL]</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1223" rel="bookmark" title="Permanent Link to Code Snippet: Clipping Planes in Shader [HLSL]">Code Snippet: Clipping Planes in Shader [HLSL]</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1025" rel="bookmark" title="Permanent Link to Billboards e Transparência (XNA 4.0)">Billboards e Transparência (XNA 4.0)</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1207" rel="bookmark" title="Permanent Link to XNA 4.0 Gamma Corrected Pipeline">XNA 4.0 Gamma Corrected Pipeline</a></li>
+           		 <li><a href="http://ploobs.com.br/arquivos/1243" rel="bookmark" title="Permanent Link to [PloobsEngine] Tutorial 7 &#8211; Ploobs Materials">[PloobsEngine] Tutorial 7 &#8211; Ploobs Materials</a></li>
+                 </ol>
+       </div>
+        <!-- /related posts -->
+
+</div>
+
+
+
+   </div>
+    <!-- mid content -->
+   </div>
+   <!-- /mid -->
+
+   
+<!-- sidebar -->
+<div id="sidebar">
+ <!-- sidebar 1st container -->
+ <div id="sidebar-wrap1">
+  <!-- sidebar 2nd container -->
+  <div id="sidebar-wrap2">
+     <ul id="sidelist">
+     	
+        <li><div id="fusion-search" class="widget fusion_SearchWidget">         <!-- wp search form -->
+          <div id="searchtab">
+            <div class="inside">
+              <form method="get" id="searchform" action="http://ploobs.com.br/">
+              <fieldset>
+                <input type="text" name="s" id="searchbox" class="searchfield" value="Procurar" onfocus="if(this.value == 'Procurar') {this.value = '';}" onblur="if (this.value == '') {this.value = 'Procurar';}" />
+                 <input type="submit" value="Go" class="searchbutton" />
+              </fieldset>
+              </form>
+            </div>
+          </div>
+         <!-- /wp search form -->
+  </div></li><li><div id="fusion-categories" class="widget fusion_CategoryWidget"> <!-- sidebar menu (categories) -->
+ <ul class="nav">
+   	<li  class="cat-item cat-item-1"><a href="http://ploobs.com.br/arquivos/category/geral" title="Todos os Posts do site"><span>All Posts <em>(107)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/geral/feed"></a>
+</li>
+	<li  class="cat-item cat-item-71"><a href="http://ploobs.com.br/arquivos/category/android" ><span>Android <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/android/feed"></a>
+</li>
+	<li  class="cat-item cat-item-168"><a href="http://ploobs.com.br/arquivos/category/artemis-2" ><span>Artemis <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/artemis-2/feed"></a>
+</li>
+	<li  class="cat-item cat-item-35"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica" ><span>Computacao Grafica <em>(43)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/feed"></a>
+<ul class='children'>
+	<li  class="cat-item cat-item-104"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/artigos-introdutorios" title="Artigos introdutorios a computacao grafica"><span>Artigos Introdutorios <em>(8)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/artigos-introdutorios/feed"></a>
+</li>
+	<li  class="cat-item cat-item-105"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/exemplos-source-code" title="Full Source Code and Explanation Samples"><span>Full Samples <em>(7)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/exemplos-source-code/feed"></a>
+</li>
+	<li  class="cat-item cat-item-89"><a href="http://ploobs.com.br/arquivos/category/computacao-grafica/shader-code-snippet" ><span>Shader Code Snippet <em>(12)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/computacao-grafica/shader-code-snippet/feed"></a>
+</li>
+</ul>
+</li>
+	<li  class="cat-item cat-item-133"><a href="http://ploobs.com.br/arquivos/category/developers-diary" ><span>Developers Diary <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/developers-diary/feed"></a>
+</li>
+	<li  class="cat-item cat-item-170"><a href="http://ploobs.com.br/arquivos/category/directx-11" ><span>DirectX 11 <em>(3)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/directx-11/feed"></a>
+</li>
+	<li  class="cat-item cat-item-115"><a href="http://ploobs.com.br/arquivos/category/divulgacao" ><span>Divulgação <em>(2)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/divulgacao/feed"></a>
+</li>
+	<li  class="cat-item cat-item-26"><a href="http://ploobs.com.br/arquivos/category/ia" ><span>IA <em>(4)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ia/feed"></a>
+</li>
+	<li  class="cat-item cat-item-97"><a href="http://ploobs.com.br/arquivos/category/maxscript" ><span>MaxScript <em>(1)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/maxscript/feed"></a>
+</li>
+	<li  class="cat-item cat-item-21"><a href="http://ploobs.com.br/arquivos/category/ploobsengine" ><span>PloobsEngine <em>(27)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/feed"></a>
+<ul class='children'>
+	<li  class="cat-item cat-item-103"><a href="http://ploobs.com.br/arquivos/category/ploobsengine/releases" title="PloobsEngine Releases"><span>Releases <em>(4)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/releases/feed"></a>
+</li>
+	<li  class="cat-item cat-item-102"><a href="http://ploobs.com.br/arquivos/category/ploobsengine/tutoriais" title="Tutorais da PloobsEngine"><span>Tutorials <em>(15)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/ploobsengine/tutoriais/feed"></a>
+</li>
+</ul>
+</li>
+	<li  class="cat-item cat-item-16"><a href="http://ploobs.com.br/arquivos/category/portfolio" ><span>Portfolio <em>(19)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/portfolio/feed"></a>
+</li>
+	<li  class="cat-item cat-item-9"><a href="http://ploobs.com.br/arquivos/category/xna" ><span>XNA <em>(36)</em></span></a><a class="rss tip" href="http://ploobs.com.br/arquivos/category/xna/feed"></a>
+</li>
+     </ul>
+  <!-- /sidebar menu -->
+ </div></li><li><div id="text-4" class="widget widget_text">			<div class="textwidget"><div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div class="fb-like-box" data-href="http://www.facebook.com/pages/Ploobs-Games/101527043290136" data-width="250" data-show-faces="true" data-stream="false" data-header="true"></div></div>
+		</div></li>		<li><div id="recent-posts-3" class="widget widget_recent_entries">		<h2 class="title">Topicos Recentes</h2>		<ul>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2419">Free CI with GitHub, C# and Travis</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2396">C# Artemis Entity System Tutorial</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2378">Implementing a Render Queue for Games</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2364">BitField in Shaders (SM 3 and before)</a>
+						</li>
+					<li>
+				<a href="http://ploobs.com.br/arquivos/2351">Artemis Entity System for Games now on Nuget</a>
+						</li>
+				</ul>
+		</div></li>		     </ul>
+  </div>
+  <!-- /sidebar 2nd container -->
+ </div>
+ <!-- /sidebar 1st container -->
+</div>
+<!-- /sidebar -->
+
+
+
+  </div>
+  <!-- /side wrap -->
+ </div>
+ <!-- /mid column wrap -->
+</div>
+<!-- /main wrapper -->
+
+<!-- clear main & sidebar sections -->
+<div class="clearcontent"></div>
+<!-- /clear main & sidebar sections -->
+
+ 
+<!-- footer -->
+ <div id="footer">
+
+   
+   <!-- please do not remove this. respect the authors :) -->
+   <p>
+    Fusion theme by <a href="http://digitalnature.ro/projects/fusion">digitalnature</a> | powered by <a href="http://wordpress.org/">WordPress</a>    <br />
+   <a class="rss" href="http://ploobs.com.br/feed">Posts (RSS)</a> e <a href="http://ploobs.com.br/comments/feed">Comentários (RSS)</a> <a href="javascript:void(0);" id="toplink">^</a>
+   <!-- 44 queries. 0,858 seconds. -->
+   </p>
+ </div>
+ <!-- /footer -->
+   <div id="layoutcontrol">
+   <a href="javascript:void(0);" class="setFont" title="Aumentar/Diminuir tamanho do texto"><span>SetTextSize</span></a>
+   <a href="javascript:void(0);" class="setLiquid" title="Muda entre largura total e largura fixa"><span>SetPageWidth</span></a>
+ </div>
+ </div>
+<!-- /page -->
+
+</div>
+</div>
+<!-- /page wrappers -->
+
+
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/comment-reply.min.js?ver=4.4.9'></script>
+<script type='text/javascript' src='http://ploobs.com.br/wp-includes/js/wp-embed.min.js?ver=4.4.9'></script>
+</body>
+</html>
